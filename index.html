@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fortnite OG Drop Guide</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section class="hero panel">
+      <button
+        id="easter-egg-trigger"
+        class="easter-egg-trigger"
+        type="button"
+        aria-label="Hidden easter egg trigger"
+      ></button>
+      <div class="hero-copy">
+        <p class="eyebrow">Fortnite OG Companion</p>
+        <h1>Find the best drop spot for every OG season.</h1>
+        <p class="hero-text">
+          Compare safer openers, high-upside hot drops, and rotation-friendly backup plans without leaving your browser.
+        </p>
+        <div class="hero-intel-strip">
+          <article class="intel-chip">
+            <span class="intel-label">Map Reads</span>
+            <strong>POIs, landmarks, and routes</strong>
+          </article>
+          <article class="intel-chip">
+            <span class="intel-label">Movement</span>
+            <strong>Rifts, planes, roads, and edge rotates</strong>
+          </article>
+        </div>
+      </div>
+
+      <div class="hero-media">
+        <img class="hero-art" src="./assets/hero-drop-map.svg" alt="Stylized tactical map illustration for Fortnite OG drop planning">
+        <div class="hero-stats">
+          <article class="stat-chip">
+            <span class="stat-label">Seasons</span>
+            <strong id="season-count">5</strong>
+          </article>
+          <article class="stat-chip">
+            <span class="stat-label">Curated spots</span>
+            <strong id="spot-count">10</strong>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="season-layout">
+      <aside class="season-panel panel">
+        <div class="section-heading">
+          <h2>Season Radar</h2>
+          <p>Switch seasons to see the strongest landing options.</p>
+        </div>
+        <div id="season-list" class="season-list" aria-label="Season selection"></div>
+      </aside>
+
+      <section class="content-column">
+        <section id="season-overview" class="overview panel" aria-live="polite"></section>
+
+        <section class="panel">
+          <div class="section-heading">
+            <h2>Best Spots</h2>
+            <p>Sorted for low conflict, clean mobility, and strong placement routes.</p>
+          </div>
+          <div id="spot-list" class="spot-list"></div>
+        </section>
+      </section>
+
+      <aside class="detail-panel panel">
+        <div class="section-heading">
+          <h2>Landing Plan</h2>
+          <p>Tap a spot to drill into the opening route.</p>
+        </div>
+        <div id="spot-detail" class="spot-detail" aria-live="polite"></div>
+      </aside>
+    </section>
+  </main>
+
+  <div id="easter-egg-toast" class="easter-egg-toast" aria-live="polite" aria-hidden="true"></div>
+
+  <script src="./src/main.js"></script>
+</body>
+</html>

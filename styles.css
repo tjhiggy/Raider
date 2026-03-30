@@ -1,0 +1,951 @@
+:root {
+  color-scheme: dark;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  --display-font: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  --bg-top: #1b3fae;
+  --bg-mid: #16318c;
+  --bg-bottom: #0e1838;
+  --panel: rgba(8, 17, 44, 0.84);
+  --panel-strong: rgba(10, 23, 58, 0.96);
+  --panel-border: rgba(125, 212, 255, 0.34);
+  --text: #ffffff;
+  --muted: rgba(235, 245, 255, 0.8);
+  --soft: rgba(204, 227, 255, 0.66);
+  --shadow: rgba(3, 8, 22, 0.42);
+  --accent: #f7d047;
+  --accent-strong: #ffb100;
+  --sky: #74d7ff;
+  --cyan: #1ec8ff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 12% 10%, rgba(116, 215, 255, 0.22), transparent 24%),
+    radial-gradient(circle at 82% 16%, rgba(255, 208, 71, 0.16), transparent 22%),
+    linear-gradient(180deg, #2a68f4 0%, var(--bg-top) 26%, var(--bg-mid) 58%, var(--bg-bottom) 100%);
+  color: var(--text);
+  letter-spacing: 0.01em;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+.app-shell {
+  width: min(1400px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 28px 0 40px;
+}
+
+.panel {
+  background: var(--panel);
+  border: 2px solid var(--panel-border);
+  border-radius: 18px;
+  box-shadow: 0 24px 80px var(--shadow);
+  backdrop-filter: blur(12px);
+}
+
+.hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 28px;
+  margin-bottom: 24px;
+  background:
+    radial-gradient(circle at 84% 22%, rgba(255, 255, 255, 0.18), transparent 18%),
+    linear-gradient(125deg, rgba(11, 90, 174, 0.98), rgba(24, 61, 181, 0.95) 52%, rgba(16, 29, 72, 0.96));
+  position: relative;
+  overflow: hidden;
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.easter-egg-trigger {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 18px;
+  background: transparent;
+  color: transparent;
+  font-size: 0;
+  cursor: pointer;
+  z-index: 2;
+  opacity: 0.02;
+}
+
+.easter-egg-trigger:focus-visible {
+  opacity: 0.16;
+  outline: 2px solid rgba(255, 255, 255, 0.7);
+  outline-offset: 2px;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: auto -40px -50px auto;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(247, 208, 71, 0.35), transparent 68%);
+  pointer-events: none;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 0 60%, rgba(255, 255, 255, 0.06) 60% 64%, transparent 64% 100%);
+  pointer-events: none;
+}
+
+.hero h1,
+.section-heading h2,
+.overview-title,
+.detail-title,
+.spot-name {
+  margin: 0;
+}
+
+.hero-copy {
+  max-width: 760px;
+}
+
+.hero-media {
+  display: grid;
+  gap: 14px;
+  width: min(420px, 100%);
+  align-self: stretch;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-art {
+  width: 100%;
+  min-height: 240px;
+  object-fit: cover;
+  border-radius: 16px;
+  border: 2px solid rgba(157, 235, 255, 0.36);
+  background: rgba(8, 17, 44, 0.34);
+  box-shadow: 0 16px 36px rgba(3, 8, 22, 0.22);
+}
+
+.eyebrow {
+  margin: 0 0 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.hero h1 {
+  font-family: var(--display-font);
+  font-size: clamp(2rem, 5vw, 4.2rem);
+  line-height: 0.94;
+  max-width: 12ch;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  font-weight: 900;
+}
+
+.hero-text,
+.section-heading p,
+.overview-copy,
+.detail-copy,
+.spot-headline,
+.season-summary,
+.spot-region,
+.plan-list li,
+.loot-list li {
+  color: var(--muted);
+}
+
+.hero-text {
+  max-width: 58ch;
+  margin: 14px 0 0;
+  font-size: 1rem;
+  line-height: 1.6;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+}
+
+.hero-intel-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
+  position: relative;
+  z-index: 1;
+}
+
+.intel-chip {
+  min-width: 220px;
+  padding: 12px 14px;
+  border: 2px solid rgba(157, 235, 255, 0.22);
+  border-radius: 16px;
+  background: rgba(8, 17, 44, 0.26);
+}
+
+.intel-label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.intel-chip strong {
+  font-size: 0.92rem;
+  line-height: 1.4;
+  font-family: var(--display-font);
+  font-weight: 700;
+}
+
+.hero-stats {
+  display: grid;
+  gap: 14px;
+  min-width: 180px;
+  align-self: end;
+}
+
+.stat-chip,
+.meta-pill,
+.score-pill {
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+}
+
+.stat-chip {
+  padding: 16px 18px;
+  background: rgba(7, 18, 44, 0.44);
+}
+
+.stat-label {
+  display: block;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(227, 241, 255, 0.8);
+  margin-bottom: 6px;
+}
+
+.stat-chip strong {
+  font-size: 1.9rem;
+  color: var(--accent);
+}
+
+.season-layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr) 340px;
+  gap: 20px;
+}
+
+.season-panel,
+.detail-panel,
+.content-column > .panel,
+.overview {
+  padding: 22px;
+}
+
+.content-column {
+  display: grid;
+  gap: 20px;
+}
+
+.section-heading {
+  margin-bottom: 18px;
+}
+
+.section-heading p {
+  margin: 8px 0 0;
+  line-height: 1.5;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+}
+
+.season-list,
+.spot-list {
+  display: grid;
+  gap: 14px;
+}
+
+.spot-list {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.season-button,
+.spot-card {
+  width: 100%;
+  border: 2px solid rgba(116, 215, 255, 0.18);
+  border-radius: 16px;
+  color: inherit;
+}
+
+.season-button {
+  text-align: left;
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+  cursor: pointer;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+}
+
+.season-button:hover,
+.season-button:focus-visible {
+  transform: translateY(-3px) scale(1.01);
+  border-color: rgba(255, 255, 255, 0.42);
+  box-shadow: 0 18px 30px rgba(0, 0, 0, 0.28);
+}
+
+.season-button.active {
+  border-color: var(--accent);
+  box-shadow: 0 22px 34px rgba(0, 0, 0, 0.24);
+}
+
+.season-button.coming-soon {
+  position: relative;
+  overflow: hidden;
+}
+
+.season-button.coming-soon::after {
+  content: "";
+  position: absolute;
+  inset: auto -20px -34px auto;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, rgba(255, 233, 161, 0.35), transparent 72%);
+  pointer-events: none;
+}
+
+.season-title-row,
+.spot-top,
+.detail-score-row,
+.overview-meta,
+.spot-score-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.season-button h3,
+.spot-name,
+.detail-title {
+  font-family: var(--display-font);
+  margin: 0;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  font-weight: 800;
+}
+
+.season-summary {
+  margin: 10px 0 0;
+  line-height: 1.45;
+  font-size: 0.96rem;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+}
+
+.coming-soon-badge {
+  display: inline-flex;
+  margin-top: 12px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(20, 14, 8, 0.28);
+  border: 1px solid rgba(255, 243, 204, 0.26);
+  color: rgba(255, 247, 224, 0.92);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.overview {
+  position: relative;
+  overflow: hidden;
+  border-width: 2px;
+}
+
+.overview::after {
+  content: "";
+  position: absolute;
+  inset: auto -40px -60px auto;
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.12), transparent 70%);
+  pointer-events: none;
+}
+
+.overview-title {
+  font-family: var(--display-font);
+  font-size: clamp(1.8rem, 4vw, 2.7rem);
+  line-height: 0.94;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  font-weight: 900;
+}
+
+.overview-subtitle {
+  margin: 8px 0 0;
+  font-size: 1.08rem;
+  font-weight: 800;
+  color: rgba(255, 245, 209, 0.96);
+}
+
+.overview-copy {
+  margin: 16px 0 18px;
+  max-width: 60ch;
+  line-height: 1.6;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+}
+
+.coming-soon-note {
+  margin: 18px 0 0;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(18, 12, 8, 0.22);
+  border: 1px solid rgba(255, 239, 198, 0.18);
+  color: rgba(255, 244, 220, 0.88);
+  line-height: 1.5;
+}
+
+.overview-meta {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+.meta-pill,
+.score-pill {
+  padding: 10px 14px;
+  background: rgba(7, 14, 35, 0.36);
+}
+
+.meta-pill-label,
+.score-label {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--soft);
+  margin-bottom: 4px;
+}
+
+.meta-pill-value,
+.score-value {
+  font-family: var(--display-font);
+  font-weight: 800;
+  color: var(--accent);
+}
+
+.spot-card {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+  background: linear-gradient(180deg, rgba(17, 34, 78, 0.72), rgba(8, 18, 47, 0.86));
+  cursor: pointer;
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+}
+
+.spot-card:hover,
+.spot-card:focus-visible {
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.36);
+  background: linear-gradient(180deg, rgba(24, 47, 106, 0.8), rgba(10, 23, 57, 0.92));
+}
+
+.spot-card.active {
+  border-color: var(--accent);
+  background: linear-gradient(180deg, rgba(28, 54, 119, 0.84), rgba(10, 23, 57, 0.96));
+}
+
+.spot-region {
+  font-size: 0.92rem;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+}
+
+.spot-headline,
+.detail-copy,
+.plan-list,
+.loot-list {
+  margin: 0;
+  line-height: 1.55;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+}
+
+.spot-intel-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.spot-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(157, 235, 255, 0.2);
+  background: rgba(7, 14, 35, 0.38);
+  color: rgba(237, 246, 255, 0.9);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.spot-chip-mobility {
+  color: var(--accent);
+}
+
+.spot-score-row,
+.detail-score-row {
+  flex-wrap: wrap;
+}
+
+.score-pill {
+  min-width: 82px;
+}
+
+.detail-panel {
+  align-self: start;
+  background: linear-gradient(180deg, rgba(10, 23, 58, 0.96), rgba(7, 14, 35, 0.94));
+}
+
+.detail-visual-shell {
+  margin-bottom: 18px;
+}
+
+.detail-visual {
+  display: block;
+  width: 100%;
+  border-radius: 16px;
+  border: 2px solid rgba(157, 235, 255, 0.18);
+  background: rgba(8, 17, 44, 0.34);
+}
+
+.drop-map-image {
+  display: block;
+  width: 100%;
+  border-radius: 18px;
+  border: 2px solid rgba(157, 235, 255, 0.2);
+  background: rgba(8, 17, 44, 0.3);
+  box-shadow: 0 16px 38px rgba(3, 8, 22, 0.2);
+}
+
+.mobility-highlight {
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 2px solid rgba(247, 208, 71, 0.22);
+  background: linear-gradient(180deg, rgba(34, 28, 8, 0.26), rgba(8, 17, 44, 0.28));
+}
+
+.mobility-highlight-label {
+  margin-bottom: 8px;
+  color: var(--accent);
+  font-family: var(--display-font);
+  font-size: 1rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.mobility-location-card {
+  padding: 16px 18px;
+  border-radius: 16px;
+  border: 2px solid rgba(30, 200, 255, 0.28);
+  background:
+    radial-gradient(circle at top right, rgba(30, 200, 255, 0.16), transparent 34%),
+    linear-gradient(180deg, rgba(9, 22, 56, 0.92), rgba(7, 14, 35, 0.9));
+  box-shadow: 0 14px 30px rgba(3, 8, 22, 0.18);
+}
+
+.mobility-location-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.mobility-location-title {
+  color: var(--text);
+  font-family: var(--display-font);
+  font-size: 1rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.mobility-location-grid {
+  flex-shrink: 0;
+  padding: 7px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(30, 200, 255, 0.32);
+  background: rgba(30, 200, 255, 0.12);
+  color: #b9f1ff;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.mobility-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.mobility-card {
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(157, 235, 255, 0.18);
+  background: rgba(7, 14, 35, 0.34);
+  color: var(--muted);
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  line-height: 1.45;
+}
+
+.detail-empty {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.empty-state {
+  padding: 20px;
+  border-radius: 16px;
+  border: 2px solid rgba(116, 215, 255, 0.16);
+  background: linear-gradient(180deg, rgba(17, 34, 78, 0.72), rgba(8, 18, 47, 0.86));
+}
+
+.easter-egg-toast {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0.86);
+  width: min(92vw, 720px);
+  padding: 24px 28px;
+  border: 2px solid rgba(247, 208, 71, 0.72);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(14, 28, 70, 0.98), rgba(8, 18, 47, 0.98));
+  box-shadow: 0 18px 42px rgba(3, 8, 22, 0.42);
+  color: var(--accent);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: clamp(1.6rem, 4.2vw, 3.1rem);
+  font-weight: 900;
+  line-height: 1.1;
+  z-index: 20;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+
+.easter-egg-toast.visible {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.detail-block + .detail-block {
+  margin-top: 20px;
+}
+
+.detail-kicker {
+  margin: 0 0 8px;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.plan-list,
+.loot-list {
+  padding-left: 18px;
+}
+
+.plan-list li + li,
+.loot-list li + li {
+  margin-top: 10px;
+}
+
+@media (max-width: 1120px) {
+  .season-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .season-panel {
+    order: 1;
+  }
+
+  .content-column {
+    order: 2;
+  }
+
+  .detail-panel {
+    order: 3;
+  }
+}
+
+@media (max-width: 760px) {
+  .app-shell {
+    width: min(100%, calc(100% - 16px));
+    padding: 12px 0 28px;
+  }
+
+  .hero {
+    padding: 20px 18px;
+    gap: 18px;
+  }
+
+  .hero,
+  .hero-stats {
+    display: grid;
+  }
+
+  .hero h1 {
+    font-size: clamp(1.8rem, 10vw, 2.7rem);
+    max-width: 10ch;
+  }
+
+  .hero-text {
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .hero-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    min-width: 0;
+  }
+
+  .hero-media {
+    width: 100%;
+  }
+
+  .hero-art {
+    min-height: 180px;
+  }
+
+  .hero-intel-strip {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .intel-chip {
+    min-width: 0;
+  }
+
+  .stat-chip {
+    padding: 14px;
+  }
+
+  .stat-chip strong {
+    font-size: 1.45rem;
+  }
+
+  .season-layout {
+    gap: 14px;
+  }
+
+  .season-panel,
+  .detail-panel,
+  .content-column > .panel,
+  .overview {
+    padding: 16px;
+  }
+
+  .section-heading {
+    margin-bottom: 14px;
+  }
+
+  .season-list {
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(220px, 82vw);
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 4px;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .season-button {
+    min-height: 134px;
+    scroll-snap-align: start;
+  }
+
+  .spot-list {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .spot-top,
+  .season-title-row {
+    align-items: flex-start;
+  }
+
+  .spot-top,
+  .detail-score-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .spot-score-row,
+  .overview-meta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .drop-map-image {
+    border-radius: 16px;
+  }
+
+  .mobility-location-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .mobility-location-grid {
+    align-self: flex-start;
+  }
+
+  .score-pill,
+  .meta-pill {
+    min-width: 0;
+  }
+
+  .spot-card {
+    padding: 16px;
+  }
+
+  .detail-block + .detail-block {
+    margin-top: 16px;
+  }
+
+  .plan-list,
+  .loot-list {
+    padding-left: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-shell {
+    width: min(100%, calc(100% - 12px));
+    padding-top: 8px;
+  }
+
+  .panel {
+    border-radius: 14px;
+  }
+
+  .hero {
+    padding: 18px 14px;
+    margin-bottom: 14px;
+  }
+
+  .easter-egg-trigger {
+    top: 8px;
+    right: 8px;
+    width: 32px;
+    height: 32px;
+  }
+
+  .eyebrow {
+    font-size: 0.72rem;
+    margin-bottom: 8px;
+  }
+
+  .hero h1 {
+    font-size: clamp(1.7rem, 11vw, 2.25rem);
+  }
+
+  .hero-stats {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .hero-art {
+    min-height: 150px;
+  }
+
+  .season-panel,
+  .detail-panel,
+  .content-column > .panel,
+  .overview {
+    padding: 14px;
+  }
+
+  .season-list {
+    grid-auto-columns: minmax(200px, 88vw);
+    gap: 10px;
+  }
+
+  .season-button,
+  .spot-card {
+    clip-path: none;
+    border-radius: 14px;
+  }
+
+  .season-button {
+    padding: 14px;
+    min-height: 126px;
+  }
+
+  .season-button:hover,
+  .season-button:focus-visible,
+  .spot-card:hover,
+  .spot-card:focus-visible {
+    transform: none;
+  }
+
+  .overview-title {
+    font-size: 1.6rem;
+  }
+
+  .overview-subtitle {
+    font-size: 0.98rem;
+  }
+
+  .overview-copy,
+  .detail-copy,
+  .season-summary,
+  .spot-headline,
+  .spot-region,
+  .plan-list,
+  .loot-list,
+  .section-heading p {
+    font-size: 0.92rem;
+  }
+
+  .spot-score-row,
+  .overview-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .spot-intel-row {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .drop-map-image {
+    border-radius: 14px;
+  }
+
+  .coming-soon-badge {
+    width: fit-content;
+  }
+
+  .detail-kicker {
+    font-size: 0.72rem;
+  }
+}
