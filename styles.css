@@ -49,6 +49,14 @@ button { color: inherit; }
   margin-bottom: 18px;
 }
 
+.command-body {
+  display: block;
+}
+
+.command-toggle {
+  display: none;
+}
+
 .command-top,
 .command-actions,
 .quick-links,
@@ -1125,6 +1133,23 @@ button { color: inherit; }
   .command-top,
   .search-result-top,
   .spotlight-heading { align-items: flex-start; flex-direction: column; }
+  .command-bar {
+    position: sticky;
+    top: 8px;
+  }
+  .command-toggle {
+    display: inline-flex;
+  }
+  .command-bar.mobile-collapsed .command-body {
+    display: none;
+  }
+  .command-bar.mobile-collapsed {
+    padding-bottom: 12px;
+  }
+  .command-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
   .quest-overview-panel,
   .quest-list-panel,
   .quest-detail-panel,

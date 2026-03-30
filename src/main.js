@@ -710,6 +710,8 @@ const appUpdatedElement = document.querySelector("#app-updated");
 const reviewedCountElement = document.querySelector("#reviewed-count");
 const continueLabelElement = document.querySelector("#continue-label");
 const globalSearchElement = document.querySelector("#global-search");
+const commandBarElement = document.querySelector(".command-bar");
+const toggleCommandBarElement = document.querySelector("#toggle-command-bar");
 const searchResultsPanelElement = document.querySelector("#search-results-panel");
 const searchResultsElement = document.querySelector("#search-results");
 const updateSpotlightElement = document.querySelector("#update-spotlight");
@@ -750,6 +752,24 @@ const closeChangelogElement = document.querySelector("#close-changelog");
 const changelogListElement = document.querySelector("#changelog-list");
 
 let deferredInstallPrompt = null;
+
+function syncCommandBarState() {
+  if (!commandBarElement || !toggleCommandBarElement) {
+    return;
+  }
+
+  const isMobile = window.matchMedia("(max-width: 760px)").matches;
+  if (!isMobile) {
+    commandBarElement.classList.remove("mobile-collapsed");
+    toggleCommandBarElement.textContent = "Hide tools";
+    toggleCommandBarElement.setAttribute("aria-expanded", "true");
+    return;
+  }
+
+  const isCollapsed = commandBarElement.classList.contains("mobile-collapsed");
+  toggleCommandBarElement.textContent = isCollapsed ? "Show tools" : "Hide tools";
+  toggleCommandBarElement.setAttribute("aria-expanded", isCollapsed ? "false" : "true");
+}
 
 function getSelectedTrack() {
   return tracks.find((track) => track.id === state.selectedTrackId);
@@ -1532,9 +1552,21 @@ window.addEventListener("keydown", (event) => {
 });
 
 window.addEventListener("scroll", syncBackToTopVisibility, { passive: true });
+window.addEventListener("resize", syncCommandBarState);
+
+toggleCommandBarElement.addEventListener("click", () => {
+  if (window.matchMedia("(max-width: 760px)").matches) {
+    commandBarElement.classList.toggle("mobile-collapsed");
+  }
+  syncCommandBarState();
+});
 
 loadState();
+if (window.matchMedia("(max-width: 760px)").matches) {
+  commandBarElement.classList.add("mobile-collapsed");
+}
 render();
 syncBackToTopVisibility();
+syncCommandBarState();
 renderSearchResults("");
 registerServiceWorker();

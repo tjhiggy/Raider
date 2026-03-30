@@ -23,29 +23,32 @@
           <h2 class="command-title">Quick access</h2>
         </div>
         <div class="command-actions">
+          <button id="toggle-command-bar" class="hero-button hero-button-secondary command-toggle" type="button" aria-expanded="true" aria-controls="command-bar-body">Hide tools</button>
           <button id="share-app" class="hero-button hero-button-secondary" type="button">Share</button>
           <button id="install-app" class="hero-button hero-button-secondary" type="button" hidden>Install app</button>
         </div>
       </div>
-      <label class="search-label" for="global-search">Search the guide</label>
-      <input id="global-search" class="search-input" type="search" placeholder="Search lessons, quests, materials, and machine intel">
-      <div class="quick-links" aria-label="Quick links">
-        <a class="quick-link" href="#update-center">Updates</a>
-        <a class="quick-link" href="#curriculum">Curriculum</a>
-        <a class="quick-link" href="#quest-ops">Quests</a>
-        <a class="quick-link" href="#materials-intel">Materials</a>
-        <a class="quick-link" href="#machine-intel">Machines</a>
-        <a class="quick-link quick-link-discord" href="https://discord.gg/4JZ9f39h" target="_blank" rel="noreferrer">Join Discord</a>
-      </div>
-      <div class="progress-strip">
-        <article class="meta-pill">
-          <span class="meta-label">Reviewed lessons</span>
-          <strong id="reviewed-count" class="meta-value">0</strong>
-        </article>
-        <article class="meta-pill">
-          <span class="meta-label">Continue from</span>
-          <strong id="continue-label" class="meta-value">New Raider</strong>
-        </article>
+      <div id="command-bar-body" class="command-body">
+        <label class="search-label" for="global-search">Search the guide</label>
+        <input id="global-search" class="search-input" type="search" placeholder="Search lessons, quests, materials, and machine intel">
+        <div class="quick-links" aria-label="Quick links">
+          <a class="quick-link" href="#update-center">Updates</a>
+          <a class="quick-link" href="#curriculum">Curriculum</a>
+          <a class="quick-link" href="#quest-ops">Quests</a>
+          <a class="quick-link" href="#materials-intel">Materials</a>
+          <a class="quick-link" href="#machine-intel">Machines</a>
+          <a class="quick-link quick-link-discord" href="https://discord.gg/4JZ9f39h" target="_blank" rel="noreferrer">Join Discord</a>
+        </div>
+        <div class="progress-strip">
+          <article class="meta-pill">
+            <span class="meta-label">Reviewed lessons</span>
+            <strong id="reviewed-count" class="meta-value">0</strong>
+          </article>
+          <article class="meta-pill">
+            <span class="meta-label">Continue from</span>
+            <strong id="continue-label" class="meta-value">New Raider</strong>
+          </article>
+        </div>
       </div>
     </section>
 
