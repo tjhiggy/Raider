@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.7.4",
+    date: "2026-03-30",
+    summary: "Made the Discord promotion much more visible with a dedicated community callout near the top of the app.",
+    changes: [
+      "Added a prominent community panel directly under the command bar.",
+      "Kept the existing Discord links in the quick-links row and footer.",
+      "Changed the promotion from a subtle utility link into a clear join-the-community message."
+    ]
+  },
+  {
     version: "v1.7.3",
     date: "2026-03-30",
     summary: "Expanded the materials area with a full catalog of currently listed ARC Raiders materials.",

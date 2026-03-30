@@ -132,6 +132,42 @@ button { color: inherit; }
   margin-bottom: 18px;
 }
 
+.community-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  padding: 20px;
+  margin-bottom: 18px;
+  background: linear-gradient(180deg, rgba(214, 117, 48, 0.14), rgba(255, 255, 255, 0.03));
+}
+
+.community-title {
+  margin: 0;
+  font-family: var(--display-font);
+  text-transform: uppercase;
+}
+
+.community-text,
+.community-note {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.community-text {
+  margin: 10px 0 0;
+}
+
+.community-actions {
+  display: grid;
+  gap: 10px;
+  justify-items: end;
+}
+
+.community-note {
+  font-size: 0.9rem;
+}
+
 .search-results {
   display: grid;
   gap: 12px;
@@ -1075,12 +1111,14 @@ button { color: inherit; }
 @media (max-width: 760px) {
   .app-shell { width: min(100%, calc(100% - 16px)); padding-top: 12px; }
   .command-bar,
-  .search-results-panel { padding: 16px; }
+  .search-results-panel,
+  .community-panel { padding: 16px; }
   .hero, .status-card, .briefing, .pain-points-panel, .overview-panel, .rail-panel, .detail-panel, .intel-panel { padding: 16px; }
   .hero h1 { font-size: clamp(1.9rem, 10vw, 2.8rem); max-width: 10ch; }
   .hero-actions { display: grid; grid-template-columns: 1fr; }
   .lesson-list, .machine-list, .track-list { grid-template-columns: 1fr; }
   .machine-priority-grid { grid-template-columns: 1fr; }
+  .community-panel,
   .track-title-row, .lesson-title-row, .machine-top { align-items: flex-start; flex-direction: column; }
   .overview-meta, .detail-chip-row { display: grid; grid-template-columns: 1fr; }
   .release-title-row,
