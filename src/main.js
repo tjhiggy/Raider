@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.7.6",
+    date: "2026-03-30",
+    summary: "Expanded ARC Machine Intel to cover the full currently listed ARC roster instead of only a starter subset.",
+    changes: [
+      "Replaced the partial ARC list with a broader current catalog of known ARC types.",
+      "Included newer named threats like Firefly, Comet, and Shredder alongside established units.",
+      "Kept the section practical by grouping each ARC around its battlefield role and response priority."
+    ]
+  },
+  {
     version: "v1.7.5",
     date: "2026-03-30",
     summary: "Added a hidden easter egg that shows a centered message when the secret trigger is found.",
@@ -483,12 +493,28 @@ const lessons = [
 ];
 
 const machines = [
-  { name: "Tick", threat: "Ambush", copy: "Small, stealthy machines that cling to structures and punish inattentive movement indoors or under rooftops.", response: "Clear ceilings, walls, and tight interiors before looting casually." },
-  { name: "Snitch", threat: "Detection", copy: "Airborne observer that spots suspicious activity and can turn your position into a reinforcement event.", response: "Break line of sight or remove it quickly before it escalates." },
-  { name: "Leaper", threat: "Burst Pressure", copy: "A larger machine with a punishing leap attack that can collapse distance fast and force you out of stable cover.", response: "Create space before it commits and avoid predictable positions." },
-  { name: "Bombardier", threat: "Area Denial", copy: "Works with Spotter drones to designate you for lethal mortar pressure and destroy static positions.", response: "Relocate early and do not tunnel on a held angle once you are marked." },
-  { name: "Wasp / Hornet / Rocketeer", threat: "Air Superiority", copy: "Flying ARC variants punish players who treat open ground as safe travel time.", response: "Use cover chains and shorten exposed crossings." },
-  { name: "Queen", threat: "Endgame Hazard", copy: "A massive machine threat tied to Harvester activity and not something new players should challenge casually.", response: "Treat it as a major event and only engage with a real plan." }
+  { name: "Snitch", threat: "Detection", copy: "Flying observer that loudly alerts nearby ARC and can rapidly expand a quiet skirmish into a full problem.", response: "Break line of sight or destroy it immediately before it calls reinforcements." },
+  { name: "Spotter", threat: "Target Designation", copy: "Support unit that helps heavier ARC, especially Bombardiers, turn your position into a punishable marker.", response: "Prioritize it early so the rest of the encounter loses coordination." },
+  { name: "Surveyor", threat: "Scout Pressure", copy: "Usually lighter than other ARC but still important because it helps populate the battlefield and punish sloppy movement.", response: "Clear it when you need a route to stay quiet and uncontested." },
+  { name: "Tick", threat: "Ambush", copy: "Small, indoor ambush ARC that latch on and punish inattentive looting or rushing through interiors.", response: "Check ceilings, corners, and tight rooms before you tunnel on loot." },
+  { name: "Pop", threat: "Close-Range Explosion", copy: "Ball-like ARC that becomes most dangerous when you let it close distance inside cluttered spaces.", response: "Keep space and delete it before it reaches your feet or your team stack." },
+  { name: "Fireball", threat: "Close-Range Burn", copy: "Aggressive short-range ARC that punishes cramped movement and late reactions.", response: "Do not let it collapse into your cover pocket; create space early." },
+  { name: "Wasp", threat: "Light Air Harassment", copy: "Fast flying ARC that pressures movement lanes and exposed rotations.", response: "Use cover chains and remove it before crossing open space." },
+  { name: "Hornet", threat: "Shock Air Threat", copy: "A nastier flying variant that adds stronger pressure and punishes players who ignore aerial tracking.", response: "Watch rear thrusters and avoid staying exposed when it lines up an attack." },
+  { name: "Rocketeer", threat: "Explosive Air Threat", copy: "Flying ARC that turns open angles and delayed rotations into explosive danger.", response: "Break sight lines quickly and never assume one rooftop peek is safe." },
+  { name: "Firefly", threat: "New Air Threat", copy: "A newer ARC unit introduced during the Shrouded Sky era that adds to aerial pressure and update-era combat variance.", response: "Treat it like priority air pressure and clear it before it stacks with ground threats." },
+  { name: "Comet", threat: "New Air Threat", copy: "Another newer ARC named in official update material, contributing to more dangerous live-service encounter mixes.", response: "Respect it as a patch-era threat and avoid learning its pattern the hard way mid-fight." },
+  { name: "Leaper", threat: "Burst Pressure", copy: "Large ARC that can cover distance fast and force you off safe positions with jump pressure.", response: "Keep lateral escape space and punish it after the commit." },
+  { name: "Shredder", threat: "Aggressive Pursuit", copy: "A newer named ARC that Embark has teased and expanded into broader map pressure ahead of Flashpoint.", response: "Assume it exists to make PvE routes less comfortable and avoid fighting it in already noisy zones." },
+  { name: "Bombardier", threat: "Area Denial", copy: "Heavy support ARC that uses marked positions to rain damage onto static players.", response: "Relocate early and kill the supporting detection chain before you try to hold ground." },
+  { name: "Bastion", threat: "Heavy Frontline", copy: "Heavily armored ARC built to dominate frontal fights and punish players who stand in obvious lanes.", response: "Do not brawl it head-on longer than necessary; work weak points and safer angles." },
+  { name: "Turret", threat: "Static Kill Zone", copy: "Fixed ARC gun emplacement commonly found in defensive or indoor spaces where it controls entry lanes.", response: "Respect sight lines before entering and clear it before exposing the whole team." },
+  { name: "Sentinel", threat: "Vantage Control", copy: "Larger outdoor threat that controls stronger angles and punishes careless movement through open spaces.", response: "Identify its line of control first, then route or peek around it deliberately." },
+  { name: "Baron Husk", threat: "Elite Ground Threat", copy: "More dangerous husk-class ARC that adds higher punishment to already contested zones.", response: "Do not let it become background damage while you chase smaller targets." },
+  { name: "Deforester Husk", threat: "Heavy Environment Threat", copy: "Bulkier husk-type ARC found in more hostile areas where it adds sustained pressure.", response: "Treat it as a positional problem first and do not get pinned near it." },
+  { name: "Matriarch", threat: "Boss-Class Threat", copy: "Large high-threat ARC that requires real planning and should not be treated like normal ambient PvE.", response: "Only engage with a plan, room to reset, and a reason to take the noise risk." },
+  { name: "Queen", threat: "Boss-Class Threat", copy: "Massive multi-legged ARC and one of the most dangerous named threats currently in the game ecosystem.", response: "Treat it as a major event-level fight, not casual background farm." },
+  { name: "ARC Orbiter", threat: "Overhead Threat Platform", copy: "A named ARC platform listed in the current ARC index and best treated as a high-risk environmental enemy presence.", response: "Do not underestimate it just because it is less common in casual discussion; identify how it changes the area first." }
 ];
 
 const prepChecklist = [
