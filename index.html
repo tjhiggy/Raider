@@ -3,184 +3,259 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="description" content="Fortnite OG drop guide with season-by-season map reads, mobility routes, and placement-first landing recommendations.">
-  <meta name="theme-color" content="#16318c">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta property="og:title" content="Fortnite OG Drop Intel">
-  <meta property="og:description" content="Placement-first drop recommendations, map reads, and mobility routes for Fortnite OG seasons.">
+  <meta name="description" content="Mobile-friendly ARC Raiders field guide for new Raiders and advanced squads. Learn extraction basics, map conditions, ARC machine threats, and high-level raid planning.">
+  <meta name="theme-color" content="#c96b2c">
+  <meta property="og:title" content="ARC Raiders Field Guide">
+  <meta property="og:description" content="A mobile-friendly onboarding and advanced strategy guide for ARC Raiders players.">
   <meta property="og:type" content="website">
-  <title>Fortnite OG Drop Intel</title>
-  <link rel="icon" href="./assets/hero-drop-map.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="./assets/hero-drop-map.svg">
+  <title>ARC Raiders Field Guide</title>
+  <link rel="icon" href="./assets/arc-signal.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./assets/arc-signal.svg">
   <link rel="manifest" href="./site.webmanifest">
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
   <main class="app-shell">
+    <section class="panel command-bar">
+      <div class="command-top">
+        <div>
+          <p class="eyebrow">Field Console</p>
+          <h2 class="command-title">Quick access</h2>
+        </div>
+        <div class="command-actions">
+          <button id="share-app" class="hero-button hero-button-secondary" type="button">Share</button>
+          <button id="install-app" class="hero-button hero-button-secondary" type="button" hidden>Install app</button>
+        </div>
+      </div>
+      <label class="search-label" for="global-search">Search the guide</label>
+      <input id="global-search" class="search-input" type="search" placeholder="Search lessons, quests, materials, and machine intel">
+      <div class="quick-links" aria-label="Quick links">
+        <a class="quick-link" href="#update-center">Updates</a>
+        <a class="quick-link" href="#curriculum">Curriculum</a>
+        <a class="quick-link" href="#quest-ops">Quests</a>
+        <a class="quick-link" href="#materials-intel">Materials</a>
+        <a class="quick-link" href="#machine-intel">Machines</a>
+      </div>
+      <div class="progress-strip">
+        <article class="meta-pill">
+          <span class="meta-label">Reviewed lessons</span>
+          <strong id="reviewed-count" class="meta-value">0</strong>
+        </article>
+        <article class="meta-pill">
+          <span class="meta-label">Continue from</span>
+          <strong id="continue-label" class="meta-value">New Raider</strong>
+        </article>
+      </div>
+    </section>
+
+    <section id="search-results-panel" class="panel search-results-panel" hidden>
+      <div class="section-heading">
+        <h2>Search Results</h2>
+        <p>Jump straight to the part of the guide you need.</p>
+      </div>
+      <div id="search-results" class="search-results" aria-live="polite"></div>
+    </section>
+
+    <section id="update-center" class="update-layout">
+      <section class="panel update-spotlight-panel">
+        <div class="section-heading">
+          <h2>Update Center</h2>
+          <p>Track what is officially confirmed, what to prepare before the next content drop, and how this app should evolve after each release.</p>
+        </div>
+        <div id="update-spotlight" class="update-spotlight" aria-live="polite"></div>
+      </section>
+
+      <section class="panel release-list-panel">
+        <div class="section-heading">
+          <h2>Release Timeline</h2>
+          <p>Use this to follow ARC Raiders' current update rhythm and jump into the changes that matter most.</p>
+        </div>
+        <div id="release-list" class="release-list"></div>
+      </section>
+
+      <aside class="panel release-detail-panel">
+        <div class="section-heading">
+          <h2>Release Detail</h2>
+          <p>Officially confirmed highlights, prep notes, and app-update ideas for each release.</p>
+        </div>
+        <div id="release-detail" class="release-detail" aria-live="polite"></div>
+      </aside>
+    </section>
+
     <section class="hero panel">
-      <button
-        id="easter-egg-trigger"
-        class="easter-egg-trigger"
-        type="button"
-        aria-label="Hidden easter egg trigger"
-      ></button>
       <div class="hero-copy">
-        <p class="eyebrow">Fortnite OG Drop Intel</p>
-        <h1>Placement-first drop reads for every OG season.</h1>
+        <p class="eyebrow">ARC Raiders Learning App</p>
+        <h1>Know what to run, what to learn, and what changed.</h1>
         <p class="hero-text">
-          Compare safer openers, high-upside hot drops, and rotation-friendly backup plans without leaving your browser.
+          Use this guide like a raid console: check the latest update, continue your learning path, and jump straight into quests, materials, or machine intel without hunting through the app.
         </p>
-        <div class="hero-intel-strip">
-          <article class="intel-chip">
-            <span class="intel-label">Map Reads</span>
-            <strong>POIs, landmarks, and routes</strong>
-          </article>
-          <article class="intel-chip">
-            <span class="intel-label">Movement</span>
-            <strong>Rifts, planes, roads, and edge rotates</strong>
-          </article>
+        <div class="hero-actions">
+          <a class="hero-button hero-button-primary" href="#curriculum">Continue learning</a>
+          <a class="hero-button hero-button-secondary" href="#update-center">View latest update</a>
         </div>
       </div>
 
-      <div class="hero-media">
-        <section class="hero-spotlight-card">
-          <div class="hero-spotlight-head">
-            <div>
-              <p class="intel-label">Season Spotlight</p>
-              <h2 id="hero-spotlight-name" class="hero-spotlight-title">Loading drop...</h2>
-            </div>
-            <span id="hero-spotlight-type" class="hero-spotlight-tag">POI</span>
-          </div>
-          <p id="hero-spotlight-copy" class="hero-spotlight-copy">Finding the best current drop for this season.</p>
-          <div class="hero-spotlight-grid">
-            <article class="hero-spotlight-pill">
-              <span class="hero-spotlight-label">Map</span>
-              <strong id="hero-spotlight-map" class="hero-spotlight-value">--</strong>
-            </article>
-            <article class="hero-spotlight-pill">
-              <span class="hero-spotlight-label">Mobility</span>
-              <strong id="hero-spotlight-mobility" class="hero-spotlight-value">--</strong>
-            </article>
-            <article class="hero-spotlight-pill">
-              <span class="hero-spotlight-label">Placement</span>
-              <strong id="hero-spotlight-placement" class="hero-spotlight-value">--</strong>
-            </article>
-          </div>
-          <div class="hero-spotlight-actions">
-            <button id="hero-open-breakdown" class="hero-action-button hero-action-primary" type="button">Open breakdown</button>
-            <button id="hero-open-browser" class="hero-action-button" type="button">Browse drops</button>
-          </div>
+      <div class="hero-aside hero-dashboard">
+        <section id="hero-update-card" class="hero-card hero-card-accent" aria-live="polite"></section>
+        <section id="hero-personal-card" class="hero-card" aria-live="polite"></section>
+        <section class="hero-card">
+          <span class="hero-card-label">Best next actions</span>
+          <div id="hero-task-list" class="hero-task-list" aria-live="polite"></div>
         </section>
-        <div class="hero-stats">
-          <article class="stat-chip">
-            <span class="stat-label">Seasons</span>
-            <strong id="season-count">5</strong>
-          </article>
-          <article class="stat-chip">
-            <span class="stat-label">Curated spots</span>
-            <strong id="spot-count">10</strong>
-          </article>
-          <article class="stat-chip">
-            <span class="stat-label">Current Focus</span>
-            <strong id="hero-current-season">Season 1</strong>
-          </article>
-        </div>
       </div>
     </section>
 
-    <section class="utility-grid">
-      <section class="panel utility-panel">
-        <div class="section-heading section-heading-collapsible">
-          <div>
-            <h2>Quick Start</h2>
-            <p>Use the app fast without digging through every panel.</p>
-          </div>
-          <button class="section-toggle" type="button" data-panel-toggle="quickStart">Show</button>
-        </div>
-        <div id="quick-start-list" class="utility-list collapsible-panel" aria-live="polite"></div>
-      </section>
-
-      <section class="panel utility-panel">
-        <div class="section-heading section-heading-collapsible">
-          <div>
-            <h2>What's New</h2>
-            <p>Recent changes tied to the current app version.</p>
-          </div>
-          <button class="section-toggle" type="button" data-panel-toggle="releaseNotes">Show</button>
-        </div>
-        <div id="release-notes" class="utility-list collapsible-panel" aria-live="polite"></div>
-      </section>
+    <section class="status-grid">
+      <article class="panel status-card">
+        <span class="status-label">Guide tracks</span>
+        <strong id="track-count" class="status-value">2</strong>
+        <p class="status-copy">Separate routes for onboarding and advanced play.</p>
+      </article>
+      <article class="panel status-card">
+        <span class="status-label">Lessons</span>
+        <strong id="lesson-count" class="status-value">8</strong>
+        <p class="status-copy">Short, focused teaching modules built for quick review on desktop or mobile.</p>
+      </article>
+      <article class="panel status-card">
+        <span class="status-label">Machine profiles</span>
+        <strong id="machine-count" class="status-value">6</strong>
+        <p class="status-copy">Threat summaries for common ARC units you should recognize fast.</p>
+      </article>
     </section>
 
-    <section class="season-layout">
-      <aside class="season-panel panel">
-        <div class="section-heading section-heading-collapsible">
-          <div>
-            <h2>Season Radar</h2>
-            <p>Switch seasons to see the strongest landing options.</p>
-          </div>
-          <button class="section-toggle" type="button" data-panel-toggle="seasonRadar" aria-expanded="true">Hide</button>
+    <section class="panel briefing">
+      <div class="section-heading">
+        <h2>First Raid Briefing</h2>
+        <p>These are the habits that keep a new Raider alive long enough to learn.</p>
+      </div>
+      <div id="briefing-list" class="briefing-list" aria-live="polite"></div>
+    </section>
+
+    <section id="curriculum" class="curriculum-layout">
+      <aside class="panel rail-panel">
+        <div class="section-heading">
+          <h2>Guide Tracks</h2>
+          <p>Switch between the new player route and advanced gameplay route.</p>
         </div>
-        <div id="season-radar-body" class="collapsible-panel">
-          <div id="season-list" class="season-list" aria-label="Season selection"></div>
-        </div>
+        <div id="track-list" class="track-list" aria-label="Guide tracks"></div>
       </aside>
 
-      <section class="content-column">
-        <section id="season-overview" class="overview panel" aria-live="polite"></section>
-
+      <section class="lesson-column">
+        <section id="track-overview" class="panel overview-panel" aria-live="polite"></section>
         <section class="panel">
-          <div class="section-heading section-heading-collapsible">
-            <div>
-              <h2>Drop Browser</h2>
-              <p>Filter the pool, then focus on one recommended drop at a time.</p>
-            </div>
-            <button class="section-toggle" type="button" data-panel-toggle="dropBrowser" aria-expanded="true">Hide</button>
+          <div class="section-heading">
+            <h2>Lessons</h2>
+            <p>Tap a lesson for the practical breakdown, checks, and field notes.</p>
           </div>
-          <div id="drop-browser-body" class="collapsible-panel">
-            <div id="spot-list" class="spot-list"></div>
-          </div>
+          <div id="lesson-list" class="lesson-list"></div>
         </section>
       </section>
 
-      <aside class="detail-panel panel">
-        <div class="section-heading section-heading-collapsible">
-          <div>
-            <h2>Drop Breakdown</h2>
-            <p>Tap a spot to see the map read, route, and mobility plan.</p>
-          </div>
-          <button class="section-toggle" type="button" data-panel-toggle="dropBreakdown" aria-expanded="true">Hide</button>
+      <aside class="panel detail-panel">
+        <div class="section-heading">
+          <h2>Lesson Detail</h2>
+          <p>Use this panel as your quick-reference board before queueing up.</p>
         </div>
-        <div id="drop-breakdown-body" class="collapsible-panel">
-          <div id="spot-detail" class="spot-detail" aria-live="polite"></div>
-        </div>
+        <div id="lesson-detail" class="lesson-detail" aria-live="polite"></div>
+        <button id="mark-reviewed" class="hero-button hero-button-secondary detail-action" type="button">Mark lesson reviewed</button>
       </aside>
+    </section>
+
+    <section id="quest-ops" class="quest-layout">
+      <section class="panel quest-overview-panel">
+        <div class="section-heading">
+          <h2>Quest Operations</h2>
+          <p>Use this board to understand how ARC Raiders quest systems work and how to finish them efficiently.</p>
+        </div>
+        <div id="quest-overview" class="quest-overview" aria-live="polite"></div>
+      </section>
+
+      <section class="panel quest-list-panel">
+        <div class="section-heading">
+          <h2>Quest Types</h2>
+          <p>Pick a quest type to see the goal, the safest approach, and the common mistake that slows people down.</p>
+        </div>
+        <div id="quest-list" class="quest-list"></div>
+      </section>
+
+      <aside class="panel quest-detail-panel">
+        <div class="section-heading">
+          <h2>Quest Guide</h2>
+          <p>Built from current official public information about ARC Raiders progression systems.</p>
+        </div>
+        <div id="quest-detail" class="quest-detail" aria-live="polite"></div>
+      </aside>
+    </section>
+
+    <section id="materials-intel" class="materials-layout">
+      <section class="panel materials-overview-panel">
+        <div class="section-heading">
+          <h2>Crafting Materials Intel</h2>
+          <p>Use this section to understand where material types usually come from so you can route for crafting more intentionally.</p>
+        </div>
+        <div id="materials-overview" class="materials-overview" aria-live="polite"></div>
+      </section>
+
+      <section class="panel materials-list-panel">
+        <div class="section-heading">
+          <h2>Material Families</h2>
+          <p>Pick a material family to see where it tends to appear, what map spaces suit it, and how to farm it safely.</p>
+        </div>
+        <div id="materials-list" class="materials-list"></div>
+      </section>
+
+      <aside class="panel materials-detail-panel">
+        <div class="section-heading">
+          <h2>Material Guide</h2>
+          <p>Built from current official public map, workshop, and event information.</p>
+        </div>
+        <div id="materials-detail" class="materials-detail" aria-live="polite"></div>
+      </aside>
+    </section>
+
+    <section id="machine-intel" class="intel-grid">
+      <section class="panel intel-panel">
+        <div class="section-heading">
+          <h2>ARC Machine Intel</h2>
+          <p>Learn the job each machine does so you can react faster under pressure.</p>
+        </div>
+        <figure class="section-art-card">
+          <img class="section-art" src="./assets/machine-schematic.svg" alt="ARC Raiders-inspired machine schematic graphic">
+        </figure>
+        <div id="machine-list" class="machine-list"></div>
+      </section>
+
+      <section class="panel intel-panel">
+        <div class="section-heading">
+          <h2>Raid Prep Checklist</h2>
+          <p>A simple pre-drop checklist for solo or squad play.</p>
+        </div>
+        <div id="prep-list" class="prep-list"></div>
+      </section>
     </section>
 
     <footer class="app-footer">
-      <span class="footer-label">App Version</span>
-      <button id="app-version" class="footer-version footer-version-button" type="button" aria-haspopup="dialog" aria-controls="version-history-modal">v0.0.0</button>
-      <span id="app-updated" class="footer-meta">Updated --</span>
-      <span class="footer-meta">Tip: Add to Home Screen on iPhone for app-style access</span>
+      <span class="footer-item">ARC Raiders Field Guide</span>
+      <button id="app-version" class="footer-item footer-button" type="button" aria-haspopup="dialog" aria-controls="changelog-modal">v1.0.0</button>
+      <span id="app-updated" class="footer-item">Updated 2026-03-30</span>
+      <span class="footer-item">Optimized for desktop and mobile browsers</span>
     </footer>
   </main>
 
   <button id="back-to-top" class="back-to-top" type="button" aria-label="Back to top">Top</button>
-  <div id="version-history-modal" class="modal-shell" aria-hidden="true">
-    <div class="modal-backdrop" data-close-version-history="true"></div>
-    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="version-history-title">
-      <div class="modal-header">
+  <div id="modal-backdrop" class="modal-backdrop" hidden></div>
+  <section id="changelog-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="changelog-title" hidden>
+    <div class="modal-panel">
+      <div class="modal-head">
         <div>
-          <p class="detail-kicker">Release History</p>
-          <h2 id="version-history-title" class="modal-title">App Changes By Version</h2>
+          <p class="eyebrow">Release History</p>
+          <h2 id="changelog-title">App changelog</h2>
         </div>
-        <button id="close-version-history" class="modal-close" type="button" aria-label="Close version history">Close</button>
+        <button id="close-changelog" class="modal-close" type="button" aria-label="Close changelog">Close</button>
       </div>
-      <div id="version-history-list" class="version-history-list"></div>
-    </section>
-  </div>
-  <div id="easter-egg-toast" class="easter-egg-toast" aria-live="polite" aria-hidden="true"></div>
+      <div id="changelog-list" class="changelog-list" aria-live="polite"></div>
+    </div>
+  </section>
 
   <script src="./src/main.js"></script>
 </body>

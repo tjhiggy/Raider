@@ -1,14 +1,14 @@
 {
-  "name": "Fortnite OG Drop Intel",
-  "short_name": "Drop Intel",
-  "description": "Placement-first drop recommendations, map reads, and mobility routes for Fortnite OG seasons.",
+  "name": "ARC Raiders Field Guide",
+  "short_name": "ARC Guide",
+  "description": "Mobile-friendly ARC Raiders learning app for new and advanced players.",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#0e1838",
-  "theme_color": "#16318c",
+  "background_color": "#12100f",
+  "theme_color": "#c96b2c",
   "icons": [
     {
-      "src": "./assets/hero-drop-map.svg",
+      "src": "./assets/arc-signal.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
