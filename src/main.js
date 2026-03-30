@@ -1413,7 +1413,7 @@ function getSpotArt(spot) {
 }
 
 function getSpotMapMeta(spot) {
-  return SPOT_MAP_META[spot.name] ?? {
+  return SPOT_MAP_META[spot.name] || {
     x: 50,
     y: 50,
     grid: spot.region,
@@ -1557,7 +1557,7 @@ function getMobilityProfile(spot) {
 
 function getMobilityLocationMeta(spot) {
   const mapMeta = getSpotMapMeta(spot);
-  return MOBILITY_LOCATION_META[spot.name] ?? {
+  return MOBILITY_LOCATION_META[spot.name] || {
     x: Math.min(mapMeta.x + 6, 92),
     y: Math.min(mapMeta.y + 6, 92),
     title: "Nearest exit route",
@@ -1584,7 +1584,8 @@ function placementScore(spot) {
 
 function getSelectedSpot() {
   const seasonSpots = getSeasonSpots(state.selectedSeasonId);
-  return seasonSpots.find((spot) => spot.id === state.selectedSpotId) ?? seasonSpots[0] ?? null;
+  const selectedSpot = seasonSpots.find((spot) => spot.id === state.selectedSpotId);
+  return selectedSpot || seasonSpots[0] || null;
 }
 
 function scorePill(label, value) {
@@ -1619,7 +1620,8 @@ function renderSeasonList() {
     button.addEventListener("click", () => {
       const { seasonId } = button.dataset;
       state.selectedSeasonId = seasonId;
-      state.selectedSpotId = getSeasonSpots(seasonId)[0]?.id ?? null;
+      const firstSeasonSpot = getSeasonSpots(seasonId)[0];
+      state.selectedSpotId = firstSeasonSpot ? firstSeasonSpot.id : null;
       render();
     });
   }
@@ -1716,7 +1718,7 @@ function renderSpotDetail() {
   const spot = getSelectedSpot();
   const season = getSelectedSeason();
 
-  if (!spot && season?.comingSoon) {
+  if (!spot && season && season.comingSoon) {
     spotDetailElement.innerHTML = `
       <section class="detail-block">
         <p class="detail-kicker">Coming soon</p>
@@ -1847,6 +1849,8 @@ function revealEasterEgg() {
   }, 5000);
 }
 
-easterEggTriggerElement?.addEventListener("click", revealEasterEgg);
+if (easterEggTriggerElement) {
+  easterEggTriggerElement.addEventListener("click", revealEasterEgg);
+}
 
 render();
