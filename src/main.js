@@ -1472,6 +1472,10 @@ function getSpotMapImage(spot) {
   const routeLine = spot.type === "Route";
   const label = spot.name.replace(/&/g, "&amp;");
   const hint = meta.grid.replace(/&/g, "&amp;");
+  const dropLabelX = Math.min(meta.x * 6.85 + 26, 600);
+  const dropLabelY = Math.max(meta.y * 3.95 - 18, 86);
+  const mobilityLabelX = Math.min(mobilityMeta.x * 6.85 + 28, 590);
+  const mobilityLabelY = Math.min(mobilityMeta.y * 3.95 + 42, 332);
 
   const biomeOverlay = theme.biome === "snow"
     ? '<path d="M118 156C168 120 244 122 314 134C377 145 430 180 486 182C541 184 578 162 618 146L640 248C586 264 520 284 458 280C401 276 358 250 293 246C220 241 166 259 90 286L78 196C90 182 102 168 118 156Z" fill="#F5FBFF" fill-opacity="0.52"/>'
@@ -1486,18 +1490,19 @@ function getSpotMapImage(spot) {
     : "";
 
   const svg = `
-  <svg width="720" height="420" viewBox="0 0 720 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="720" height="460" viewBox="0 0 720 460" fill="none" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <linearGradient id="sky" x1="96" y1="34" x2="626" y2="360" gradientUnits="userSpaceOnUse">
         <stop stop-color="${theme.sky[0]}"/>
         <stop offset="0.48" stop-color="${theme.sky[1]}"/>
         <stop offset="1" stop-color="${theme.sky[2]}"/>
       </linearGradient>
-      <filter id="shadow" x="0" y="0" width="720" height="420" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <filter id="shadow" x="0" y="0" width="720" height="460" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
         <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#06112B" flood-opacity="0.28"/>
       </filter>
     </defs>
-    <rect width="720" height="420" rx="28" fill="url(#sky)"/>
+    <rect width="720" height="460" rx="28" fill="#081534"/>
+    <rect x="18" y="18" width="684" height="340" rx="24" fill="url(#sky)"/>
     <g filter="url(#shadow)">
       <path d="M72 238C104 175 170 136 244 120C318 104 392 104 446 122C498 139 532 168 586 176C622 182 650 180 672 168L650 296C610 320 556 338 496 340C418 343 354 326 292 318C214 308 144 318 74 340L52 268C58 256 64 246 72 238Z" fill="${theme.island}" fill-opacity="0.94" stroke="${theme.accent}" stroke-width="6"/>
       <path d="M182 178C214 154 266 146 316 151C368 156 416 174 452 177C486 180 520 168 546 154L558 216C530 232 484 244 438 240C386 236 346 212 292 208C252 205 218 214 180 230L170 194L182 178Z" fill="#1D5CA9" fill-opacity="0.26"/>
@@ -1506,6 +1511,8 @@ function getSpotMapImage(spot) {
       <path d="M116 210C138 188 164 171 196 156" stroke="${theme.accent}" stroke-opacity="0.56" stroke-width="5" stroke-linecap="round"/>
       <path d="M486 260C520 240 566 234 614 240" stroke="${theme.accent}" stroke-opacity="0.44" stroke-width="5" stroke-linecap="round"/>
       ${routeSvg}
+      <path d="M${meta.x * 6.85} 46V326" stroke="#F8FBFF" stroke-opacity="0.2" stroke-width="2" stroke-dasharray="5 8"/>
+      <path d="M54 ${meta.y * 3.95}H666" stroke="#F8FBFF" stroke-opacity="0.2" stroke-width="2" stroke-dasharray="5 8"/>
       <g transform="translate(${meta.x * 6.85}, ${meta.y * 3.95})">
         <circle r="16" fill="${theme.marker}" stroke="white" stroke-width="5"/>
         <circle r="34" fill="${theme.marker}" fill-opacity="0.22"/>
@@ -1516,14 +1523,18 @@ function getSpotMapImage(spot) {
         <rect x="-28" y="-28" width="56" height="56" rx="14" fill="#74D7FF" fill-opacity="0.16"/>
       </g>
     </g>
-    <rect x="28" y="24" width="174" height="42" rx="18" fill="#09173A" fill-opacity="0.66" stroke="${theme.accent}" stroke-opacity="0.45" stroke-width="2"/>
-    <text x="50" y="52" fill="#F5FBFF" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="800">DROP MAP: ${hint}</text>
-    <rect x="28" y="330" width="292" height="62" rx="18" fill="#09173A" fill-opacity="0.72" stroke="${theme.accent}" stroke-opacity="0.42" stroke-width="2"/>
-    <circle cx="54" cy="360" r="10" fill="${theme.marker}" stroke="white" stroke-width="3"/>
-    <rect x="86" y="350" width="20" height="20" rx="5" fill="#74D7FF" stroke="white" stroke-width="3"/>
-    <text x="124" y="355" fill="#F5FBFF" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700">DROP</text>
-    <text x="124" y="374" fill="#BEEBFF" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700">MOBILITY</text>
-    <text x="176" y="366" fill="#F5FBFF" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="800">${label}</text>
+    <rect x="34" y="30" width="222" height="46" rx="16" fill="#09173A" fill-opacity="0.82" stroke="${theme.accent}" stroke-opacity="0.45" stroke-width="2"/>
+    <text x="54" y="58" fill="#F5FBFF" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="800">${label}</text>
+    <text x="590" y="58" fill="#D3EEFF" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" text-anchor="end">${hint}</text>
+    <rect x="${dropLabelX - 12}" y="${dropLabelY - 24}" width="116" height="34" rx="12" fill="#09173A" fill-opacity="0.88" stroke="${theme.marker}" stroke-opacity="0.65" stroke-width="2"/>
+    <text x="${dropLabelX}" y="${dropLabelY - 2}" fill="#FFF8D7" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="800">LAND HERE</text>
+    <rect x="${mobilityLabelX - 12}" y="${mobilityLabelY - 24}" width="154" height="34" rx="12" fill="#09173A" fill-opacity="0.88" stroke="#74D7FF" stroke-opacity="0.7" stroke-width="2"/>
+    <text x="${mobilityLabelX}" y="${mobilityLabelY - 2}" fill="#CFF3FF" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="800">MOBILITY HERE</text>
+    <rect x="24" y="374" width="672" height="62" rx="18" fill="#09173A" fill-opacity="0.92" stroke="#2A507A" stroke-width="2"/>
+    <circle cx="56" cy="405" r="10" fill="${theme.marker}" stroke="white" stroke-width="3"/>
+    <text x="78" y="410" fill="#F5FBFF" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700">Yellow marker = landing point</text>
+    <rect x="378" y="394" width="20" height="20" rx="5" fill="#74D7FF" stroke="white" stroke-width="3"/>
+    <text x="408" y="410" fill="#BEEBFF" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700">Blue marker = mobility</text>
   </svg>`;
 
   return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
@@ -1759,15 +1770,25 @@ function renderSpotDetail() {
 
   const mobilityProfile = getMobilityProfile(spot);
   const mobilityLocation = getMobilityLocationMeta(spot);
+  const mapMeta = getSpotMapMeta(spot);
 
   spotDetailElement.innerHTML = `
-    <section class="detail-visual-shell">
-      <img class="detail-visual" src="${getSpotArt(spot)}" alt="${spot.type} scouting illustration for ${spot.name}">
-    </section>
-
     <section class="detail-block">
-      <p class="detail-kicker">Drop map</p>
+      <p class="detail-kicker">Map read</p>
       <img class="drop-map-image" src="${getSpotMapImage(spot)}" alt="Stylized Fortnite island map showing the location of ${spot.name}">
+      <div class="map-read-card">
+        <div class="map-read-grid">
+          <article class="map-read-pill">
+            <span class="map-read-label">Land on</span>
+            <strong class="map-read-value">${mapMeta.hint}</strong>
+          </article>
+          <article class="map-read-pill">
+            <span class="map-read-label">Mobility</span>
+            <strong class="map-read-value">${mobilityLocation.title}</strong>
+          </article>
+        </div>
+        <p class="map-read-copy">${mobilityLocation.where}</p>
+      </div>
     </section>
 
     <section class="detail-block">

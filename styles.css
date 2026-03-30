@@ -535,18 +535,6 @@ select {
   background: linear-gradient(180deg, rgba(10, 23, 58, 0.96), rgba(7, 14, 35, 0.94));
 }
 
-.detail-visual-shell {
-  margin-bottom: 18px;
-}
-
-.detail-visual {
-  display: block;
-  width: 100%;
-  border-radius: 16px;
-  border: 2px solid rgba(157, 235, 255, 0.18);
-  background: rgba(8, 17, 44, 0.34);
-}
-
 .drop-map-image {
   display: block;
   width: 100%;
@@ -554,6 +542,51 @@ select {
   border: 2px solid rgba(157, 235, 255, 0.2);
   background: rgba(8, 17, 44, 0.3);
   box-shadow: 0 16px 38px rgba(3, 8, 22, 0.2);
+}
+
+.map-read-card {
+  margin-top: 14px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  border: 2px solid rgba(157, 235, 255, 0.18);
+  background: linear-gradient(180deg, rgba(12, 24, 59, 0.92), rgba(7, 14, 35, 0.92));
+}
+
+.map-read-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.map-read-pill {
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(157, 235, 255, 0.18);
+}
+
+.map-read-label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--soft);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.map-read-value {
+  color: var(--text);
+  font-family: var(--display-font);
+  font-size: 0.98rem;
+  font-weight: 800;
+}
+
+.map-read-copy {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
 }
 
 .mobility-highlight {
@@ -837,6 +870,10 @@ select {
 
   .drop-map-image {
     border-radius: 16px;
+  }
+
+  .map-read-grid {
+    grid-template-columns: 1fr;
   }
 
   .mobility-location-head {
