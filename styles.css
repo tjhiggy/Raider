@@ -22,6 +22,10 @@
   box-sizing: border-box;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -119,6 +123,7 @@ select {
 
 .hero-copy {
   max-width: 760px;
+  min-width: 0;
 }
 
 .hero-media {
@@ -128,6 +133,7 @@ select {
   align-self: stretch;
   position: relative;
   z-index: 1;
+  min-width: 0;
 }
 
 .hero-art {
@@ -257,6 +263,12 @@ select {
 .content-column > .panel,
 .overview {
   padding: 22px;
+}
+
+.content-column,
+.season-panel,
+.detail-panel {
+  min-width: 0;
 }
 
 .content-column {
@@ -680,6 +692,20 @@ select {
 }
 
 @media (max-width: 1120px) {
+  .hero {
+    display: grid;
+    gap: 18px;
+  }
+
+  .hero-media {
+    width: 100%;
+  }
+
+  .hero-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    min-width: 0;
+  }
+
   .season-layout {
     grid-template-columns: 1fr;
   }
