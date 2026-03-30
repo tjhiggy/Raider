@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.7.2",
+    date: "2026-03-30",
+    summary: "Added Discord promotion links so players can jump from the guide into your ARC Raiders community.",
+    changes: [
+      "Added a Join Discord link in the quick-links area near the top of the app.",
+      "Added a matching Discord link in the footer for a persistent community callout.",
+      "Kept the promotion lightweight so it supports the guide instead of interrupting it."
+    ]
+  },
+  {
     version: "v1.7.1",
     date: "2026-03-30",
     summary: "Cleaned up the ARC Machine Intel section and replaced the awkward graphic with a more useful threat-priority overview.",

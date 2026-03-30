@@ -116,6 +116,11 @@ button { color: inherit; }
   letter-spacing: 0.06em;
 }
 
+.quick-link-discord {
+  border-color: rgba(240, 177, 109, 0.34);
+  color: var(--accent-soft);
+}
+
 .progress-strip {
   flex-wrap: wrap;
   justify-content: flex-start;
@@ -872,6 +877,12 @@ button { color: inherit; }
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.06);
   background: rgba(255, 255, 255, 0.03);
+}
+
+.footer-link:hover,
+.footer-link:focus-visible {
+  border-color: var(--line-strong);
+  color: var(--signal);
 }
 
 .footer-button {
