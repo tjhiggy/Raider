@@ -44,7 +44,34 @@
       </div>
 
       <div class="hero-media">
-        <img class="hero-art" src="./assets/hero-drop-map.svg" alt="Stylized tactical map illustration for Fortnite OG drop planning">
+        <section class="hero-spotlight-card">
+          <div class="hero-spotlight-head">
+            <div>
+              <p class="intel-label">Season Spotlight</p>
+              <h2 id="hero-spotlight-name" class="hero-spotlight-title">Loading drop...</h2>
+            </div>
+            <span id="hero-spotlight-type" class="hero-spotlight-tag">POI</span>
+          </div>
+          <p id="hero-spotlight-copy" class="hero-spotlight-copy">Finding the best current drop for this season.</p>
+          <div class="hero-spotlight-grid">
+            <article class="hero-spotlight-pill">
+              <span class="hero-spotlight-label">Map</span>
+              <strong id="hero-spotlight-map" class="hero-spotlight-value">--</strong>
+            </article>
+            <article class="hero-spotlight-pill">
+              <span class="hero-spotlight-label">Mobility</span>
+              <strong id="hero-spotlight-mobility" class="hero-spotlight-value">--</strong>
+            </article>
+            <article class="hero-spotlight-pill">
+              <span class="hero-spotlight-label">Placement</span>
+              <strong id="hero-spotlight-placement" class="hero-spotlight-value">--</strong>
+            </article>
+          </div>
+          <div class="hero-spotlight-actions">
+            <button id="hero-open-breakdown" class="hero-action-button hero-action-primary" type="button">Open breakdown</button>
+            <button id="hero-open-browser" class="hero-action-button" type="button">Browse drops</button>
+          </div>
+        </section>
         <div class="hero-stats">
           <article class="stat-chip">
             <span class="stat-label">Seasons</span>
@@ -53,6 +80,10 @@
           <article class="stat-chip">
             <span class="stat-label">Curated spots</span>
             <strong id="spot-count">10</strong>
+          </article>
+          <article class="stat-chip">
+            <span class="stat-label">Current Focus</span>
+            <strong id="hero-current-season">Season 1</strong>
           </article>
         </div>
       </div>

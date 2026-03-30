@@ -1,16 +1,25 @@
-const APP_VERSION = "v1.2.0";
+const APP_VERSION = "v1.3.0";
 const APP_UPDATED = "2026-03-30";
 const QUICK_START_STEPS = [
   "Choose a season first to load the correct loot and mobility meta.",
   "Use the Drop Browser filters to narrow the season down to the style you want.",
-  "Use the blue mobility marker as your first exit anchor when the zone pulls badly."
+  "Use the season spotlight at the top for the fastest path into the best current recommendation."
 ];
 const RELEASE_NOTES = [
-  "Reworked the drop browsing flow so only one active recommendation is shown at a time.",
-  "Added drop filters, a focused selector, and next/previous navigation for iPhone-friendly browsing.",
-  "Simplified the main content flow so the page feels more guided and less overwhelming on mobile."
+  "Replaced the old decorative hero graphic with a live season spotlight.",
+  "Added direct jump actions from the hero into the drop browser and breakdown.",
+  "Improved the top-of-page flow so the app starts with an actual decision aid instead of filler artwork."
 ];
 const VERSION_HISTORY = [
+  {
+    version: "v1.3.0",
+    updated: "2026-03-30",
+    changes: [
+      "Replaced the drop route intel artwork with a useful season spotlight module.",
+      "Added featured drop, mobility, and placement intel directly into the hero area.",
+      "Improved the top-of-page UX flow with faster jump actions into the browser and breakdown."
+    ]
+  },
   {
     version: "v1.2.0",
     updated: "2026-03-30",
@@ -1357,6 +1366,15 @@ const detailPanelElement = document.querySelector(".detail-panel");
 const bestSpotsPanelElement = document.querySelector(".content-column .panel:last-of-type");
 const seasonCountElement = document.querySelector("#season-count");
 const spotCountElement = document.querySelector("#spot-count");
+const heroCurrentSeasonElement = document.querySelector("#hero-current-season");
+const heroSpotlightNameElement = document.querySelector("#hero-spotlight-name");
+const heroSpotlightTypeElement = document.querySelector("#hero-spotlight-type");
+const heroSpotlightCopyElement = document.querySelector("#hero-spotlight-copy");
+const heroSpotlightMapElement = document.querySelector("#hero-spotlight-map");
+const heroSpotlightMobilityElement = document.querySelector("#hero-spotlight-mobility");
+const heroSpotlightPlacementElement = document.querySelector("#hero-spotlight-placement");
+const heroOpenBreakdownElement = document.querySelector("#hero-open-breakdown");
+const heroOpenBrowserElement = document.querySelector("#hero-open-browser");
 const appVersionElement = document.querySelector("#app-version");
 const appUpdatedElement = document.querySelector("#app-updated");
 const quickStartListElement = document.querySelector("#quick-start-list");
@@ -1760,6 +1778,60 @@ function renderVersionHistory() {
     .join("");
 }
 
+function renderHeroSpotlight() {
+  const selectedSeason = getSelectedSeason();
+  const seasonSpots = getFilteredSeasonSpots(getSeasonSpots(state.selectedSeasonId));
+  const featuredSpot = seasonSpots[0] || getSelectedSpot();
+
+  if (heroCurrentSeasonElement && selectedSeason) {
+    heroCurrentSeasonElement.textContent = selectedSeason.title;
+  }
+
+  if (!featuredSpot) {
+    if (heroSpotlightNameElement) {
+      heroSpotlightNameElement.textContent = "Season preview";
+    }
+    if (heroSpotlightTypeElement) {
+      heroSpotlightTypeElement.textContent = "Soon";
+    }
+    if (heroSpotlightCopyElement) {
+      heroSpotlightCopyElement.textContent = "We are waiting for the live drop pool before featuring a best current recommendation.";
+    }
+    if (heroSpotlightMapElement) {
+      heroSpotlightMapElement.textContent = "--";
+    }
+    if (heroSpotlightMobilityElement) {
+      heroSpotlightMobilityElement.textContent = "--";
+    }
+    if (heroSpotlightPlacementElement) {
+      heroSpotlightPlacementElement.textContent = "--";
+    }
+    return;
+  }
+
+  const mapMeta = getSpotMapMeta(featuredSpot);
+  const mobilityProfile = getMobilityProfile(featuredSpot);
+
+  if (heroSpotlightNameElement) {
+    heroSpotlightNameElement.textContent = featuredSpot.name;
+  }
+  if (heroSpotlightTypeElement) {
+    heroSpotlightTypeElement.textContent = featuredSpot.type;
+  }
+  if (heroSpotlightCopyElement) {
+    heroSpotlightCopyElement.textContent = featuredSpot.headline;
+  }
+  if (heroSpotlightMapElement) {
+    heroSpotlightMapElement.textContent = mapMeta.grid;
+  }
+  if (heroSpotlightMobilityElement) {
+    heroSpotlightMobilityElement.textContent = mobilityProfile.label;
+  }
+  if (heroSpotlightPlacementElement) {
+    heroSpotlightPlacementElement.textContent = String(placementScore(featuredSpot));
+  }
+}
+
 function openVersionHistory() {
   if (!versionHistoryModalElement) {
     return;
@@ -2126,6 +2198,7 @@ function renderStats() {
 
 function render() {
   renderStats();
+  renderHeroSpotlight();
   renderUtilityLists();
   renderVersionHistory();
   renderSeasonList();
@@ -2170,6 +2243,24 @@ if (easterEggTriggerElement) {
 if (backToTopElement) {
   backToTopElement.addEventListener("click", () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+}
+
+if (heroOpenBreakdownElement) {
+  heroOpenBreakdownElement.addEventListener("click", () => {
+    const selectedSpot = getSelectedSpot();
+    if (selectedSpot) {
+      state.selectedSpotId = selectedSpot.id;
+      renderSpotList();
+      renderSpotDetail();
+    }
+    scrollElementIntoView(detailPanelElement);
+  });
+}
+
+if (heroOpenBrowserElement) {
+  heroOpenBrowserElement.addEventListener("click", () => {
+    scrollElementIntoView(bestSpotsPanelElement);
   });
 }
 
