@@ -1467,14 +1467,6 @@ const MOBILITY_LOCATION_META = {
   "Happy Hamlet Perimeter Route": { x: 47, y: 84, title: "Perimeter path", where: "The perimeter snow route is the whole point of this recommendation." },
 };
 
-function getSpotArt(spot) {
-  if (!spot) {
-    return "./assets/poi-scout.svg";
-  }
-
-  return spot.type === "POI" ? "./assets/poi-scout.svg" : "./assets/landmark-route.svg";
-}
-
 function getSpotMapMeta(spot) {
   return SPOT_MAP_META[spot.name] || {
     x: 50,
