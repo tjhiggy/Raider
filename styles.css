@@ -50,6 +50,33 @@ select {
   padding: 28px 0 40px;
 }
 
+.app-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+  padding: 12px 16px 0;
+  color: rgba(235, 245, 255, 0.74);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.footer-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.footer-version {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(247, 208, 71, 0.28);
+  background: rgba(8, 17, 44, 0.4);
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
 .panel {
   background: var(--panel);
   border: 2px solid var(--panel-border);
@@ -908,6 +935,13 @@ select {
   .app-shell {
     width: min(100%, calc(100% - 12px));
     padding-top: 8px;
+  }
+
+  .app-footer {
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 16px;
+    padding-top: 6px;
   }
 
   .panel {

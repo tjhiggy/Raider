@@ -1,3 +1,5 @@
+const APP_VERSION = "v1.0.0";
+
 const data = {
   seasons: [
     {
@@ -1306,6 +1308,7 @@ const detailPanelElement = document.querySelector(".detail-panel");
 const bestSpotsPanelElement = document.querySelector(".content-column .panel:last-of-type");
 const seasonCountElement = document.querySelector("#season-count");
 const spotCountElement = document.querySelector("#spot-count");
+const appVersionElement = document.querySelector("#app-version");
 const easterEggTriggerElement = document.querySelector("#easter-egg-trigger");
 const easterEggToastElement = document.querySelector("#easter-egg-toast");
 
@@ -1863,6 +1866,9 @@ function renderSpotDetail() {
 function renderStats() {
   seasonCountElement.textContent = String(data.seasons.length);
   spotCountElement.textContent = String(data.spots.length);
+  if (appVersionElement) {
+    appVersionElement.textContent = APP_VERSION;
+  }
 }
 
 function render() {
