@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.7.1",
+    date: "2026-03-30",
+    summary: "Cleaned up the ARC Machine Intel section and replaced the awkward graphic with a more useful threat-priority overview.",
+    changes: [
+      "Removed the decorative machine schematic from the machine intel section.",
+      "Added a machine overview board that tells players what types of threats to prioritize first.",
+      "Made the section read more like a quick-reference combat tool and less like a visual placeholder."
+    ]
+  },
+  {
     version: "v1.7.0",
     date: "2026-03-30",
     summary: "Restructured the app around training flow and current player pain points instead of just content categories.",
@@ -624,6 +634,7 @@ const updateCenterElement = document.querySelector("#update-center");
 const heroUpdateCardElement = document.querySelector("#hero-update-card");
 const heroPersonalCardElement = document.querySelector("#hero-personal-card");
 const heroTaskListElement = document.querySelector("#hero-task-list");
+const machineOverviewElement = document.querySelector("#machine-overview");
 const painPointListElement = document.querySelector("#pain-point-list");
 const briefingListElement = document.querySelector("#briefing-list");
 const trackListElement = document.querySelector("#track-list");
@@ -849,6 +860,27 @@ function renderLessonDetail() {
 }
 
 function renderMachines() {
+  machineOverviewElement.innerHTML = `
+    <section class="machine-intel-note">
+      <strong class="hero-card-label">Threat priority</strong>
+      <p>When a fight starts getting messy, stop thinking about raw health pools first. Kill or break the units that expand the fight, expose you, or force you out of cover.</p>
+    </section>
+    <div class="machine-priority-grid">
+      <article class="machine-priority-card">
+        <strong>1. Detection first</strong>
+        <p>Snitches and spotters are the units most likely to turn a small mistake into a whole area problem.</p>
+      </article>
+      <article class="machine-priority-card">
+        <strong>2. Area denial next</strong>
+        <p>Bombardier-style pressure and flying units punish players who stay still or cross open ground late.</p>
+      </article>
+      <article class="machine-priority-card">
+        <strong>3. Burst threats after</strong>
+        <p>Leapers and heavy threats become easier to manage once detection and space control are handled.</p>
+      </article>
+    </div>
+  `;
+
   machineListElement.innerHTML = machines.map((machine) => `
     <article class="machine-card">
       <div class="machine-top">

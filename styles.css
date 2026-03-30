@@ -269,21 +269,6 @@ button { color: inherit; }
   gap: 12px;
 }
 
-.section-art-card {
-  margin: 0;
-  overflow: hidden;
-  border-radius: 20px;
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.03);
-  margin-bottom: 14px;
-}
-
-.section-art {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
 .hero-card, .briefing-item, .machine-card, .prep-card {
   padding: 16px;
   border-radius: 18px;
@@ -798,6 +783,50 @@ button { color: inherit; }
 
 .callout strong { color: var(--signal); }
 .intel-grid { grid-template-columns: 1.15fr 0.85fr; }
+.machine-overview {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.machine-priority-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.machine-priority-card {
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.machine-priority-card strong {
+  display: block;
+  color: var(--signal);
+  font-size: 0.95rem;
+}
+
+.machine-priority-card p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.machine-intel-note {
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(214, 117, 48, 0.24);
+  background: rgba(214, 117, 48, 0.08);
+}
+
+.machine-intel-note p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
 .machine-list { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
 .machine-threat {
   color: var(--danger);
@@ -1000,6 +1029,7 @@ button { color: inherit; }
   .hero h1 { font-size: clamp(1.9rem, 10vw, 2.8rem); max-width: 10ch; }
   .hero-actions { display: grid; grid-template-columns: 1fr; }
   .lesson-list, .machine-list, .track-list { grid-template-columns: 1fr; }
+  .machine-priority-grid { grid-template-columns: 1fr; }
   .track-title-row, .lesson-title-row, .machine-top { align-items: flex-start; flex-direction: column; }
   .overview-meta, .detail-chip-row { display: grid; grid-template-columns: 1fr; }
   .release-title-row,
@@ -1031,5 +1061,4 @@ button { color: inherit; }
   .modal-panel { padding: 16px; border-radius: 18px; }
   .modal-head,
   .changelog-top { flex-direction: column; align-items: flex-start; }
-  .section-art-card { border-radius: 16px; }
 }
