@@ -452,6 +452,11 @@ button { color: inherit; }
   margin-bottom: 20px;
 }
 
+.materials-catalog-panel {
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
 .track-button, .lesson-card {
   width: 100%;
   text-align: left;
@@ -619,6 +624,40 @@ button { color: inherit; }
 .materials-list {
   display: grid;
   gap: 12px;
+}
+
+.materials-catalog {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.catalog-group {
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.catalog-group-title {
+  margin: 0 0 12px;
+  font-family: var(--display-font);
+  font-size: 1rem;
+  text-transform: uppercase;
+}
+
+.catalog-list {
+  display: grid;
+  gap: 8px;
+}
+
+.catalog-item {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--muted);
+  line-height: 1.4;
 }
 
 .quest-title-row {
@@ -1030,6 +1069,7 @@ button { color: inherit; }
 @media (max-width: 1120px) {
   .hero, .update-layout, .curriculum-layout, .quest-layout, .materials-layout, .intel-grid, .status-grid, .briefing-list, .launchpad-grid { grid-template-columns: 1fr; }
   .curriculum-layout { gap: 16px; }
+  .materials-catalog { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 760px) {
@@ -1055,7 +1095,8 @@ button { color: inherit; }
   .release-detail-panel,
   .materials-overview-panel,
   .materials-list-panel,
-  .materials-detail-panel { padding: 16px; }
+  .materials-detail-panel,
+  .materials-catalog-panel { padding: 16px; }
   .quest-title-row { align-items: flex-start; flex-direction: column; }
 }
 

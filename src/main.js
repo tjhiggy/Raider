@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.7.3",
+    date: "2026-03-30",
+    summary: "Expanded the materials area with a full catalog of currently listed ARC Raiders materials.",
+    changes: [
+      "Added a complete materials catalog grouped into Basic, Topside, and Refined materials.",
+      "Kept the routing advice section while adding a proper reference list for lookup use.",
+      "Labeled the full catalog as community-supported source data so players know the provenance."
+    ]
+  },
+  {
     version: "v1.7.2",
     date: "2026-03-30",
     summary: "Added Discord promotion links so players can jump from the guide into your ARC Raiders community.",
@@ -619,6 +629,61 @@ const materialFamilies = [
   }
 ];
 
+const materialCatalog = [
+  {
+    title: "Basic Materials",
+    items: ["Chemicals", "Fabric", "Metal Parts", "Plastic Parts", "Rubber Parts"]
+  },
+  {
+    title: "Topside Materials",
+    items: [
+      "Advanced ARC Powercell",
+      "Arc Alloy",
+      "Arc Circuitry",
+      "Arc Motion Core",
+      "Arc Powercell",
+      "Battery",
+      "Canister",
+      "Complex Gun Parts",
+      "Duct Tape",
+      "Exodus Modules",
+      "Great Mullein",
+      "Heavy Gun Parts",
+      "Light Gun Parts",
+      "Magnet",
+      "Medium Gun Parts",
+      "Moss",
+      "Oil",
+      "Processor",
+      "Rope",
+      "Sensors",
+      "Simple Gun Parts",
+      "Speaker Component",
+      "Steel Spring",
+      "Synthesized Fuel",
+      "Syringe",
+      "Voltage Converter",
+      "Wires"
+    ]
+  },
+  {
+    title: "Refined Materials",
+    items: [
+      "Advanced Electrical Components",
+      "Advanced Mechanical Components",
+      "Antiseptic",
+      "Crude Explosives",
+      "Durable Cloth",
+      "Electrical Components",
+      "Explosive Compound",
+      "Magnetic Accelerator",
+      "Mechanical Components",
+      "Mod Components",
+      "Power Rod"
+    ]
+  }
+];
+
 const state = {
   selectedReleaseId: "flashpoint-2026-03-31",
   selectedTrackId: tracks[0].id,
@@ -661,6 +726,7 @@ const materialsOverviewElement = document.querySelector("#materials-overview");
 const materialsListElement = document.querySelector("#materials-list");
 const materialsDetailElement = document.querySelector("#materials-detail");
 const materialsDetailPanelElement = document.querySelector(".materials-detail-panel");
+const materialsCatalogElement = document.querySelector("#materials-catalog");
 const detailPanelElement = document.querySelector(".detail-panel");
 const lessonPanelElement = document.querySelector(".lesson-column");
 const backToTopElement = document.querySelector("#back-to-top");
@@ -1340,6 +1406,17 @@ function renderMaterialsDetail() {
   `;
 }
 
+function renderMaterialsCatalog() {
+  materialsCatalogElement.innerHTML = materialCatalog.map((group) => `
+    <section class="catalog-group">
+      <h3 class="catalog-group-title">${group.title}</h3>
+      <div class="catalog-list">
+        ${group.items.map((item) => `<article class="catalog-item">${item}</article>`).join("")}
+      </div>
+    </section>
+  `).join("");
+}
+
 function syncBackToTopVisibility() {
   backToTopElement.classList.toggle("visible", window.scrollY > 520);
 }
@@ -1401,6 +1478,7 @@ function render() {
   renderMaterialsOverview();
   renderMaterialsList();
   renderMaterialsDetail();
+  renderMaterialsCatalog();
   renderMachines();
   renderPrepList();
 }
