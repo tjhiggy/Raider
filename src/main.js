@@ -1,4 +1,4 @@
-const APP_VERSION = "v1.1.0";
+const APP_VERSION = "v1.1.1";
 const APP_UPDATED = "2026-03-30";
 const QUICK_START_STEPS = [
   "Choose a season first to load the correct loot and mobility meta.",
@@ -9,6 +9,35 @@ const RELEASE_NOTES = [
   "Added install/share metadata and a web manifest for app-style home-screen use.",
   "Added quick-start guidance and versioned release notes right inside the app.",
   "Added a floating back-to-top button for easier long-page navigation on mobile."
+];
+const VERSION_HISTORY = [
+  {
+    version: "v1.1.1",
+    updated: "2026-03-30",
+    changes: [
+      "Made the footer app version clickable.",
+      "Added a pop-up changelog with release history across versions.",
+      "Added a dedicated modal close and backdrop dismiss flow."
+    ]
+  },
+  {
+    version: "v1.1.0",
+    updated: "2026-03-30",
+    changes: [
+      "Added install/share metadata and a web manifest for app-style home-screen use.",
+      "Added quick-start guidance and versioned release notes right inside the app.",
+      "Added a floating back-to-top button for easier long-page navigation on mobile."
+    ]
+  },
+  {
+    version: "v1.0.0",
+    updated: "2026-03-30",
+    changes: [
+      "Added a visible footer version badge for easier testing and release references.",
+      "Improved the mobile browsing flow with a cleaner season selector and auto-scroll behavior.",
+      "Refined the drop breakdown panel and map readability."
+    ]
+  }
 ];
 
 const data = {
@@ -1324,6 +1353,9 @@ const appUpdatedElement = document.querySelector("#app-updated");
 const quickStartListElement = document.querySelector("#quick-start-list");
 const releaseNotesElement = document.querySelector("#release-notes");
 const backToTopElement = document.querySelector("#back-to-top");
+const versionHistoryModalElement = document.querySelector("#version-history-modal");
+const versionHistoryListElement = document.querySelector("#version-history-list");
+const closeVersionHistoryElement = document.querySelector("#close-version-history");
 const easterEggTriggerElement = document.querySelector("#easter-egg-trigger");
 const easterEggToastElement = document.querySelector("#easter-egg-toast");
 
@@ -1667,6 +1699,44 @@ function renderUtilityLists() {
   }
 }
 
+function renderVersionHistory() {
+  if (!versionHistoryListElement) {
+    return;
+  }
+
+  versionHistoryListElement.innerHTML = VERSION_HISTORY
+    .map((entry) => `
+      <article class="version-entry">
+        <div class="version-entry-head">
+          <h3 class="version-entry-title">${entry.version}</h3>
+          <span class="version-entry-date">${entry.updated}</span>
+        </div>
+        <div class="version-entry-list">
+          ${entry.changes.map((item) => `<p class="version-entry-change">${item}</p>`).join("")}
+        </div>
+      </article>
+    `)
+    .join("");
+}
+
+function openVersionHistory() {
+  if (!versionHistoryModalElement) {
+    return;
+  }
+
+  versionHistoryModalElement.classList.add("visible");
+  versionHistoryModalElement.setAttribute("aria-hidden", "false");
+}
+
+function closeVersionHistory() {
+  if (!versionHistoryModalElement) {
+    return;
+  }
+
+  versionHistoryModalElement.classList.remove("visible");
+  versionHistoryModalElement.setAttribute("aria-hidden", "true");
+}
+
 function renderSeasonList() {
   seasonListElement.innerHTML = data.seasons
     .map((season) => `
@@ -1916,6 +1986,7 @@ function renderStats() {
 function render() {
   renderStats();
   renderUtilityLists();
+  renderVersionHistory();
   renderSeasonList();
   renderSeasonOverview();
   renderSpotList();
@@ -1960,6 +2031,29 @@ if (backToTopElement) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
 }
+
+if (appVersionElement) {
+  appVersionElement.addEventListener("click", openVersionHistory);
+}
+
+if (closeVersionHistoryElement) {
+  closeVersionHistoryElement.addEventListener("click", closeVersionHistory);
+}
+
+if (versionHistoryModalElement) {
+  versionHistoryModalElement.addEventListener("click", (event) => {
+    const target = event.target;
+    if (target instanceof HTMLElement && target.dataset.closeVersionHistory === "true") {
+      closeVersionHistory();
+    }
+  });
+}
+
+window.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    closeVersionHistory();
+  }
+});
 
 window.addEventListener("scroll", syncBackToTopVisibility, { passive: true });
 

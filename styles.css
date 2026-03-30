@@ -143,6 +143,18 @@ select {
   font-weight: 800;
 }
 
+.footer-version-button {
+  cursor: pointer;
+  transition: border-color 180ms ease, transform 180ms ease, background 180ms ease;
+}
+
+.footer-version-button:hover,
+.footer-version-button:focus-visible {
+  border-color: rgba(247, 208, 71, 0.72);
+  background: rgba(15, 28, 68, 0.9);
+  transform: translateY(-1px);
+}
+
 .footer-meta {
   font-size: 0.72rem;
   font-weight: 700;
@@ -179,6 +191,116 @@ select {
 .back-to-top:hover,
 .back-to-top:focus-visible {
   border-color: rgba(247, 208, 71, 0.72);
+}
+
+.modal-shell {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease;
+  z-index: 40;
+}
+
+.modal-shell.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 8, 24, 0.74);
+  backdrop-filter: blur(8px);
+}
+
+.modal-card {
+  position: relative;
+  width: min(760px, 100%);
+  max-height: min(82vh, 920px);
+  overflow: auto;
+  padding: 22px;
+  border-radius: 22px;
+  border: 2px solid rgba(125, 212, 255, 0.24);
+  background: linear-gradient(180deg, rgba(10, 23, 58, 0.98), rgba(7, 14, 35, 0.98));
+  box-shadow: 0 24px 80px rgba(3, 8, 22, 0.46);
+}
+
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.modal-title {
+  margin: 0;
+  font-family: var(--display-font);
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.modal-close {
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(157, 235, 255, 0.22);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.version-history-list {
+  display: grid;
+  gap: 14px;
+}
+
+.version-entry {
+  padding: 16px 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(157, 235, 255, 0.16);
+  background: rgba(7, 14, 35, 0.42);
+}
+
+.version-entry-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.version-entry-title {
+  margin: 0;
+  color: var(--accent);
+  font-family: var(--display-font);
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.version-entry-date {
+  color: var(--soft);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.version-entry-list {
+  display: grid;
+  gap: 8px;
+}
+
+.version-entry-change {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
 }
 
 .panel {
@@ -957,6 +1079,10 @@ select {
     padding: 16px;
   }
 
+  .modal-card {
+    padding: 18px;
+  }
+
   .season-panel,
   .detail-panel,
   .content-column > .panel,
@@ -1060,6 +1186,16 @@ select {
     right: 12px;
     bottom: 12px;
     padding: 11px 13px;
+  }
+
+  .modal-shell {
+    padding: 12px;
+  }
+
+  .modal-header,
+  .version-entry-head {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .panel {
