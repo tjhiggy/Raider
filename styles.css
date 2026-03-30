@@ -546,10 +546,6 @@ select {
   gap: 14px;
 }
 
-.spot-list {
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-}
-
 .season-button,
 .spot-card {
   width: 100%;
@@ -713,6 +709,149 @@ select {
   font-family: var(--display-font);
   font-weight: 800;
   color: var(--accent);
+}
+
+.spot-browser-shell {
+  display: grid;
+  gap: 16px;
+}
+
+.spot-controls-panel {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(157, 235, 255, 0.18);
+  background: linear-gradient(180deg, rgba(12, 24, 59, 0.82), rgba(7, 14, 35, 0.84));
+}
+
+.spot-filter-row {
+  display: grid;
+  grid-template-columns: 1.3fr minmax(160px, 0.8fr) minmax(220px, 1fr);
+  gap: 12px;
+  align-items: end;
+}
+
+.spot-filter-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filter-chip {
+  padding: 10px 12px;
+  border: 1px solid rgba(157, 235, 255, 0.18);
+  border-radius: 999px;
+  background: rgba(7, 14, 35, 0.46);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.filter-chip.active {
+  border-color: rgba(247, 208, 71, 0.72);
+  background: rgba(247, 208, 71, 0.14);
+  color: var(--accent);
+}
+
+.spot-select-shell {
+  display: grid;
+  gap: 6px;
+}
+
+.spot-select-shell-wide {
+  min-width: 0;
+}
+
+.spot-select-label {
+  color: var(--soft);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.spot-select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid rgba(157, 235, 255, 0.22);
+  border-radius: 14px;
+  background: rgba(7, 14, 35, 0.74);
+  color: var(--text);
+}
+
+.spot-browser-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.spot-browser-summary,
+.spot-nav-count {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.spot-nav-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.spot-nav-button,
+.spot-open-button {
+  padding: 11px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(157, 235, 255, 0.22);
+  background: rgba(7, 14, 35, 0.6);
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.spot-nav-button[disabled] {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.spot-open-button {
+  border-color: rgba(247, 208, 71, 0.4);
+  color: var(--accent);
+}
+
+.spot-focus-card {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  border-radius: 18px;
+  border: 2px solid rgba(247, 208, 71, 0.24);
+  background: linear-gradient(180deg, rgba(21, 41, 94, 0.88), rgba(9, 18, 46, 0.96));
+  box-shadow: 0 20px 34px rgba(3, 8, 22, 0.22);
+}
+
+.spot-focus-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.spot-focus-pills {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.spot-focus-actions {
+  display: flex;
+  justify-content: flex-start;
 }
 
 .spot-card {
@@ -984,6 +1123,14 @@ select {
     grid-template-columns: 1fr;
   }
 
+  .spot-filter-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .spot-select-shell-wide {
+    grid-column: 1 / -1;
+  }
+
   .hero {
     display: grid;
     gap: 18px;
@@ -1107,7 +1254,6 @@ select {
   }
 
   .spot-list {
-    grid-template-columns: 1fr;
     gap: 12px;
   }
 
@@ -1117,13 +1263,40 @@ select {
   }
 
   .spot-top,
-  .detail-score-row {
+  .detail-score-row,
+  .spot-focus-top {
     flex-direction: column;
     align-items: stretch;
   }
 
   .spot-top {
     gap: 12px;
+  }
+
+  .spot-filter-row,
+  .spot-browser-meta {
+    grid-template-columns: 1fr;
+    display: grid;
+  }
+
+  .spot-nav-row,
+  .spot-focus-actions {
+    justify-content: stretch;
+  }
+
+  .spot-nav-button,
+  .spot-open-button {
+    width: 100%;
+  }
+
+  .spot-nav-row {
+    grid-template-columns: 1fr auto 1fr;
+    display: grid;
+  }
+
+  .spot-controls-panel,
+  .spot-focus-card {
+    padding: 16px;
   }
 
   .spot-score-row,
@@ -1245,7 +1418,8 @@ select {
   }
 
   .season-button,
-  .spot-card {
+  .spot-card,
+  .spot-focus-card {
     clip-path: none;
     border-radius: 14px;
   }
@@ -1293,6 +1467,11 @@ select {
 
   .spot-card {
     gap: 14px;
+  }
+
+  .spot-filter-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
   }
 
   .drop-map-image {

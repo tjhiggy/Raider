@@ -1,16 +1,25 @@
-const APP_VERSION = "v1.1.1";
+const APP_VERSION = "v1.2.0";
 const APP_UPDATED = "2026-03-30";
 const QUICK_START_STEPS = [
   "Choose a season first to load the correct loot and mobility meta.",
-  "Pick a drop from Best Spots to open the full map read and route plan.",
+  "Use the Drop Browser filters to narrow the season down to the style you want.",
   "Use the blue mobility marker as your first exit anchor when the zone pulls badly."
 ];
 const RELEASE_NOTES = [
-  "Added install/share metadata and a web manifest for app-style home-screen use.",
-  "Added quick-start guidance and versioned release notes right inside the app.",
-  "Added a floating back-to-top button for easier long-page navigation on mobile."
+  "Reworked the drop browsing flow so only one active recommendation is shown at a time.",
+  "Added drop filters, a focused selector, and next/previous navigation for iPhone-friendly browsing.",
+  "Simplified the main content flow so the page feels more guided and less overwhelming on mobile."
 ];
 const VERSION_HISTORY = [
+  {
+    version: "v1.2.0",
+    updated: "2026-03-30",
+    changes: [
+      "Replaced the full drop-card list with a focused drop browser.",
+      "Added filters for drop type and conflict level plus a single active recommendation view.",
+      "Added previous and next controls to move through matching drops more smoothly on phones."
+    ]
+  },
   {
     version: "v1.1.1",
     updated: "2026-03-30",
@@ -1362,6 +1371,8 @@ const easterEggToastElement = document.querySelector("#easter-egg-toast");
 const state = {
   selectedSeasonId: data.seasons[0].id,
   selectedSpotId: data.spots[0].id,
+  selectedTypeFilter: "All",
+  selectedRiskFilter: "all",
 };
 
 let easterEggTimeoutId = null;
@@ -1646,7 +1657,7 @@ function placementScore(spot) {
 }
 
 function getSelectedSpot() {
-  const seasonSpots = getSeasonSpots(state.selectedSeasonId);
+  const seasonSpots = getFilteredSeasonSpots(getSeasonSpots(state.selectedSeasonId));
   const selectedSpot = seasonSpots.find((spot) => spot.id === state.selectedSpotId);
   return selectedSpot || seasonSpots[0] || null;
 }
@@ -1673,6 +1684,44 @@ function scrollElementIntoView(element) {
     behavior: "smooth",
     block: "start"
   });
+}
+
+function getRiskBucket(spot) {
+  if (spot.risk <= 34) {
+    return "low";
+  }
+  if (spot.risk <= 64) {
+    return "medium";
+  }
+  return "high";
+}
+
+function getFilteredSeasonSpots(seasonSpots) {
+  return seasonSpots.filter((spot) => {
+    const typeMatches = state.selectedTypeFilter === "All" || spot.type === state.selectedTypeFilter;
+    const riskMatches = state.selectedRiskFilter === "all" || getRiskBucket(spot) === state.selectedRiskFilter;
+    return typeMatches && riskMatches;
+  });
+}
+
+function syncSelectedSpotWithFilters(filteredSpots) {
+  const currentSelected = filteredSpots.find((spot) => spot.id === state.selectedSpotId);
+  if (!currentSelected) {
+    state.selectedSpotId = filteredSpots.length > 0 ? filteredSpots[0].id : null;
+  }
+}
+
+function moveSelectedSpot(direction) {
+  const filteredSpots = getFilteredSeasonSpots(getSeasonSpots(state.selectedSeasonId));
+  if (filteredSpots.length === 0) {
+    return;
+  }
+
+  const currentIndex = Math.max(filteredSpots.findIndex((spot) => spot.id === state.selectedSpotId), 0);
+  const nextIndex = (currentIndex + direction + filteredSpots.length) % filteredSpots.length;
+  state.selectedSpotId = filteredSpots[nextIndex].id;
+  renderSpotList();
+  renderSpotDetail();
 }
 
 function renderUtilityLists() {
@@ -1812,50 +1861,150 @@ function renderSpotList() {
     return;
   }
 
-  spotListElement.innerHTML = seasonSpots
-    .map((spot) => `
-      <button
-        class="spot-card ${spot.id === state.selectedSpotId ? "active" : ""}"
-        type="button"
-        data-spot-id="${spot.id}"
-      >
-        <div class="spot-top">
-          <div>
-            <h3 class="spot-name">${spot.name}</h3>
-            <p class="spot-region">${spot.region}</p>
-          </div>
-          <div class="meta-pill">
-            <span class="meta-pill-label">Type</span>
-            <strong class="meta-pill-value">${spot.type}</strong>
-          </div>
-          <div class="meta-pill">
-            <span class="meta-pill-label">Ideal Team</span>
-            <strong class="meta-pill-value">${spot.squad}</strong>
-          </div>
-        </div>
-        <p class="spot-headline">${spot.headline}</p>
-        <div class="spot-intel-row">
-          <span class="spot-chip">Map: ${getSpotMapMeta(spot).grid}</span>
-          <span class="spot-chip spot-chip-mobility">${getMobilityProfile(spot).label}</span>
-        </div>
-        <div class="spot-score-row">
-          ${scorePill("Placement", placementScore(spot))}
-          ${scorePill("Loot", spot.loot)}
-          ${scorePill("Rotate", spot.rotate)}
-          ${scorePill("Risk", spot.risk)}
-        </div>
-      </button>
-    `)
-    .join("");
+  const filteredSpots = getFilteredSeasonSpots(seasonSpots);
+  syncSelectedSpotWithFilters(filteredSpots);
+  const selectedSpot = filteredSpots.find((spot) => spot.id === state.selectedSpotId) || null;
+  const selectedIndex = selectedSpot ? filteredSpots.findIndex((spot) => spot.id === selectedSpot.id) : -1;
 
-  for (const button of spotListElement.querySelectorAll("[data-spot-id]")) {
+  spotListElement.innerHTML = `
+    <section class="spot-browser-shell">
+      <div class="spot-controls-panel">
+        <div class="spot-filter-row">
+          <div class="spot-filter-group" aria-label="Drop type filter">
+            ${["All", "POI", "Landmark", "Route"].map((label) => `
+              <button
+                class="filter-chip ${state.selectedTypeFilter === label ? "active" : ""}"
+                type="button"
+                data-type-filter="${label}"
+              >
+                ${label}
+              </button>
+            `).join("")}
+          </div>
+          <label class="spot-select-shell">
+            <span class="spot-select-label">Conflict</span>
+            <select id="risk-filter" class="spot-select">
+              <option value="all" ${state.selectedRiskFilter === "all" ? "selected" : ""}>Any risk</option>
+              <option value="low" ${state.selectedRiskFilter === "low" ? "selected" : ""}>Low conflict</option>
+              <option value="medium" ${state.selectedRiskFilter === "medium" ? "selected" : ""}>Balanced</option>
+              <option value="high" ${state.selectedRiskFilter === "high" ? "selected" : ""}>Higher risk</option>
+            </select>
+          </label>
+          <label class="spot-select-shell spot-select-shell-wide">
+            <span class="spot-select-label">Selected drop</span>
+            <select id="spot-selector" class="spot-select">
+              ${filteredSpots.map((spot) => `
+                <option value="${spot.id}" ${spot.id === state.selectedSpotId ? "selected" : ""}>
+                  ${spot.name} (${spot.region})
+                </option>
+              `).join("")}
+            </select>
+          </label>
+        </div>
+        <div class="spot-browser-meta">
+          <p class="spot-browser-summary">${filteredSpots.length} matching drops in ${getSelectedSeason().title}</p>
+          <div class="spot-nav-row">
+            <button class="spot-nav-button" type="button" data-spot-nav="-1" ${filteredSpots.length <= 1 ? "disabled" : ""}>Previous</button>
+            <span class="spot-nav-count">${selectedSpot ? `${selectedIndex + 1} / ${filteredSpots.length}` : "0 / 0"}</span>
+            <button class="spot-nav-button" type="button" data-spot-nav="1" ${filteredSpots.length <= 1 ? "disabled" : ""}>Next</button>
+          </div>
+        </div>
+      </div>
+      ${selectedSpot ? `
+        <article class="spot-focus-card">
+          <div class="spot-focus-top">
+            <div>
+              <p class="detail-kicker">${selectedSpot.region}</p>
+              <h3 class="spot-name">${selectedSpot.name}</h3>
+            </div>
+            <div class="spot-focus-pills">
+              <div class="meta-pill">
+                <span class="meta-pill-label">Type</span>
+                <strong class="meta-pill-value">${selectedSpot.type}</strong>
+              </div>
+              <div class="meta-pill">
+                <span class="meta-pill-label">Ideal Team</span>
+                <strong class="meta-pill-value">${selectedSpot.squad}</strong>
+              </div>
+            </div>
+          </div>
+          <p class="spot-headline">${selectedSpot.headline}</p>
+          <div class="spot-intel-row">
+            <span class="spot-chip">Map: ${getSpotMapMeta(selectedSpot).grid}</span>
+            <span class="spot-chip spot-chip-mobility">${getMobilityProfile(selectedSpot).label}</span>
+            <span class="spot-chip">Conflict: ${getRiskBucket(selectedSpot) === "low" ? "Low" : getRiskBucket(selectedSpot) === "medium" ? "Balanced" : "High"}</span>
+          </div>
+          <div class="spot-score-row">
+            ${scorePill("Placement", placementScore(selectedSpot))}
+            ${scorePill("Loot", selectedSpot.loot)}
+            ${scorePill("Rotate", selectedSpot.rotate)}
+            ${scorePill("Risk", selectedSpot.risk)}
+          </div>
+          <div class="spot-focus-actions">
+            <button class="spot-open-button" type="button" data-open-breakdown="true">Open Drop Breakdown</button>
+          </div>
+        </article>
+      ` : `
+        <article class="empty-state">
+          <p class="detail-kicker">No matches</p>
+          <h3 class="detail-title">No drops fit that filter combination.</h3>
+          <p class="detail-copy">Try switching the conflict filter or returning to all drop types.</p>
+          <button class="spot-open-button" type="button" data-reset-filters="true">Reset filters</button>
+        </article>
+      `}
+    </section>
+  `;
+
+  for (const button of spotListElement.querySelectorAll("[data-type-filter]")) {
     button.addEventListener("click", () => {
-      state.selectedSpotId = button.dataset.spotId;
+      state.selectedTypeFilter = button.dataset.typeFilter;
+      renderSpotList();
+      renderSpotDetail();
+    });
+  }
+
+  const riskFilterElement = spotListElement.querySelector("#risk-filter");
+  if (riskFilterElement) {
+    riskFilterElement.addEventListener("change", (event) => {
+      state.selectedRiskFilter = event.target.value;
+      renderSpotList();
+      renderSpotDetail();
+    });
+  }
+
+  const spotSelectorElement = spotListElement.querySelector("#spot-selector");
+  if (spotSelectorElement) {
+    spotSelectorElement.addEventListener("change", (event) => {
+      state.selectedSpotId = event.target.value;
       renderSpotList();
       renderSpotDetail();
       if (isMobileLayout()) {
         scrollElementIntoView(detailPanelElement);
       }
+    });
+  }
+
+  for (const button of spotListElement.querySelectorAll("[data-spot-nav]")) {
+    button.addEventListener("click", () => {
+      moveSelectedSpot(Number(button.dataset.spotNav));
+    });
+  }
+
+  const openBreakdownButton = spotListElement.querySelector("[data-open-breakdown]");
+  if (openBreakdownButton) {
+    openBreakdownButton.addEventListener("click", () => {
+      renderSpotDetail();
+      scrollElementIntoView(detailPanelElement);
+    });
+  }
+
+  const resetFiltersButton = spotListElement.querySelector("[data-reset-filters]");
+  if (resetFiltersButton) {
+    resetFiltersButton.addEventListener("click", () => {
+      state.selectedTypeFilter = "All";
+      state.selectedRiskFilter = "all";
+      renderSpotList();
+      renderSpotDetail();
     });
   }
 }
