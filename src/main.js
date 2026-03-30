@@ -1302,6 +1302,8 @@ const seasonListElement = document.querySelector("#season-list");
 const seasonOverviewElement = document.querySelector("#season-overview");
 const spotListElement = document.querySelector("#spot-list");
 const spotDetailElement = document.querySelector("#spot-detail");
+const detailPanelElement = document.querySelector(".detail-panel");
+const bestSpotsPanelElement = document.querySelector(".content-column .panel:last-of-type");
 const seasonCountElement = document.querySelector("#season-count");
 const spotCountElement = document.querySelector("#spot-count");
 const easterEggTriggerElement = document.querySelector("#easter-egg-trigger");
@@ -1597,6 +1599,21 @@ function scorePill(label, value) {
   `;
 }
 
+function isMobileLayout() {
+  return window.matchMedia("(max-width: 760px)").matches;
+}
+
+function scrollElementIntoView(element) {
+  if (!element) {
+    return;
+  }
+
+  element.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+}
+
 function renderSeasonList() {
   seasonListElement.innerHTML = data.seasons
     .map((season) => `
@@ -1623,6 +1640,9 @@ function renderSeasonList() {
       const firstSeasonSpot = getSeasonSpots(seasonId)[0];
       state.selectedSpotId = firstSeasonSpot ? firstSeasonSpot.id : null;
       render();
+      if (isMobileLayout()) {
+        scrollElementIntoView(bestSpotsPanelElement || seasonOverviewElement);
+      }
     });
   }
 }
@@ -1710,6 +1730,9 @@ function renderSpotList() {
       state.selectedSpotId = button.dataset.spotId;
       renderSpotList();
       renderSpotDetail();
+      if (isMobileLayout()) {
+        scrollElementIntoView(detailPanelElement);
+      }
     });
   }
 }
