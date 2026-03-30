@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.7.0",
+    date: "2026-03-30",
+    summary: "Restructured the app around training flow and current player pain points instead of just content categories.",
+    changes: [
+      "Replaced low-value summary cards with a clearer launchpad based on the most common player goals.",
+      "Added a pain-point triage section for issues like material confusion, patch uncertainty, and raid drift.",
+      "Shifted the app toward a training dashboard that helps players know where to go first."
+    ]
+  },
+  {
     version: "v1.6.1",
     date: "2026-03-30",
     summary: "Reworked the top section into a useful operations deck instead of a decorative hero image.",
@@ -200,6 +210,49 @@ const BRIEFING_STEPS = [
   {
     title: "Progress happens in Speranza",
     copy: "Quests, crafting, workshop upgrades, skills, traders, and Raider Decks turn surviving raids into long-term power."
+  }
+];
+
+const painPoints = [
+  {
+    id: "material-confusion",
+    title: "I do not know where items or materials are",
+    copy: "Players repeatedly get blocked by crafting and item-location knowledge, especially when a quest or workshop upgrade depends on one missing material.",
+    actionLabel: "Open material routing",
+    onOpen: () => scrollElementIntoView(document.querySelector("#materials-intel"))
+  },
+  {
+    id: "quest-drift",
+    title: "My raids feel random",
+    copy: "A common trap is entering Topside without a single goal, then extracting nothing useful or dying with partial progress.",
+    actionLabel: "Open quest board",
+    onOpen: () => scrollElementIntoView(document.querySelector("#quest-ops"))
+  },
+  {
+    id: "machine-pressure",
+    title: "ARC fights get out of control fast",
+    copy: "Newer players often aggro the wrong targets, stay too long after noise, or fail to reset after a messy fight.",
+    actionLabel: "Open machine intel",
+    onOpen: () => scrollElementIntoView(document.querySelector("#machine-intel"))
+  },
+  {
+    id: "new-player-overload",
+    title: "There is too much information at once",
+    copy: "The game and the official site surface a lot of systems quickly, so the app needs to behave like a guided training flow instead of a content dump.",
+    actionLabel: "Start new raider path",
+    onOpen: () => {
+      state.selectedTrackId = "new-raider";
+      state.selectedLessonId = getLessonsForTrack("new-raider")[0]?.id ?? null;
+      render();
+      scrollElementIntoView(document.querySelector("#curriculum"));
+    }
+  },
+  {
+    id: "patch-confusion",
+    title: "I cannot tell what advice is still current",
+    copy: "Frequent Embark posts and live-service updates make it easy for older route or threat advice to feel unclear without a patch-first view.",
+    actionLabel: "Check update center",
+    onOpen: () => scrollElementIntoView(document.querySelector("#update-center"))
   }
 ];
 
@@ -571,6 +624,7 @@ const updateCenterElement = document.querySelector("#update-center");
 const heroUpdateCardElement = document.querySelector("#hero-update-card");
 const heroPersonalCardElement = document.querySelector("#hero-personal-card");
 const heroTaskListElement = document.querySelector("#hero-task-list");
+const painPointListElement = document.querySelector("#pain-point-list");
 const briefingListElement = document.querySelector("#briefing-list");
 const trackListElement = document.querySelector("#track-list");
 const trackOverviewElement = document.querySelector("#track-overview");
@@ -624,9 +678,15 @@ function scrollElementIntoView(element) {
 }
 
 function renderCounts() {
-  trackCountElement.textContent = String(tracks.length);
-  lessonCountElement.textContent = String(lessons.length);
-  machineCountElement.textContent = String(machines.length);
+  if (trackCountElement) {
+    trackCountElement.textContent = String(tracks.length);
+  }
+  if (lessonCountElement) {
+    lessonCountElement.textContent = String(lessons.length);
+  }
+  if (machineCountElement) {
+    machineCountElement.textContent = String(machines.length);
+  }
   appVersionButtonElement.textContent = APP_VERSION;
   appUpdatedElement.textContent = `Updated ${APP_UPDATED}`;
 }
@@ -654,6 +714,28 @@ function renderBriefing() {
       <p class="briefing-copy">${step.copy}</p>
     </article>
   `).join("");
+}
+
+function renderPainPoints() {
+  painPointListElement.innerHTML = painPoints.map((painPoint) => `
+    <article class="pain-point-card">
+      <h3 class="pain-point-title">${painPoint.title}</h3>
+      <p class="pain-point-copy">${painPoint.copy}</p>
+      <button class="hero-button hero-button-secondary pain-point-action" type="button" data-pain-point-id="${painPoint.id}">${painPoint.actionLabel}</button>
+    </article>
+  `).join("");
+
+  for (const button of painPointListElement.querySelectorAll("[data-pain-point-id]")) {
+    button.addEventListener("click", () => {
+      const painPoint = painPoints.find((entry) => entry.id === button.dataset.painPointId);
+      if (!painPoint) {
+        return;
+      }
+
+      painPoint.onOpen();
+      saveState();
+    });
+  }
 }
 
 function renderTracks() {
@@ -896,6 +978,13 @@ function loadState() {
 
 function buildSearchIndex() {
   return [
+    ...painPoints.map((painPoint) => ({
+      id: painPoint.id,
+      type: "Pain point",
+      title: painPoint.title,
+      body: painPoint.copy,
+      action: () => painPoint.onOpen()
+    })),
     ...releases.map((release) => ({
       id: release.id,
       type: "Release",
@@ -1259,6 +1348,7 @@ function render() {
   renderReleaseList();
   renderReleaseDetail();
   renderBriefing();
+  renderPainPoints();
   renderTracks();
   renderTrackOverview();
   renderLessons();

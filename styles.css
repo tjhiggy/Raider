@@ -360,14 +360,64 @@ button { color: inherit; }
   text-transform: uppercase;
 }
 
-.status-grid, .intel-grid { display: grid; gap: 18px; }
+.launchpad-grid,
+.status-grid,
+.intel-grid { display: grid; gap: 18px; }
+.launchpad-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-bottom: 20px; }
 .status-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom: 20px; }
 .status-card, .briefing, .overview-panel, .rail-panel, .detail-panel, .intel-panel { padding: 20px; }
 .status-value { margin-top: 10px; font-size: 2rem; color: var(--accent-soft); }
 .briefing { margin-bottom: 20px; }
+.pain-points-panel { padding: 20px; margin-bottom: 20px; }
 .section-heading { margin-bottom: 18px; }
 .section-heading p { margin: 8px 0 0; }
 .briefing-list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+.launchpad-card {
+  display: block;
+  padding: 20px;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+
+.launchpad-card:hover,
+.launchpad-card:focus-visible {
+  transform: translateY(-3px);
+  border-color: rgba(214, 117, 48, 0.72);
+  box-shadow: 0 12px 30px rgba(214, 117, 48, 0.12);
+  background: linear-gradient(180deg, rgba(214, 117, 48, 0.12), rgba(255, 255, 255, 0.03));
+}
+
+.pain-point-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.pain-point-card {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.pain-point-title {
+  margin: 0;
+  font-family: var(--display-font);
+  font-size: 1rem;
+  text-transform: uppercase;
+}
+
+.pain-point-copy {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.pain-point-action {
+  width: fit-content;
+}
 
 .briefing-index {
   display: inline-flex;
@@ -938,7 +988,7 @@ button { color: inherit; }
 }
 
 @media (max-width: 1120px) {
-  .hero, .update-layout, .curriculum-layout, .quest-layout, .materials-layout, .intel-grid, .status-grid, .briefing-list { grid-template-columns: 1fr; }
+  .hero, .update-layout, .curriculum-layout, .quest-layout, .materials-layout, .intel-grid, .status-grid, .briefing-list, .launchpad-grid { grid-template-columns: 1fr; }
   .curriculum-layout { gap: 16px; }
 }
 
@@ -946,7 +996,7 @@ button { color: inherit; }
   .app-shell { width: min(100%, calc(100% - 16px)); padding-top: 12px; }
   .command-bar,
   .search-results-panel { padding: 16px; }
-  .hero, .status-card, .briefing, .overview-panel, .rail-panel, .detail-panel, .intel-panel { padding: 16px; }
+  .hero, .status-card, .briefing, .pain-points-panel, .overview-panel, .rail-panel, .detail-panel, .intel-panel { padding: 16px; }
   .hero h1 { font-size: clamp(1.9rem, 10vw, 2.8rem); max-width: 10ch; }
   .hero-actions { display: grid; grid-template-columns: 1fr; }
   .lesson-list, .machine-list, .track-list { grid-template-columns: 1fr; }
