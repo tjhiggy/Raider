@@ -91,49 +91,70 @@
 
     <section class="utility-grid">
       <section class="panel utility-panel">
-        <div class="section-heading">
-          <h2>Quick Start</h2>
-          <p>Use the app fast without digging through every panel.</p>
+        <div class="section-heading section-heading-collapsible">
+          <div>
+            <h2>Quick Start</h2>
+            <p>Use the app fast without digging through every panel.</p>
+          </div>
+          <button class="section-toggle" type="button" data-panel-toggle="quickStart">Show</button>
         </div>
-        <div id="quick-start-list" class="utility-list" aria-live="polite"></div>
+        <div id="quick-start-list" class="utility-list collapsible-panel" aria-live="polite"></div>
       </section>
 
       <section class="panel utility-panel">
-        <div class="section-heading">
-          <h2>What's New</h2>
-          <p>Recent changes tied to the current app version.</p>
+        <div class="section-heading section-heading-collapsible">
+          <div>
+            <h2>What's New</h2>
+            <p>Recent changes tied to the current app version.</p>
+          </div>
+          <button class="section-toggle" type="button" data-panel-toggle="releaseNotes">Show</button>
         </div>
-        <div id="release-notes" class="utility-list" aria-live="polite"></div>
+        <div id="release-notes" class="utility-list collapsible-panel" aria-live="polite"></div>
       </section>
     </section>
 
     <section class="season-layout">
       <aside class="season-panel panel">
-        <div class="section-heading">
-          <h2>Season Radar</h2>
-          <p>Switch seasons to see the strongest landing options.</p>
+        <div class="section-heading section-heading-collapsible">
+          <div>
+            <h2>Season Radar</h2>
+            <p>Switch seasons to see the strongest landing options.</p>
+          </div>
+          <button class="section-toggle" type="button" data-panel-toggle="seasonRadar" aria-expanded="true">Hide</button>
         </div>
-        <div id="season-list" class="season-list" aria-label="Season selection"></div>
+        <div id="season-radar-body" class="collapsible-panel">
+          <div id="season-list" class="season-list" aria-label="Season selection"></div>
+        </div>
       </aside>
 
       <section class="content-column">
         <section id="season-overview" class="overview panel" aria-live="polite"></section>
 
         <section class="panel">
-          <div class="section-heading">
-            <h2>Drop Browser</h2>
-            <p>Filter the pool, then focus on one recommended drop at a time.</p>
+          <div class="section-heading section-heading-collapsible">
+            <div>
+              <h2>Drop Browser</h2>
+              <p>Filter the pool, then focus on one recommended drop at a time.</p>
+            </div>
+            <button class="section-toggle" type="button" data-panel-toggle="dropBrowser" aria-expanded="true">Hide</button>
           </div>
-          <div id="spot-list" class="spot-list"></div>
+          <div id="drop-browser-body" class="collapsible-panel">
+            <div id="spot-list" class="spot-list"></div>
+          </div>
         </section>
       </section>
 
       <aside class="detail-panel panel">
-        <div class="section-heading">
-          <h2>Drop Breakdown</h2>
-          <p>Tap a spot to see the map read, route, and mobility plan.</p>
+        <div class="section-heading section-heading-collapsible">
+          <div>
+            <h2>Drop Breakdown</h2>
+            <p>Tap a spot to see the map read, route, and mobility plan.</p>
+          </div>
+          <button class="section-toggle" type="button" data-panel-toggle="dropBreakdown" aria-expanded="true">Hide</button>
         </div>
-        <div id="spot-detail" class="spot-detail" aria-live="polite"></div>
+        <div id="drop-breakdown-body" class="collapsible-panel">
+          <div id="spot-detail" class="spot-detail" aria-live="polite"></div>
+        </div>
       </aside>
     </section>
 

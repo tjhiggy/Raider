@@ -50,6 +50,13 @@ select {
   padding: 28px 0 40px;
 }
 
+.season-panel,
+.content-column > .panel,
+.detail-panel,
+.overview {
+  scroll-margin-top: 84px;
+}
+
 .utility-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -621,10 +628,36 @@ select {
   margin-bottom: 18px;
 }
 
+.section-heading-collapsible,
+.overview-heading-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .section-heading p {
   margin: 8px 0 0;
   line-height: 1.5;
   font-family: "Segoe UI", Tahoma, sans-serif;
+}
+
+.section-toggle {
+  display: none;
+  padding: 9px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(157, 235, 255, 0.2);
+  background: rgba(7, 14, 35, 0.44);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.collapsible-panel.collapsed {
+  display: none;
 }
 
 .season-list,
@@ -1186,6 +1219,50 @@ select {
   margin-top: 20px;
 }
 
+.detail-collapse {
+  border-radius: 18px;
+  border: 1px solid rgba(157, 235, 255, 0.16);
+  background: rgba(7, 14, 35, 0.24);
+  overflow: hidden;
+}
+
+.detail-collapse + .detail-collapse {
+  margin-top: 16px;
+}
+
+.detail-collapse-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  font-family: var(--display-font);
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.detail-collapse-state {
+  color: var(--accent);
+  font-size: 0.74rem;
+}
+
+.detail-collapse-body {
+  display: grid;
+  gap: 14px;
+  padding: 0 16px 16px;
+}
+
+.detail-collapse-body.collapsed {
+  display: none;
+}
+
 .detail-kicker {
   margin: 0 0 8px;
   color: var(--accent);
@@ -1265,6 +1342,12 @@ select {
     padding: 12px 0 28px;
   }
 
+  .section-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   .hero {
     padding: 20px 18px;
     gap: 18px;
@@ -1319,6 +1402,11 @@ select {
     padding: 16px;
   }
 
+  .utility-grid {
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
   .modal-card {
     padding: 18px;
   }
@@ -1332,6 +1420,11 @@ select {
 
   .section-heading {
     margin-bottom: 14px;
+  }
+
+  .section-heading-collapsible,
+  .overview-heading-row {
+    flex-direction: column;
   }
 
   .season-list {
@@ -1390,6 +1483,14 @@ select {
   .spot-controls-panel,
   .spot-focus-card {
     padding: 16px;
+  }
+
+  .spot-controls-panel {
+    position: sticky;
+    top: calc(env(safe-area-inset-top) + 8px);
+    z-index: 8;
+    border-radius: 16px;
+    box-shadow: 0 14px 24px rgba(3, 8, 22, 0.2);
   }
 
   .spot-score-row,
@@ -1471,6 +1572,10 @@ select {
   .hero {
     padding: 18px 14px;
     margin-bottom: 14px;
+  }
+
+  .section-toggle {
+    width: 100%;
   }
 
   .easter-egg-trigger {
@@ -1561,6 +1666,11 @@ select {
   .spot-filter-group {
     display: grid;
     grid-template-columns: 1fr 1fr;
+  }
+
+  .spot-controls-panel {
+    padding: 14px;
+    gap: 12px;
   }
 
   .drop-map-image {

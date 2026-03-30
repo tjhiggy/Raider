@@ -1,4 +1,4 @@
-const APP_VERSION = "v1.3.0";
+const APP_VERSION = "v1.4.0";
 const APP_UPDATED = "2026-03-30";
 const QUICK_START_STEPS = [
   "Choose a season first to load the correct loot and mobility meta.",
@@ -6,11 +6,20 @@ const QUICK_START_STEPS = [
   "Use the season spotlight at the top for the fastest path into the best current recommendation."
 ];
 const RELEASE_NOTES = [
-  "Replaced the old decorative hero graphic with a live season spotlight.",
-  "Added direct jump actions from the hero into the drop browser and breakdown.",
-  "Improved the top-of-page flow so the app starts with an actual decision aid instead of filler artwork."
+  "Made the top utility panels collapsible on mobile for a tighter phone layout.",
+  "Turned longer detail sections into expandable cards so the breakdown is easier to scan.",
+  "Reduced always-open page weight on iPhone while keeping the full intel available on demand."
 ];
 const VERSION_HISTORY = [
+  {
+    version: "v1.4.0",
+    updated: "2026-03-30",
+    changes: [
+      "Made Quick Start and What's New collapsible on mobile.",
+      "Turned longer Drop Breakdown sections into collapsible cards on iPhone.",
+      "Tightened the overall mobile flow so the page feels more compact and easier to scan."
+    ]
+  },
   {
     version: "v1.3.0",
     updated: "2026-03-30",
@@ -1362,6 +1371,9 @@ const seasonListElement = document.querySelector("#season-list");
 const seasonOverviewElement = document.querySelector("#season-overview");
 const spotListElement = document.querySelector("#spot-list");
 const spotDetailElement = document.querySelector("#spot-detail");
+const seasonRadarBodyElement = document.querySelector("#season-radar-body");
+const dropBrowserBodyElement = document.querySelector("#drop-browser-body");
+const dropBreakdownBodyElement = document.querySelector("#drop-breakdown-body");
 const detailPanelElement = document.querySelector(".detail-panel");
 const bestSpotsPanelElement = document.querySelector(".content-column .panel:last-of-type");
 const seasonCountElement = document.querySelector("#season-count");
@@ -1391,6 +1403,18 @@ const state = {
   selectedSpotId: data.spots[0].id,
   selectedTypeFilter: "All",
   selectedRiskFilter: "all",
+  panelOpen: {
+    quickStart: false,
+    releaseNotes: false,
+    seasonRadar: true,
+    dropBrowser: true,
+    dropBreakdown: true,
+    seasonOverview: true,
+    whyItWorks: true,
+    mobilityPlan: false,
+    routePlan: false,
+    lootHighlights: false,
+  },
 };
 
 let easterEggTimeoutId = null;
@@ -1758,6 +1782,50 @@ function renderUtilityLists() {
   }
 }
 
+function isPanelOpen(key, mobileDefault) {
+  return isMobileLayout() ? state.panelOpen[key] ?? mobileDefault : true;
+}
+
+function syncStaticPanels() {
+  const panelMap = {
+    quickStart: quickStartListElement,
+    releaseNotes: releaseNotesElement,
+    seasonRadar: seasonRadarBodyElement,
+    dropBrowser: dropBrowserBodyElement,
+    dropBreakdown: dropBreakdownBodyElement,
+  };
+
+  for (const [key, panel] of Object.entries(panelMap)) {
+    const toggle = document.querySelector(`[data-panel-toggle="${key}"]`);
+    const isOpen = isPanelOpen(key, key !== "quickStart" && key !== "releaseNotes");
+
+    if (panel) {
+      panel.classList.toggle("collapsed", !isOpen);
+    }
+
+    if (toggle) {
+      toggle.textContent = isOpen ? "Hide" : "Show";
+      toggle.setAttribute("aria-expanded", String(isOpen));
+    }
+  }
+}
+
+function renderCollapsibleSection(key, title, bodyHtml, mobileDefaultOpen) {
+  const isOpen = isPanelOpen(key, mobileDefaultOpen);
+
+  return `
+    <section class="detail-collapse ${isOpen ? "open" : ""}">
+      <button class="detail-collapse-toggle" type="button" data-detail-toggle="${key}" aria-expanded="${isOpen}">
+        <span>${title}</span>
+        <span class="detail-collapse-state">${isOpen ? "Hide" : "Show"}</span>
+      </button>
+      <div class="detail-collapse-body ${isOpen ? "" : "collapsed"}">
+        ${bodyHtml}
+      </div>
+    </section>
+  `;
+}
+
 function renderVersionHistory() {
   if (!versionHistoryListElement) {
     return;
@@ -1875,6 +1943,11 @@ function renderSeasonList() {
       state.selectedSeasonId = seasonId;
       const firstSeasonSpot = getSeasonSpots(seasonId)[0];
       state.selectedSpotId = firstSeasonSpot ? firstSeasonSpot.id : null;
+      if (isMobileLayout()) {
+        state.panelOpen.seasonRadar = false;
+        state.panelOpen.dropBrowser = true;
+        state.panelOpen.dropBreakdown = true;
+      }
       render();
       if (isMobileLayout()) {
         scrollElementIntoView(bestSpotsPanelElement || seasonOverviewElement);
@@ -1891,23 +1964,39 @@ function renderSeasonOverview() {
   }
 
   seasonOverviewElement.style.background = season.gradient;
+  const seasonOverviewOpen = isPanelOpen("seasonOverview", true);
   seasonOverviewElement.innerHTML = `
     <p class="eyebrow">Current Focus</p>
-    <h2 class="overview-title">${season.title}</h2>
-    <p class="overview-subtitle">${season.subtitle}</p>
-    <p class="overview-copy">${season.overview}</p>
-    <div class="overview-meta">
-      <article class="meta-pill">
-        <span class="meta-pill-label">Meta</span>
-        <strong class="meta-pill-value">${season.style}</strong>
-      </article>
-      <article class="meta-pill">
-        <span class="meta-pill-label">Best For</span>
-        <strong class="meta-pill-value">${season.bestFor}</strong>
-      </article>
+    <div class="overview-heading-row">
+      <div>
+        <h2 class="overview-title">${season.title}</h2>
+        <p class="overview-subtitle">${season.subtitle}</p>
+      </div>
+      <button class="section-toggle" type="button" data-panel-toggle="seasonOverview" aria-expanded="${seasonOverviewOpen}">${seasonOverviewOpen ? "Hide" : "Show"}</button>
     </div>
-    ${season.comingSoon ? '<p class="coming-soon-note">Season 8 is teased here as a preview only. Recommendations will update once Epic confirms the live OG map and mobility pool.</p>' : ""}
+    <div class="collapsible-panel ${seasonOverviewOpen ? "" : "collapsed"}" id="season-overview-body">
+      <p class="overview-copy">${season.overview}</p>
+      <div class="overview-meta">
+        <article class="meta-pill">
+          <span class="meta-pill-label">Meta</span>
+          <strong class="meta-pill-value">${season.style}</strong>
+        </article>
+        <article class="meta-pill">
+          <span class="meta-pill-label">Best For</span>
+          <strong class="meta-pill-value">${season.bestFor}</strong>
+        </article>
+      </div>
+      ${season.comingSoon ? '<p class="coming-soon-note">Season 8 is teased here as a preview only. Recommendations will update once Epic confirms the live OG map and mobility pool.</p>' : ""}
+    </div>
   `;
+
+  const seasonToggleElement = seasonOverviewElement.querySelector('[data-panel-toggle="seasonOverview"]');
+  if (seasonToggleElement) {
+    seasonToggleElement.addEventListener("click", () => {
+      state.panelOpen.seasonOverview = !isPanelOpen("seasonOverview", true);
+      renderSeasonOverview();
+    });
+  }
 }
 
 function renderSpotList() {
@@ -2040,8 +2129,10 @@ function renderSpotList() {
   if (spotSelectorElement) {
     spotSelectorElement.addEventListener("change", (event) => {
       state.selectedSpotId = event.target.value;
+      state.panelOpen.dropBreakdown = true;
       renderSpotList();
       renderSpotDetail();
+      syncStaticPanels();
       if (isMobileLayout()) {
         scrollElementIntoView(detailPanelElement);
       }
@@ -2057,7 +2148,9 @@ function renderSpotList() {
   const openBreakdownButton = spotListElement.querySelector("[data-open-breakdown]");
   if (openBreakdownButton) {
     openBreakdownButton.addEventListener("click", () => {
+      state.panelOpen.dropBreakdown = true;
       renderSpotDetail();
+      syncStaticPanels();
       scrollElementIntoView(detailPanelElement);
     });
   }
@@ -2138,21 +2231,12 @@ function renderSpotDetail() {
       </div>
     </section>
 
-    <section class="detail-block">
-      <p class="detail-kicker">Why it works</p>
-      <p class="detail-copy">${spot.why}</p>
-    </section>
-
-    <section class="detail-block">
-      <p class="detail-kicker">Mobility anchor</p>
+    ${renderCollapsibleSection("whyItWorks", "Why it works", `<p class="detail-copy">${spot.why}</p>`, true)}
+    ${renderCollapsibleSection("mobilityPlan", "Mobility plan", `
       <div class="mobility-highlight">
         <div class="mobility-highlight-label">${mobilityProfile.label}</div>
         <p class="detail-copy">${mobilityProfile.emphasis}</p>
       </div>
-    </section>
-
-    <section class="detail-block">
-      <p class="detail-kicker">Where to find it</p>
       <div class="mobility-location-card">
         <div class="mobility-location-head">
           <div class="mobility-location-title">${mobilityLocation.title}</div>
@@ -2160,29 +2244,29 @@ function renderSpotDetail() {
         </div>
         <p class="detail-copy">${mobilityLocation.where}</p>
       </div>
-    </section>
-
-    <section class="detail-block">
-      <p class="detail-kicker">Mobility options</p>
       <div class="mobility-grid">
         ${spot.mobility.map((item) => `<article class="mobility-card">${item}</article>`).join("")}
       </div>
-    </section>
-
-    <section class="detail-block">
-      <p class="detail-kicker">Opening route</p>
+    `, false)}
+    ${renderCollapsibleSection("routePlan", "Opening route", `
       <ol class="plan-list">
         ${spot.plan.map((step) => `<li>${step}</li>`).join("")}
       </ol>
-    </section>
-
-    <section class="detail-block">
-      <p class="detail-kicker">Loot highlights</p>
+    `, false)}
+    ${renderCollapsibleSection("lootHighlights", "Loot highlights", `
       <ul class="loot-list">
         ${spot.highlights.map((item) => `<li>${item}</li>`).join("")}
       </ul>
-    </section>
+    `, false)}
   `;
+
+  for (const button of spotDetailElement.querySelectorAll("[data-detail-toggle]")) {
+    button.addEventListener("click", () => {
+      const key = button.dataset.detailToggle;
+      state.panelOpen[key] = !isPanelOpen(key, false);
+      renderSpotDetail();
+    });
+  }
 }
 
 function renderStats() {
@@ -2200,6 +2284,7 @@ function render() {
   renderStats();
   renderHeroSpotlight();
   renderUtilityLists();
+  syncStaticPanels();
   renderVersionHistory();
   renderSeasonList();
   renderSeasonOverview();
@@ -2249,18 +2334,34 @@ if (backToTopElement) {
 if (heroOpenBreakdownElement) {
   heroOpenBreakdownElement.addEventListener("click", () => {
     const selectedSpot = getSelectedSpot();
+    state.panelOpen.dropBreakdown = true;
     if (selectedSpot) {
       state.selectedSpotId = selectedSpot.id;
       renderSpotList();
       renderSpotDetail();
     }
+    syncStaticPanels();
     scrollElementIntoView(detailPanelElement);
   });
 }
 
 if (heroOpenBrowserElement) {
   heroOpenBrowserElement.addEventListener("click", () => {
+    state.panelOpen.dropBrowser = true;
+    syncStaticPanels();
     scrollElementIntoView(bestSpotsPanelElement);
+  });
+}
+
+for (const button of document.querySelectorAll("[data-panel-toggle]")) {
+  button.addEventListener("click", () => {
+    const key = button.dataset.panelToggle;
+    state.panelOpen[key] = !isPanelOpen(key, key !== "quickStart" && key !== "releaseNotes");
+    if (key === "seasonOverview") {
+      renderSeasonOverview();
+      return;
+    }
+    syncStaticPanels();
   });
 }
 
