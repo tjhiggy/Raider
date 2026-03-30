@@ -1,4 +1,4 @@
-const APP_VERSION = "v1.4.0";
+const APP_VERSION = "v1.4.1";
 const APP_UPDATED = "2026-03-30";
 const QUICK_START_STEPS = [
   "Choose a season first to load the correct loot and mobility meta.",
@@ -6,11 +6,20 @@ const QUICK_START_STEPS = [
   "Use the season spotlight at the top for the fastest path into the best current recommendation."
 ];
 const RELEASE_NOTES = [
-  "Made the top utility panels collapsible on mobile for a tighter phone layout.",
-  "Turned longer detail sections into expandable cards so the breakdown is easier to scan.",
-  "Reduced always-open page weight on iPhone while keeping the full intel available on demand."
+  "Retitled the app to Fortnite OG Drop Intel for a sharper tactical identity.",
+  "Updated the hero eyebrow, browser title, and home-screen manifest to match.",
+  "Kept the overall mobile-tightening work from v1.4.0 while making the brand feel more intentional."
 ];
 const VERSION_HISTORY = [
+  {
+    version: "v1.4.1",
+    updated: "2026-03-30",
+    changes: [
+      "Retitled the app to Fortnite OG Drop Intel.",
+      "Updated the hero label, browser title, and sharing metadata to match the new identity.",
+      "Updated the installable app manifest so the new name carries through on mobile."
+    ]
+  },
   {
     version: "v1.4.0",
     updated: "2026-03-30",
