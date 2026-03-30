@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.7.5",
+    date: "2026-03-30",
+    summary: "Added a hidden easter egg that shows a centered message when the secret trigger is found.",
+    changes: [
+      "Added a hidden clickable trigger in a low-visibility part of the page.",
+      "Added a centered 5-second toast message for the easter egg.",
+      "Kept the trigger subtle so it feels like an actual hidden find."
+    ]
+  },
+  {
     version: "v1.7.4",
     date: "2026-03-30",
     summary: "Made the Discord promotion much more visible with a dedicated community callout near the top of the app.",
@@ -742,6 +752,8 @@ const materialsCatalogElement = document.querySelector("#materials-catalog");
 const detailPanelElement = document.querySelector(".detail-panel");
 const lessonPanelElement = document.querySelector(".lesson-column");
 const backToTopElement = document.querySelector("#back-to-top");
+const easterEggTriggerElement = document.querySelector("#easter-egg-trigger");
+const easterEggToastElement = document.querySelector("#easter-egg-toast");
 const appVersionButtonElement = document.querySelector("#app-version");
 const markReviewedButtonElement = document.querySelector("#mark-reviewed");
 const shareAppButtonElement = document.querySelector("#share-app");
@@ -752,6 +764,7 @@ const closeChangelogElement = document.querySelector("#close-changelog");
 const changelogListElement = document.querySelector("#changelog-list");
 
 let deferredInstallPrompt = null;
+let easterEggTimeoutId = null;
 
 function syncCommandBarState() {
   if (!commandBarElement || !toggleCommandBarElement) {
@@ -1489,6 +1502,22 @@ function registerServiceWorker() {
   }
 }
 
+function revealEasterEgg() {
+  easterEggToastElement.textContent = "Live By The Goop, Die By The Goop";
+  easterEggToastElement.classList.add("visible");
+  easterEggToastElement.setAttribute("aria-hidden", "false");
+
+  if (easterEggTimeoutId !== null) {
+    window.clearTimeout(easterEggTimeoutId);
+  }
+
+  easterEggTimeoutId = window.setTimeout(() => {
+    easterEggToastElement.classList.remove("visible");
+    easterEggToastElement.setAttribute("aria-hidden", "true");
+    easterEggTimeoutId = null;
+  }, 5000);
+}
+
 function render() {
   renderCounts();
   updateProgressSummary();
@@ -1517,6 +1546,7 @@ backToTopElement.addEventListener("click", () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
 
+easterEggTriggerElement.addEventListener("click", revealEasterEgg);
 markReviewedButtonElement.addEventListener("click", toggleReviewedLesson);
 globalSearchElement.addEventListener("input", () => {
   renderSearchResults(globalSearchElement.value);
