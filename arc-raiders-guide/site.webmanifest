@@ -1,0 +1,17 @@
+{
+  "name": "ARC Raiders Field Guide",
+  "short_name": "ARC Guide",
+  "description": "Mobile-friendly ARC Raiders learning app for new and advanced players.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#12100f",
+  "theme_color": "#c96b2c",
+  "icons": [
+    {
+      "src": "./assets/arc-signal.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

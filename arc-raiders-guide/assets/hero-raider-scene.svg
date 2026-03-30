@@ -1,0 +1,32 @@
+<svg width="1200" height="900" viewBox="0 0 1200 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="900" rx="40" fill="#191513"/>
+  <rect x="28" y="28" width="1144" height="844" rx="28" fill="url(#bg)"/>
+  <path d="M92 696L258 510L412 594L564 398L690 470L834 310L1092 548V846H92V696Z" fill="#241D19"/>
+  <path d="M114 728L278 558L416 628L562 470L686 528L850 372L1088 592V846H114V728Z" fill="#332923"/>
+  <path d="M796 184L852 132L898 196L838 248L796 184Z" fill="#F1E4D2" fill-opacity="0.92"/>
+  <path d="M840 248L918 164L978 224L898 308L840 248Z" fill="#D67530"/>
+  <circle cx="916" cy="208" r="18" fill="#191513"/>
+  <path d="M732 344L822 254L904 336L814 426L732 344Z" fill="#E6D8C4" fill-opacity="0.88"/>
+  <path d="M794 392L914 272L990 348L872 468L794 392Z" fill="#C96B2C"/>
+  <path d="M408 714L514 542L600 604L688 490L770 544L724 846H326L408 714Z" fill="#47372F"/>
+  <path d="M554 402L612 304L660 336L616 430L554 402Z" fill="#F1E4D2"/>
+  <path d="M532 432L614 388L674 500L592 544L532 432Z" fill="#D67530"/>
+  <rect x="576" y="546" width="34" height="156" rx="12" transform="rotate(28 576 546)" fill="#191513"/>
+  <path d="M520 640L574 564L624 602L570 678L520 640Z" fill="#191513"/>
+  <circle cx="354" cy="264" r="74" fill="#F0B16D" fill-opacity="0.1"/>
+  <circle cx="1016" cy="166" r="106" fill="#D67530" fill-opacity="0.16"/>
+  <path d="M174 174C278 134 408 130 514 180" stroke="#F0B16D" stroke-width="10" stroke-linecap="round" stroke-dasharray="10 16"/>
+  <path d="M144 232C286 214 410 244 558 328" stroke="#E9DCC8" stroke-opacity="0.36" stroke-width="6" stroke-linecap="round"/>
+  <path d="M780 640C858 620 952 636 1048 700" stroke="#F0B16D" stroke-opacity="0.4" stroke-width="8" stroke-linecap="round"/>
+  <path d="M936 134L1094 94" stroke="#E9DCC8" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="1098" cy="92" r="16" fill="#E9DCC8"/>
+  <rect x="94" y="90" width="282" height="74" rx="20" fill="#191513" fill-opacity="0.72" stroke="#D67530" stroke-width="3"/>
+  <text x="126" y="136" fill="#F6EFE7" font-family="Arial Black, Impact, sans-serif" font-size="34">TOPSIDE SURVIVAL</text>
+  <defs>
+    <linearGradient id="bg" x1="218" y1="74" x2="1030" y2="826" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#30251F"/>
+      <stop offset="0.42" stop-color="#1F1815"/>
+      <stop offset="1" stop-color="#141110"/>
+    </linearGradient>
+  </defs>
+</svg>

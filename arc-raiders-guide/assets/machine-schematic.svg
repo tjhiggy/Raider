@@ -1,0 +1,15 @@
+<svg width="900" height="700" viewBox="0 0 900 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="700" rx="32" fill="#171311"/>
+  <rect x="24" y="24" width="852" height="652" rx="24" stroke="#D67530" stroke-opacity="0.5" stroke-width="3"/>
+  <path d="M154 514L248 388L336 454L450 292L558 352L694 208L790 282" stroke="#F0B16D" stroke-width="8" stroke-linecap="round" stroke-dasharray="10 18"/>
+  <circle cx="248" cy="388" r="52" fill="#E9DCC8" fill-opacity="0.1" stroke="#E9DCC8" stroke-width="3"/>
+  <circle cx="450" cy="292" r="66" fill="#D67530" fill-opacity="0.14" stroke="#D67530" stroke-width="3"/>
+  <circle cx="694" cy="208" r="52" fill="#E9DCC8" fill-opacity="0.1" stroke="#E9DCC8" stroke-width="3"/>
+  <path d="M204 470L248 388L300 472" stroke="#E9DCC8" stroke-width="12" stroke-linecap="round"/>
+  <path d="M406 356L450 228L504 356" stroke="#D67530" stroke-width="14" stroke-linecap="round"/>
+  <path d="M654 250L694 168L742 250" stroke="#E9DCC8" stroke-width="12" stroke-linecap="round"/>
+  <rect x="82" y="86" width="264" height="62" rx="18" fill="#1F1815" stroke="#D67530" stroke-width="2"/>
+  <text x="112" y="126" fill="#F6EFE7" font-family="Arial Black, Impact, sans-serif" font-size="30">ARC MACHINE INTEL</text>
+  <rect x="96" y="560" width="700" height="78" rx="22" fill="#1B1513" stroke="#F0B16D" stroke-opacity="0.35" stroke-width="2"/>
+  <text x="132" y="610" fill="#F6EFE7" font-family="Trebuchet MS, Segoe UI, sans-serif" font-size="28">Scout detection. Break line of sight. Reposition before chain pressure starts.</text>
+</svg>
