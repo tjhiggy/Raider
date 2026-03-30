@@ -1,0 +1,17 @@
+{
+  "name": "Fortnite OG Drop Guide",
+  "short_name": "OG Drops",
+  "description": "Placement-first drop recommendations, map reads, and mobility routes for Fortnite OG seasons.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0e1838",
+  "theme_color": "#16318c",
+  "icons": [
+    {
+      "src": "./assets/hero-drop-map.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

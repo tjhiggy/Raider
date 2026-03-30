@@ -3,7 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Fortnite OG drop guide with season-by-season map reads, mobility routes, and placement-first landing recommendations.">
+  <meta name="theme-color" content="#16318c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta property="og:title" content="Fortnite OG Drop Guide">
+  <meta property="og:description" content="Placement-first drop recommendations, map reads, and mobility routes for Fortnite OG seasons.">
+  <meta property="og:type" content="website">
   <title>Fortnite OG Drop Guide</title>
+  <link rel="icon" href="./assets/hero-drop-map.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./assets/hero-drop-map.svg">
+  <link rel="manifest" href="./site.webmanifest">
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
@@ -48,6 +58,24 @@
       </div>
     </section>
 
+    <section class="utility-grid">
+      <section class="panel utility-panel">
+        <div class="section-heading">
+          <h2>Quick Start</h2>
+          <p>Use the app fast without digging through every panel.</p>
+        </div>
+        <div id="quick-start-list" class="utility-list" aria-live="polite"></div>
+      </section>
+
+      <section class="panel utility-panel">
+        <div class="section-heading">
+          <h2>What’s New</h2>
+          <p>Recent changes tied to the current app version.</p>
+        </div>
+        <div id="release-notes" class="utility-list" aria-live="polite"></div>
+      </section>
+    </section>
+
     <section class="season-layout">
       <aside class="season-panel panel">
         <div class="section-heading">
@@ -81,9 +109,12 @@
     <footer class="app-footer">
       <span class="footer-label">App Version</span>
       <strong id="app-version" class="footer-version">v0.0.0</strong>
+      <span id="app-updated" class="footer-meta">Updated --</span>
+      <span class="footer-meta">Tip: Add to Home Screen on iPhone for app-style access</span>
     </footer>
   </main>
 
+  <button id="back-to-top" class="back-to-top" type="button" aria-label="Back to top">Top</button>
   <div id="easter-egg-toast" class="easter-egg-toast" aria-live="polite" aria-hidden="true"></div>
 
   <script src="./src/main.js"></script>

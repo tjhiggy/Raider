@@ -1,4 +1,15 @@
-const APP_VERSION = "v1.0.0";
+const APP_VERSION = "v1.1.0";
+const APP_UPDATED = "2026-03-30";
+const QUICK_START_STEPS = [
+  "Choose a season first to load the correct loot and mobility meta.",
+  "Pick a drop from Best Spots to open the full map read and route plan.",
+  "Use the blue mobility marker as your first exit anchor when the zone pulls badly."
+];
+const RELEASE_NOTES = [
+  "Added install/share metadata and a web manifest for app-style home-screen use.",
+  "Added quick-start guidance and versioned release notes right inside the app.",
+  "Added a floating back-to-top button for easier long-page navigation on mobile."
+];
 
 const data = {
   seasons: [
@@ -1309,6 +1320,10 @@ const bestSpotsPanelElement = document.querySelector(".content-column .panel:las
 const seasonCountElement = document.querySelector("#season-count");
 const spotCountElement = document.querySelector("#spot-count");
 const appVersionElement = document.querySelector("#app-version");
+const appUpdatedElement = document.querySelector("#app-updated");
+const quickStartListElement = document.querySelector("#quick-start-list");
+const releaseNotesElement = document.querySelector("#release-notes");
+const backToTopElement = document.querySelector("#back-to-top");
 const easterEggTriggerElement = document.querySelector("#easter-egg-trigger");
 const easterEggToastElement = document.querySelector("#easter-egg-toast");
 
@@ -1628,6 +1643,30 @@ function scrollElementIntoView(element) {
   });
 }
 
+function renderUtilityLists() {
+  if (quickStartListElement) {
+    quickStartListElement.innerHTML = QUICK_START_STEPS
+      .map((item, index) => `
+        <article class="utility-item">
+          <span class="utility-index">0${index + 1}</span>
+          <p class="utility-copy">${item}</p>
+        </article>
+      `)
+      .join("");
+  }
+
+  if (releaseNotesElement) {
+    releaseNotesElement.innerHTML = RELEASE_NOTES
+      .map((item) => `
+        <article class="utility-item utility-item-note">
+          <span class="utility-dot"></span>
+          <p class="utility-copy">${item}</p>
+        </article>
+      `)
+      .join("");
+  }
+}
+
 function renderSeasonList() {
   seasonListElement.innerHTML = data.seasons
     .map((season) => `
@@ -1869,14 +1908,27 @@ function renderStats() {
   if (appVersionElement) {
     appVersionElement.textContent = APP_VERSION;
   }
+  if (appUpdatedElement) {
+    appUpdatedElement.textContent = `Updated ${APP_UPDATED}`;
+  }
 }
 
 function render() {
   renderStats();
+  renderUtilityLists();
   renderSeasonList();
   renderSeasonOverview();
   renderSpotList();
   renderSpotDetail();
+}
+
+function syncBackToTopVisibility() {
+  if (!backToTopElement) {
+    return;
+  }
+
+  const isVisible = window.scrollY > 520;
+  backToTopElement.classList.toggle("visible", isVisible);
 }
 
 function revealEasterEgg() {
@@ -1903,4 +1955,13 @@ if (easterEggTriggerElement) {
   easterEggTriggerElement.addEventListener("click", revealEasterEgg);
 }
 
+if (backToTopElement) {
+  backToTopElement.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+}
+
+window.addEventListener("scroll", syncBackToTopVisibility, { passive: true });
+
 render();
+syncBackToTopVisibility();
