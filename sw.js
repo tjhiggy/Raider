@@ -1,4 +1,4 @@
-const CACHE_NAME = "arc-raiders-guide-v1-5-0";
+const CACHE_NAME = "arc-raiders-guide-v1-7-7";
 const APP_ASSETS = [
   "./",
   "./index.html",
@@ -32,6 +32,19 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") {
+    return;
+  }
+
+  if (event.request.mode === "navigate") {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          const responseClone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
+          return networkResponse;
+        })
+        .catch(() => caches.match(event.request).then((cachedResponse) => cachedResponse || caches.match("./index.html")))
+    );
     return;
   }
 

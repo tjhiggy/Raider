@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.7.7",
+    date: "2026-03-30",
+    summary: "Fixed stale mobile cache behavior so new ARC intel and section updates appear correctly after deploys.",
+    changes: [
+      "Bumped the service worker cache version so older site builds do not keep overriding newer content.",
+      "Changed page navigations to prefer the network first, which helps new deploys show up faster.",
+      "This specifically addresses cases where older visuals or outdated ARC lists kept appearing on mobile."
+    ]
+  },
+  {
     version: "v1.7.6",
     date: "2026-03-30",
     summary: "Expanded ARC Machine Intel to cover the full currently listed ARC roster instead of only a starter subset.",
