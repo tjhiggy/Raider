@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.13.0",
+    date: "2026-03-31",
+    summary: "Improved update organization, expanded extraction-shooter onboarding, added Expeditions guidance, and rechecked materials after Flashpoint.",
+    changes: [
+      "Reduced duplication in the Updates flow by making the timeline and detail panel serve different jobs.",
+      "Added stronger extraction-shooter fundamentals in the Learn focus, including raid concepts and what makes the genre different.",
+      "Added Expeditions to the Quests focus and marked the materials catalog as verified against current public post-Flashpoint info."
+    ]
+  },
+  {
     version: "v1.12.1",
     date: "2026-03-31",
     summary: "Trimmed the oversized header into a simpler top navigation and fixed focus buttons so they jump to the correct section.",
@@ -520,6 +530,25 @@ const tracks = [
 
 const lessons = [
   {
+    id: "extraction-shooter-basics",
+    trackId: "new-raider",
+    title: "What Makes ARC Raiders an Extraction Shooter",
+    category: "Foundations",
+    time: "5 min",
+    summary: "Learn why a raid is different from a normal match and why extraction shooters reward survival, planning, and discipline more than constant fighting.",
+    body: "In an extraction shooter, the match is not about respawning until one team wins. You enter with risk, try to leave with value, and every decision affects long-term progression. A raid usually has a few phases: preparation in Speranza, entry into Topside, information gathering, pursuit of an objective, pressure management, and extraction. That makes ARC Raiders feel different from a traditional shooter because winning one fight is not the same thing as winning the run.",
+    bullets: [
+      "The goal of a raid is not just kills. It is extracting with loot, quest progress, and your kit intact.",
+      "A raid gets more dangerous over time because noise, greed, machine attention, and other Raiders all compound pressure.",
+      "Good raids usually have one purpose, one route, and one planned exit instead of endless improvisation."
+    ],
+    checks: [
+      "Do I know what success looks like before I deploy?",
+      "Am I treating every fight as mandatory when some fights are actually loss conditions?"
+    ],
+    fieldNote: "Extraction shooters reward decision quality more than action volume. Leaving alive is part of the skill expression."
+  },
+  {
     id: "raid-loop",
     trackId: "new-raider",
     title: "Understand the Raid Loop",
@@ -779,6 +808,24 @@ const questSystems = [
       "Failing to align normal raids with project progress along the way."
     ],
     fieldNote: "Projects reward steady discipline. They are won by consistency before they are finalized."
+  },
+  {
+    id: "expeditions",
+    title: "Expeditions",
+    category: "Departure and prestige progression",
+    summary: "Expeditions are ARC Raiders' longer-cycle depart system where you cash in your Stash value for permanent rewards and start a new progression phase.",
+    overview: "Official Expedition posts make it clear that this system is not a normal quest turn-in. It is a bigger decision about timing, account progression, and what you are willing to reset or preserve. Expeditions reward players who understand stash value, know what carries forward, and depart deliberately instead of impulsively.",
+    howTo: [
+      "Read the current Expedition requirements before committing, because stash-value thresholds and reward stacks matter more than one last risky raid.",
+      "Build toward Expedition with a deliberate stash-value plan instead of assuming your normal loot habits will accidentally get you there.",
+      "Know what is retained, what is reset, and what permanent bonuses you are actually buying with the departure."
+    ],
+    mistakes: [
+      "Treating Expedition like a normal project instead of a strategic reset decision.",
+      "Departing before you understand the reward structure or catch-up rules for missing progress.",
+      "Over-risking late raids when a clean stash-value push would have been enough."
+    ],
+    fieldNote: "Expeditions are prestige decisions. The strongest move is usually the deliberate one, not the fastest one."
   }
 ];
 
@@ -1452,10 +1499,10 @@ function renderQuestOverview() {
       <span class="meta-label">Officially described systems</span>
       <strong class="meta-value">${questSystems.length} live quest categories</strong>
     </article>
-    <p class="quest-overview-copy">ARC Raiders' official public material currently describes four quest-related progression systems clearly enough to guide inside the app: Trader quests, Feats, weekly Trials, and larger Projects. This section focuses on how to complete those systems reliably rather than pretending there is a public, fixed list of every named in-game task.</p>
+    <p class="quest-overview-copy">ARC Raiders' official public material currently gives enough information to guide players through Trader quests, Feats, weekly Trials, larger Projects, and Expeditions. This section focuses on how to complete those systems reliably rather than pretending there is a public, fixed list of every named in-game task.</p>
     <div class="source-note">
       <strong>Source scope:</strong>
-      <p class="quest-note">This guide is grounded in the current official public overview of quests, Traders, Feats, Trials, and Projects from ARC Raiders.</p>
+      <p class="quest-note">This guide is grounded in the current official public overview of quests, Traders, Feats, Trials, Projects, and Expedition-related posts from ARC Raiders.</p>
     </div>
   `;
 }
@@ -1775,7 +1822,8 @@ function renderReleaseList() {
         <h3 class="release-title">${release.title}</h3>
         <span class="release-badge">${release.status}</span>
       </div>
-      <p class="release-summary">${release.summary}</p>
+      <p class="release-summary">${release.date}</p>
+      <p class="release-summary">${release.confirmed.slice(0, 2).join(" • ")}</p>
     </button>
   `).join("");
 
@@ -1798,19 +1846,25 @@ function renderReleaseDetail() {
     <section class="detail-block">
       <p class="detail-kicker">${release.status}</p>
       <h3 class="detail-title">${release.title}</h3>
+      <p class="detail-copy">${release.summary}</p>
+    </section>
+    <section class="detail-block">
+      <p class="detail-kicker">Why it matters</p>
       <p class="detail-copy">${release.overview}</p>
     </section>
     <section class="detail-block">
-      <p class="detail-kicker">Officially confirmed</p>
-      <ul class="detail-list">${release.confirmed.map((item) => `<li>${item}</li>`).join("")}</ul>
-    </section>
-    <section class="detail-block">
-      <p class="detail-kicker">Player prep</p>
+      <p class="detail-kicker">What players should do now</p>
       <ul class="detail-list">${release.prep.map((item) => `<li>${item}</li>`).join("")}</ul>
     </section>
     <section class="detail-block">
-      <p class="detail-kicker">App UX follow-up</p>
+      <p class="detail-kicker">What changed in the guide</p>
       <ul class="detail-list">${release.appIdeas.map((item) => `<li>${item}</li>`).join("")}</ul>
+    </section>
+    <section class="detail-block">
+      <div class="callout">
+        <strong>Confirmed in this release:</strong>
+        <p class="detail-copy">${release.confirmed.join(" • ")}</p>
+      </div>
     </section>
   `;
 }
@@ -1883,9 +1937,13 @@ function renderMaterialsOverview() {
       <strong class="meta-value">${materialFamilies.length} material families</strong>
     </article>
     <p class="materials-copy">ARC Raiders' public material information is best understood as a routing problem, not a perfect loot-table spreadsheet. Official sources tell us which map types exist, which conditions boost certain loot, and which material families are definitely in circulation. This section translates that into practical material-hunting advice.</p>
+    <div class="callout">
+      <strong>Post-Flashpoint verification:</strong>
+      <p class="detail-copy">Current official Flashpoint coverage describes crafting improvements and a new material-source helper in the workshop, but it does not publicly list new material families or a replaced material catalog. Based on current public information, the catalog below still holds after the March 31, 2026 update.</p>
+    </div>
     <div class="source-note">
       <strong>Source scope:</strong>
-      <p class="material-note">This guide uses official public details about the Workshop, maps, special conditions, boosted cache drops, and the named basic materials used in the tunnel restoration event.</p>
+      <p class="material-note">This guide uses official public details about the Workshop, maps, special conditions, boosted cache drops, the named basic materials used in the tunnel restoration event, and post-Flashpoint workshop changes.</p>
     </div>
   `;
 }
