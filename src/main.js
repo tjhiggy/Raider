@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.11.0",
+    date: "2026-03-31",
+    summary: "Updated the app for Flashpoint launch with live official details from Embark's March 31, 2026 release coverage.",
+    changes: [
+      "Replaced the Flashpoint placeholder update record with live release details from the official content update and news hub.",
+      "Added Flashpoint's key additions to the guide, including ARC Operation: Close Scrutiny, the Vaporizer, Canto, Dolabra, Surge Coil, and the High Gain Antenna project.",
+      "Refreshed the official-news module so the latest Embark posts for March 31, 2026 are visible at the top of the app."
+    ]
+  },
+  {
     version: "v1.10.0",
     date: "2026-03-30",
     summary: "Added material-purpose guidance plus a new weapons and quick-use gear training section for newer Raiders.",
@@ -248,24 +258,29 @@ const releases = [
     id: "flashpoint-2026-03-31",
     title: "Flashpoint",
     date: "2026-03-31",
-    status: "Tomorrow",
-    summary: "Embark has publicly positioned Flashpoint as the next ARC Raiders content update landing on March 31, 2026.",
-    overview: "Based on the official 2026 roadmap and Embark's public teasers, Flashpoint is the immediate next release after Headwinds and Shrouded Sky. The roadmap confirms a new ARC threat, a new map condition, a new player project, and a content update for Scrappy.",
+    status: "Live now",
+    summary: "Flashpoint is now live as of March 31, 2026, bringing a new ARC Operation, new ARC threat, new gear, a new project, Scrappy changes, and crafting improvements.",
+    overview: "Embark's official Flashpoint coverage confirms ARC Operation: Close Scrutiny, the new Vaporizer ARC, two new weapons, the Surge Coil gadget, the High Gain Antenna project, Scrappy feeding boosts, wider Shredder presence, and new crafting improvements. The operation is high-risk: less loot is scattered around the map, but the Assessor at the center of the event is the big reward target.",
     confirmed: [
-      "New ARC threat",
-      "New map condition",
-      "New player project",
-      "Content update for Scrappy"
+      "ARC Operation: Close Scrutiny",
+      "New ARC threat: Vaporizer",
+      "New weapons: Canto and Dolabra",
+      "New gadget: Surge Coil",
+      "New project: High Gain Antenna",
+      "Scrappy feeding boost",
+      "Crafting improvements",
+      "Shredders spread across more maps and conditions"
     ],
     prep: [
-      "Keep the app's quest, materials, and machine sections modular so new content can slot into existing categories fast.",
-      "Expect at least one new threat entry and one new condition-driven routing update as soon as patch details go live.",
-      "Prepare an update workflow that highlights what changed first, then links out to deeper guide sections."
+      "Expect Close Scrutiny runs to be more combat-dense because Embark says there is less loot around the map and the main value is concentrated around the Assessor.",
+      "Bring stronger anti-ARC tools and space-control utility if you plan to contest the operation instead of farming quieter routes.",
+      "Look for the Dolabra blueprint in Close Scrutiny and treat Surge Coil as a new anti-flank or area-control tool.",
+      "If you are crafting around Flashpoint, use the new material-source helper in the workshop to recycle, refine, or purchase from one window."
     ],
     appIdeas: [
-      "Add a 'New in this update' module at the top of the app whenever a release record is marked current.",
-      "Add patch-tag badges to affected lessons, materials, and machine intel entries.",
-      "Add a post-release verification checklist so unconfirmed assumptions can be replaced quickly with live information."
+      "Surface Flashpoint additions inside the machine and gear sections so players do not have to infer what changed from the update card alone.",
+      "Keep the official-news module current so patch posts and content updates appear at the top of the app on release days.",
+      "Add patch tags to guide content touched by Flashpoint, especially ARC intel, quick-use items, and special event routing."
     ]
   },
   {
@@ -344,24 +359,38 @@ const releases = [
 
 const embarkFeed = [
   {
+    title: "Flashpoint - Patch Notes 1.22.0",
+    date: "2026-03-31",
+    source: "Official news",
+    summary: "The official patch-note entry for Flashpoint is now live on Embark's news hub.",
+    url: "https://arcraiders.com/news"
+  },
+  {
+    title: "Flashpoint Update - Find the Truth",
+    date: "2026-03-30",
+    source: "Official news",
+    summary: "Embark's full Flashpoint overview confirms Close Scrutiny, Vaporizer, Canto, Dolabra, Surge Coil, the High Gain Antenna project, and Scrappy changes.",
+    url: "https://arcraiders.com/news/flashpoint-content-update"
+  },
+  {
     title: "Patch Notes 1.21.0",
     date: "2026-03-24",
     source: "Official news",
-    summary: "A weekly patch-note update that helps players understand what changed immediately before the March 31, 2026 Flashpoint release window.",
+    summary: "The final weekly patch before Flashpoint, useful as the baseline for what changed this morning.",
     url: "https://arcraiders.com/news/patch-notes-1-21-0"
   },
   {
     title: "Patch Notes 1.20.0",
     date: "2026-03-17",
     source: "Official news",
-    summary: "Embark's weekly update cadence continued here, reinforcing why the app needs a fast current-news surface before deeper guide reading.",
+    summary: "Another pre-Flashpoint checkpoint in Embark's March update cadence.",
     url: "https://arcraiders.com/news/patch-notes-1-20-0"
   },
   {
     title: "Patch Notes 1.19.0",
     date: "2026-03-10",
     source: "Official news",
-    summary: "Another official patch-note checkpoint that supports the app's live-service update tracking model.",
+    summary: "Older March patch notes that now sit just behind the Flashpoint launch coverage in the official archive.",
     url: "https://arcraiders.com/news/patch-notes-1-19-0"
   },
   {
@@ -370,20 +399,6 @@ const embarkFeed = [
     source: "Official news",
     summary: "A rules-and-progress post that matters to players using the guide for repeatable performance and challenge prep.",
     url: "https://arcraiders.com/news/trials-season-3-what-you-need-to-know"
-  },
-  {
-    title: "Patch Notes 1.18.0",
-    date: "2026-03-03",
-    source: "Official news",
-    summary: "A same-day patch note that helps anchor March 2026 update history inside the app.",
-    url: "https://arcraiders.com/news/patch-notes-1-18-0"
-  },
-  {
-    title: "Firefly and Comet: How to combat the new ARC enemies",
-    date: "2026-02-25",
-    source: "Official news",
-    summary: "A particularly valuable official combat explainer that feeds directly into the app's machine-intel guidance.",
-    url: "https://arcraiders.com/news/firefly-and-comet-how-to-combat-the-new-arc-enemies"
   }
 ];
 
@@ -648,10 +663,11 @@ const machines = [
   { name: "Wasp", threat: "Light Air Harassment", copy: "Fast flying ARC that pressures movement lanes and exposed rotations.", response: "Use cover chains and remove it before crossing open space.", weakPoint: "Thrusters", loadout: "Fast-handling rifles or SMGs that can track air targets.", tactic: "Clip the thrusters to destabilize it instead of chasing center mass." },
   { name: "Hornet", threat: "Shock Air Threat", copy: "A nastier flying variant that adds stronger pressure and punishes players who ignore aerial tracking.", response: "Watch rear thrusters and avoid staying exposed when it lines up an attack.", weakPoint: "Unarmored rear thrusters", loadout: "Medium ammo weapons are a strong baseline.", tactic: "Dodge roll on the attack audio cue, then return fire into the rear thrusters while it recovers." },
   { name: "Rocketeer", threat: "Explosive Air Threat", copy: "Flying ARC that turns open angles and delayed rotations into explosive danger.", response: "Break sight lines quickly and never assume one rooftop peek is safe.", weakPoint: "Thrusters and the area above the scanner", loadout: "Heavy ammo or Wolfpack-style grenade pressure.", tactic: "Fight it from cover only. If you can destabilize the thrusters, the rest of the takedown gets dramatically safer." },
-  { name: "Firefly", threat: "New Air Threat", copy: "A newer ARC unit introduced during the Shrouded Sky era that adds to aerial pressure and update-era combat variance.", response: "Treat it like priority air pressure and clear it before it stacks with ground threats.", weakPoint: "Yellow body canister and semi-armored thrusters", loadout: "Heavy ammo or precise rifle fire.", tactic: "Favor clean angle shots into the yellow canister. If that is not available, strip the thrusters until it destabilizes." },
-  { name: "Comet", threat: "New Air Threat", copy: "Another newer ARC named in official update material, contributing to more dangerous live-service encounter mixes.", response: "Respect it as a patch-era threat and avoid learning its pattern the hard way mid-fight.", weakPoint: "Best punished before detonation", loadout: "Heavy ammo or grenades.", tactic: "Sidestep its approach instead of backpedaling in a straight line, then finish it before the blast window." },
+  { name: "Firefly", threat: "Air Threat", copy: "A newer ARC unit introduced during the Shrouded Sky era that adds to aerial pressure and update-era combat variance.", response: "Treat it like priority air pressure and clear it before it stacks with ground threats.", weakPoint: "Yellow body canister and semi-armored thrusters", loadout: "Heavy ammo or precise rifle fire.", tactic: "Favor clean angle shots into the yellow canister. If that is not available, strip the thrusters until it destabilizes." },
+  { name: "Comet", threat: "Air Threat", copy: "Another newer ARC named in official update material, contributing to more dangerous live-service encounter mixes.", response: "Respect it as a patch-era threat and avoid learning its pattern the hard way mid-fight.", weakPoint: "Best punished before detonation", loadout: "Heavy ammo or grenades.", tactic: "Sidestep its approach instead of backpedaling in a straight line, then finish it before the blast window." },
+  { name: "Vaporizer", threat: "Laser Air Threat", copy: "Flashpoint's new flying ARC stalks Close Scrutiny operations and is already known for devastating laser attacks and odd attack timing.", response: "Treat it like top-priority aerial pressure whenever it enters the fight, because its attack pattern is designed to punish late peeks and static cover use.", weakPoint: "Public weak-point details are still emerging", loadout: "Accurate anti-air weapons, fast burst damage, and hard-cover discipline.", tactic: "Do not learn the timing in the open. Break line of sight first, watch the laser rhythm, then take short clean peeks instead of extended trades." },
   { name: "Leaper", threat: "Burst Pressure", copy: "Large ARC that can cover distance fast and force you off safe positions with jump pressure.", response: "Keep lateral escape space and punish it after the commit.", weakPoint: "Leg joints and central eye", loadout: "Explosives, Wolfpack, or high-pen burst damage.", tactic: "Make it jump first. Once it commits, hit the legs or eye while it is recovering instead of trying to race it head-on." },
-  { name: "Shredder", threat: "Aggressive Pursuit", copy: "A newer named ARC that Embark has teased and expanded into broader map pressure ahead of Flashpoint.", response: "Assume it exists to make PvE routes less comfortable and avoid fighting it in already noisy zones.", weakPoint: "Thrusters", loadout: "Heavy ammo, grenades, or Hullcracker-style punch.", tactic: "Never fight it in the open. Use hard cover, wait for the attack signal, then peek only long enough to damage the thrusters." },
+  { name: "Shredder", threat: "Aggressive Pursuit", copy: "Flashpoint spreads Shredders across Blue Gate, Buried City, Spaceport, and Dam Battlegrounds during map conditions, making them a much more common route problem.", response: "Assume more raids can now turn into Shredder fights even outside dedicated event zones, especially on condition-affected maps.", weakPoint: "Thrusters", loadout: "Heavy ammo, grenades, or Hullcracker-style punch.", tactic: "Never fight it in the open. Use hard cover, wait for the attack signal, then peek only long enough to damage the thrusters." },
   { name: "Bombardier", threat: "Area Denial", copy: "Heavy support ARC that uses marked positions to rain damage onto static players.", response: "Relocate early and kill the supporting detection chain before you try to hold ground.", weakPoint: "Yellow leg joints and rear canister", loadout: "Heavy ammo, Hullcracker, Deadline, or Wolfpack.", tactic: "Kill the Spotter first if one is active. Then work the rear or legs from cover and never stay close enough to eat the shockwave." },
   { name: "Bastion", threat: "Heavy Frontline", copy: "Heavily armored ARC built to dominate frontal fights and punish players who stand in obvious lanes.", response: "Do not brawl it head-on longer than necessary; work weak points and safer angles.", weakPoint: "Yellow leg joints and rear canister", loadout: "Heavy-hitting rear utility like Deadline or Wolfpack, plus armor-pen weapons.", tactic: "Drag it around cover or a corner, then farm leg joints while it turns. Stuns make it dramatically safer to finish." },
   { name: "Turret", threat: "Static Kill Zone", copy: "Fixed ARC gun emplacement commonly found in defensive or indoor spaces where it controls entry lanes.", response: "Respect sight lines before entering and clear it before exposing the whole team.", weakPoint: "Punish its attack window", loadout: "Heavy ammo makes the kill fast.", tactic: "Bait the burst, duck back into cover, then repeek during its downtime." },
@@ -955,6 +971,20 @@ const weaponRoles = [
     bestFor: "Material farming, task-focused runs, and undergeared raids where survival matters more than kill pressure.",
     guidance: "Choose gear that helps you disengage, finish quick threats, and avoid long loud fights.",
     beginnerTip: "The right low-drama loadout often earns more progress than the flashy one."
+  },
+  {
+    title: "Flashpoint: Canto",
+    summary: "Canto is Flashpoint's new submachine gun and Embark positions it as a close-quarters weapon that still gives Raiders a fighting chance against ARC.",
+    bestFor: "Close interiors, operation fights, and players who need a medium-ammo weapon that can handle both Raiders and nearby machines.",
+    guidance: "Treat it as a pressure tool for tight spaces instead of a universal long-range answer.",
+    beginnerTip: "If you are learning Close Scrutiny, Canto makes more sense as a secondary pressure gun than as your only ranged plan."
+  },
+  {
+    title: "Flashpoint: Dolabra",
+    summary: "Dolabra is Flashpoint's new energy shotgun with a variable focus that can either spread damage wide or concentrate it into a tighter burst for ARC armor.",
+    bestFor: "Close Scrutiny, heavy ARC fights, and players who want a dedicated close-range armor puncher.",
+    guidance: "Use the focused fire mode when you need to punish armor or exposed weak points instead of wasting the shot on broad body damage.",
+    beginnerTip: "Only force Dolabra fights if you have cover and space to reset after the shot."
   }
 ];
 
@@ -988,6 +1018,12 @@ const quickUseItems = [
     summary: "Any tool that helps you break line of sight, reposition, or reset is huge for newer players who overstay fights.",
     bringWhen: "Especially useful on quest runs where finishing the objective matters more than winning every engagement.",
     tip: "A run-saving escape item is usually worth more than one extra stack of loot."
+  },
+  {
+    title: "Flashpoint: Surge Coil",
+    summary: "Surge Coil is Flashpoint's new deployable that periodically electrifies the area around it, shocking anything that drifts into range.",
+    bringWhen: "Strong for anti-flank coverage, operation looting windows, defensive resets, and controlling a doorway or angle while you heal or interact.",
+    tip: "Think of it as a safety bubble, not just damage. It is strongest when it stops someone from comfortably pushing you."
   }
 ];
 
