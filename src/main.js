@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.8.1",
+    date: "2026-03-30",
+    summary: "Expanded ARC Machine Intel with practical kill tips, weak points, and recommended weapon or tactic types.",
+    changes: [
+      "Added machine-by-machine guidance for how to destroy ARC more efficiently.",
+      "Included weak-point focus, suggested ammo or utility style, and one practical combat tactic per machine.",
+      "Clarified that the section combines official/public machine info with community-supported field guidance where full official counter data is not published."
+    ]
+  },
+  {
     version: "v1.8.0",
     date: "2026-03-30",
     summary: "Simplified the training flow with focus-based navigation and rewrote the Discord promo as The MuthaShip community hub.",
@@ -559,28 +569,28 @@ const lessons = [
 ];
 
 const machines = [
-  { name: "Snitch", threat: "Detection", copy: "Flying observer that loudly alerts nearby ARC and can rapidly expand a quiet skirmish into a full problem.", response: "Break line of sight or destroy it immediately before it calls reinforcements." },
-  { name: "Spotter", threat: "Target Designation", copy: "Support unit that helps heavier ARC, especially Bombardiers, turn your position into a punishable marker.", response: "Prioritize it early so the rest of the encounter loses coordination." },
-  { name: "Surveyor", threat: "Scout Pressure", copy: "Usually lighter than other ARC but still important because it helps populate the battlefield and punish sloppy movement.", response: "Clear it when you need a route to stay quiet and uncontested." },
-  { name: "Tick", threat: "Ambush", copy: "Small, indoor ambush ARC that latch on and punish inattentive looting or rushing through interiors.", response: "Check ceilings, corners, and tight rooms before you tunnel on loot." },
-  { name: "Pop", threat: "Close-Range Explosion", copy: "Ball-like ARC that becomes most dangerous when you let it close distance inside cluttered spaces.", response: "Keep space and delete it before it reaches your feet or your team stack." },
-  { name: "Fireball", threat: "Close-Range Burn", copy: "Aggressive short-range ARC that punishes cramped movement and late reactions.", response: "Do not let it collapse into your cover pocket; create space early." },
-  { name: "Wasp", threat: "Light Air Harassment", copy: "Fast flying ARC that pressures movement lanes and exposed rotations.", response: "Use cover chains and remove it before crossing open space." },
-  { name: "Hornet", threat: "Shock Air Threat", copy: "A nastier flying variant that adds stronger pressure and punishes players who ignore aerial tracking.", response: "Watch rear thrusters and avoid staying exposed when it lines up an attack." },
-  { name: "Rocketeer", threat: "Explosive Air Threat", copy: "Flying ARC that turns open angles and delayed rotations into explosive danger.", response: "Break sight lines quickly and never assume one rooftop peek is safe." },
-  { name: "Firefly", threat: "New Air Threat", copy: "A newer ARC unit introduced during the Shrouded Sky era that adds to aerial pressure and update-era combat variance.", response: "Treat it like priority air pressure and clear it before it stacks with ground threats." },
-  { name: "Comet", threat: "New Air Threat", copy: "Another newer ARC named in official update material, contributing to more dangerous live-service encounter mixes.", response: "Respect it as a patch-era threat and avoid learning its pattern the hard way mid-fight." },
-  { name: "Leaper", threat: "Burst Pressure", copy: "Large ARC that can cover distance fast and force you off safe positions with jump pressure.", response: "Keep lateral escape space and punish it after the commit." },
-  { name: "Shredder", threat: "Aggressive Pursuit", copy: "A newer named ARC that Embark has teased and expanded into broader map pressure ahead of Flashpoint.", response: "Assume it exists to make PvE routes less comfortable and avoid fighting it in already noisy zones." },
-  { name: "Bombardier", threat: "Area Denial", copy: "Heavy support ARC that uses marked positions to rain damage onto static players.", response: "Relocate early and kill the supporting detection chain before you try to hold ground." },
-  { name: "Bastion", threat: "Heavy Frontline", copy: "Heavily armored ARC built to dominate frontal fights and punish players who stand in obvious lanes.", response: "Do not brawl it head-on longer than necessary; work weak points and safer angles." },
-  { name: "Turret", threat: "Static Kill Zone", copy: "Fixed ARC gun emplacement commonly found in defensive or indoor spaces where it controls entry lanes.", response: "Respect sight lines before entering and clear it before exposing the whole team." },
-  { name: "Sentinel", threat: "Vantage Control", copy: "Larger outdoor threat that controls stronger angles and punishes careless movement through open spaces.", response: "Identify its line of control first, then route or peek around it deliberately." },
-  { name: "Baron Husk", threat: "Elite Ground Threat", copy: "More dangerous husk-class ARC that adds higher punishment to already contested zones.", response: "Do not let it become background damage while you chase smaller targets." },
-  { name: "Deforester Husk", threat: "Heavy Environment Threat", copy: "Bulkier husk-type ARC found in more hostile areas where it adds sustained pressure.", response: "Treat it as a positional problem first and do not get pinned near it." },
-  { name: "Matriarch", threat: "Boss-Class Threat", copy: "Large high-threat ARC that requires real planning and should not be treated like normal ambient PvE.", response: "Only engage with a plan, room to reset, and a reason to take the noise risk." },
-  { name: "Queen", threat: "Boss-Class Threat", copy: "Massive multi-legged ARC and one of the most dangerous named threats currently in the game ecosystem.", response: "Treat it as a major event-level fight, not casual background farm." },
-  { name: "ARC Orbiter", threat: "Overhead Threat Platform", copy: "A named ARC platform listed in the current ARC index and best treated as a high-risk environmental enemy presence.", response: "Do not underestimate it just because it is less common in casual discussion; identify how it changes the area first." }
+  { name: "Snitch", threat: "Detection", copy: "Flying observer that loudly alerts nearby ARC and can rapidly expand a quiet skirmish into a full problem.", response: "Break line of sight or destroy it immediately before it calls reinforcements.", weakPoint: "Unarmored thrusters", loadout: "Medium or heavy ammo weapons are the cleanest answer.", tactic: "Burst the thrusters first. If you are already under pressure, hide in foliage or hard cover long enough to deny the scan." },
+  { name: "Spotter", threat: "Target Designation", copy: "Support unit that helps heavier ARC, especially Bombardiers, turn your position into a punishable marker.", response: "Prioritize it early so the rest of the encounter loses coordination.", weakPoint: "Fast takedown before target lock", loadout: "Accurate primary fire or seeker-style utility if you carry it.", tactic: "Kill it before settling into cover. Vertical cover matters because Spotters often set up Bombardier follow-up." },
+  { name: "Surveyor", threat: "Scout Pressure", copy: "Usually lighter than other ARC but still important because it helps populate the battlefield and punish sloppy movement.", response: "Clear it when you need a route to stay quiet and uncontested.", weakPoint: "Exposed weak point when it fires its laser", loadout: "Explosives or stun utility plus follow-up gunfire.", tactic: "Bait the laser, shoot the exposed weak point, then finish before it flees." },
+  { name: "Tick", threat: "Ambush", copy: "Small, indoor ambush ARC that latch on and punish inattentive looting or rushing through interiors.", response: "Check ceilings, corners, and tight rooms before you tunnel on loot.", weakPoint: "Low durability overall", loadout: "Any weapon works.", tactic: "Pre-fire corners in cluttered interiors and dodge roll immediately if one latches on." },
+  { name: "Pop", threat: "Close-Range Explosion", copy: "Ball-like ARC that becomes most dangerous when you let it close distance inside cluttered spaces.", response: "Keep space and delete it before it reaches your feet or your team stack.", weakPoint: "Low durability overall", loadout: "Any weapon works.", tactic: "Climb or dodge over it to bait the blast if you are caught late, then punish on the reset." },
+  { name: "Fireball", threat: "Close-Range Burn", copy: "Aggressive short-range ARC that punishes cramped movement and late reactions.", response: "Do not let it collapse into your cover pocket; create space early.", weakPoint: "White core exposed when it opens to attack", loadout: "Heavy ammo is ideal, but any accurate burst into the open core works.", tactic: "Back off to make it open up, snap the exposed core, then move again so the death fire does not trade back." },
+  { name: "Wasp", threat: "Light Air Harassment", copy: "Fast flying ARC that pressures movement lanes and exposed rotations.", response: "Use cover chains and remove it before crossing open space.", weakPoint: "Thrusters", loadout: "Fast-handling rifles or SMGs that can track air targets.", tactic: "Clip the thrusters to destabilize it instead of chasing center mass." },
+  { name: "Hornet", threat: "Shock Air Threat", copy: "A nastier flying variant that adds stronger pressure and punishes players who ignore aerial tracking.", response: "Watch rear thrusters and avoid staying exposed when it lines up an attack.", weakPoint: "Unarmored rear thrusters", loadout: "Medium ammo weapons are a strong baseline.", tactic: "Dodge roll on the attack audio cue, then return fire into the rear thrusters while it recovers." },
+  { name: "Rocketeer", threat: "Explosive Air Threat", copy: "Flying ARC that turns open angles and delayed rotations into explosive danger.", response: "Break sight lines quickly and never assume one rooftop peek is safe.", weakPoint: "Thrusters and the area above the scanner", loadout: "Heavy ammo or Wolfpack-style grenade pressure.", tactic: "Fight it from cover only. If you can destabilize the thrusters, the rest of the takedown gets dramatically safer." },
+  { name: "Firefly", threat: "New Air Threat", copy: "A newer ARC unit introduced during the Shrouded Sky era that adds to aerial pressure and update-era combat variance.", response: "Treat it like priority air pressure and clear it before it stacks with ground threats.", weakPoint: "Yellow body canister and semi-armored thrusters", loadout: "Heavy ammo or precise rifle fire.", tactic: "Favor clean angle shots into the yellow canister. If that is not available, strip the thrusters until it destabilizes." },
+  { name: "Comet", threat: "New Air Threat", copy: "Another newer ARC named in official update material, contributing to more dangerous live-service encounter mixes.", response: "Respect it as a patch-era threat and avoid learning its pattern the hard way mid-fight.", weakPoint: "Best punished before detonation", loadout: "Heavy ammo or grenades.", tactic: "Sidestep its approach instead of backpedaling in a straight line, then finish it before the blast window." },
+  { name: "Leaper", threat: "Burst Pressure", copy: "Large ARC that can cover distance fast and force you off safe positions with jump pressure.", response: "Keep lateral escape space and punish it after the commit.", weakPoint: "Leg joints and central eye", loadout: "Explosives, Wolfpack, or high-pen burst damage.", tactic: "Make it jump first. Once it commits, hit the legs or eye while it is recovering instead of trying to race it head-on." },
+  { name: "Shredder", threat: "Aggressive Pursuit", copy: "A newer named ARC that Embark has teased and expanded into broader map pressure ahead of Flashpoint.", response: "Assume it exists to make PvE routes less comfortable and avoid fighting it in already noisy zones.", weakPoint: "Thrusters", loadout: "Heavy ammo, grenades, or Hullcracker-style punch.", tactic: "Never fight it in the open. Use hard cover, wait for the attack signal, then peek only long enough to damage the thrusters." },
+  { name: "Bombardier", threat: "Area Denial", copy: "Heavy support ARC that uses marked positions to rain damage onto static players.", response: "Relocate early and kill the supporting detection chain before you try to hold ground.", weakPoint: "Yellow leg joints and rear canister", loadout: "Heavy ammo, Hullcracker, Deadline, or Wolfpack.", tactic: "Kill the Spotter first if one is active. Then work the rear or legs from cover and never stay close enough to eat the shockwave." },
+  { name: "Bastion", threat: "Heavy Frontline", copy: "Heavily armored ARC built to dominate frontal fights and punish players who stand in obvious lanes.", response: "Do not brawl it head-on longer than necessary; work weak points and safer angles.", weakPoint: "Yellow leg joints and rear canister", loadout: "Heavy-hitting rear utility like Deadline or Wolfpack, plus armor-pen weapons.", tactic: "Drag it around cover or a corner, then farm leg joints while it turns. Stuns make it dramatically safer to finish." },
+  { name: "Turret", threat: "Static Kill Zone", copy: "Fixed ARC gun emplacement commonly found in defensive or indoor spaces where it controls entry lanes.", response: "Respect sight lines before entering and clear it before exposing the whole team.", weakPoint: "Punish its attack window", loadout: "Heavy ammo makes the kill fast.", tactic: "Bait the burst, duck back into cover, then repeek during its downtime." },
+  { name: "Sentinel", threat: "Vantage Control", copy: "Larger outdoor threat that controls stronger angles and punishes careless movement through open spaces.", response: "Identify its line of control first, then route or peek around it deliberately.", weakPoint: "Yellow arm canister", loadout: "Heavy ammo or precision fire from cover.", tactic: "Watch the beam color cues, bait the shot, then punish the yellow canister instead of dumping ammo into armor." },
+  { name: "Baron Husk", threat: "Elite Ground Threat", copy: "More dangerous husk-class ARC that adds higher punishment to already contested zones.", response: "Do not let it become background damage while you chase smaller targets.", weakPoint: "Limited public weak-point data", loadout: "Armor-pen weapons and explosives are the safest assumption.", tactic: "Treat it like a heavier ground bruiser: isolate it, keep lateral room, and do not let it pressure you while other ARC stay alive." },
+  { name: "Deforester Husk", threat: "Heavy Environment Threat", copy: "Bulkier husk-type ARC found in more hostile areas where it adds sustained pressure.", response: "Treat it as a positional problem first and do not get pinned near it.", weakPoint: "Limited public weak-point data", loadout: "Armor-pen weapons and explosive utility.", tactic: "Fight it from hard cover with an exit route already chosen. If the area is already noisy, disengaging is often the better play." },
+  { name: "Matriarch", threat: "Boss-Class Threat", copy: "Large high-threat ARC that requires real planning and should not be treated like normal ambient PvE.", response: "Only engage with a plan, room to reset, and a reason to take the noise risk.", weakPoint: "Break faceplates, then hit the red core. Leg joints are also valid weak points.", loadout: "High-pen weapons, boss utility, and cover-friendly burst tools like Deadline or Wolfpack when windows open.", tactic: "Fight from major hard cover or high ground. Ignore the shield phase unless you can safely enter it, and do not tunnel on the boss while summoned ARC are collapsing on you." },
+  { name: "Queen", threat: "Boss-Class Threat", copy: "Massive multi-legged ARC and one of the most dangerous named threats currently in the game ecosystem.", response: "Treat it as a major event-level fight, not casual background farm.", weakPoint: "Strip armor plates, then focus the red core. Yellow leg weak points are also valuable.", loadout: "High-pen primaries plus burst utility saved for exposed-core windows.", tactic: "Do not stand in repeated mortar lanes. Use cover, chip the armor off first, and only commit your biggest damage when the core is exposed." },
+  { name: "ARC Orbiter", threat: "Overhead Threat Platform", copy: "A named ARC platform listed in the current ARC index and best treated as a high-risk environmental enemy presence.", response: "Do not underestimate it just because it is less common in casual discussion; identify how it changes the area first.", weakPoint: "Public counter data is still thin", loadout: "Long-range, precise fire and cover-heavy play.", tactic: "Treat it like an area-control problem first. Break line of sight, identify what ground units it is enabling, and only commit if the area is worth the attention." }
 ];
 
 const prepChecklist = [
@@ -1131,6 +1141,10 @@ function renderMachines() {
         <p>Leapers and heavy threats become easier to manage once detection and space control are handled.</p>
       </article>
     </div>
+    <div class="source-note">
+      <strong>Source scope:</strong>
+      <p class="machine-copy">This section combines current public machine listings and official update notes with community-supported weak-point and counterplay guidance. Where full official counter data is not public, the weapon and tactic advice is practical field guidance rather than a developer-confirmed damage chart.</p>
+    </div>
   `;
 
   machineListElement.innerHTML = machines.map((machine) => `
@@ -1140,7 +1154,18 @@ function renderMachines() {
         <span class="machine-threat">${machine.threat}</span>
       </div>
       <p class="machine-copy">${machine.copy}</p>
+      <div class="machine-tactics-grid">
+        <article class="machine-tactic">
+          <span class="chip-label">Weak Point</span>
+          <strong class="chip-value">${machine.weakPoint}</strong>
+        </article>
+        <article class="machine-tactic">
+          <span class="chip-label">Best Tool</span>
+          <strong class="chip-value">${machine.loadout}</strong>
+        </article>
+      </div>
       <div class="callout"><strong>Response:</strong><p class="detail-copy">${machine.response}</p></div>
+      <div class="callout"><strong>How to kill it:</strong><p class="detail-copy">${machine.tactic}</p></div>
     </article>
   `).join("");
 }

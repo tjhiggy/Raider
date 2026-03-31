@@ -992,6 +992,20 @@ button { color: inherit; }
 }
 
 .machine-list { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.machine-tactics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.machine-tactic {
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.025);
+}
+
 .machine-threat {
   color: var(--danger);
   font-size: 0.82rem;
@@ -1232,6 +1246,7 @@ button { color: inherit; }
   .hero-actions { display: grid; grid-template-columns: 1fr; }
   .lesson-list, .machine-list, .track-list { grid-template-columns: 1fr; }
   .machine-priority-grid { grid-template-columns: 1fr; }
+  .machine-tactics-grid { grid-template-columns: 1fr; }
   .community-panel,
   .track-title-row, .lesson-title-row, .machine-top { align-items: flex-start; flex-direction: column; }
   .overview-meta, .detail-chip-row { display: grid; grid-template-columns: 1fr; }
