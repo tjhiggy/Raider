@@ -572,7 +572,19 @@ button { color: inherit; }
   margin-bottom: 20px;
 }
 
+.gear-layout {
+  display: grid;
+  grid-template-columns: 0.9fr 1fr 0.95fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
 .materials-catalog-panel {
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.material-usage-panel {
   padding: 20px;
   margin-bottom: 20px;
 }
@@ -707,6 +719,9 @@ button { color: inherit; }
 .release-list-panel,
 .release-detail-panel,
 .embark-feed-panel,
+.gear-overview-panel,
+.gear-list-panel,
+.gear-quickuse-panel,
 .materials-overview-panel,
 .materials-list-panel,
 .materials-detail-panel {
@@ -804,9 +819,22 @@ button { color: inherit; }
   gap: 12px;
 }
 
+.gear-overview,
+.weapon-role-list,
+.quick-use-list {
+  display: grid;
+  gap: 12px;
+}
+
 .materials-catalog {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.material-usage-guide {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 12px;
 }
 
@@ -836,6 +864,58 @@ button { color: inherit; }
   background: rgba(255, 255, 255, 0.02);
   color: var(--muted);
   line-height: 1.4;
+}
+
+.usage-card,
+.gear-card,
+.quick-use-card {
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.usage-title,
+.gear-title,
+.quick-use-title {
+  margin: 0;
+  font-family: var(--display-font);
+  font-size: 1rem;
+  text-transform: uppercase;
+}
+
+.usage-copy,
+.usage-note,
+.gear-copy,
+.quick-use-copy {
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.usage-copy,
+.gear-copy,
+.quick-use-copy {
+  margin: 10px 0 0;
+}
+
+.usage-meta,
+.gear-meta {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.usage-rule,
+.gear-rule {
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.usage-note {
+  margin: 12px 0 0;
+  font-size: 0.92rem;
 }
 
 .quest-title-row {
@@ -1288,7 +1368,7 @@ button { color: inherit; }
 }
 
 @media (max-width: 1120px) {
-  .hero, .update-layout, .curriculum-layout, .quest-layout, .materials-layout, .intel-grid, .status-grid, .briefing-list, .launchpad-grid { grid-template-columns: 1fr; }
+  .hero, .update-layout, .curriculum-layout, .quest-layout, .materials-layout, .gear-layout, .intel-grid, .status-grid, .briefing-list, .launchpad-grid { grid-template-columns: 1fr; }
   .curriculum-layout { gap: 16px; }
   .materials-catalog { grid-template-columns: 1fr; }
 }
@@ -1335,10 +1415,14 @@ button { color: inherit; }
   .update-spotlight-panel,
   .release-list-panel,
   .release-detail-panel,
+  .gear-overview-panel,
+  .gear-list-panel,
+  .gear-quickuse-panel,
   .materials-overview-panel,
   .materials-list-panel,
   .materials-detail-panel,
-  .materials-catalog-panel { padding: 16px; }
+  .materials-catalog-panel,
+  .material-usage-panel { padding: 16px; }
   .quest-title-row { align-items: flex-start; flex-direction: column; }
 }
 

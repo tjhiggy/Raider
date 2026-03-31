@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.10.0",
+    date: "2026-03-30",
+    summary: "Added material-purpose guidance plus a new weapons and quick-use gear training section for newer Raiders.",
+    changes: [
+      "Added a material value guide that explains likely uses, keep-or-sell decisions, and recycle guidance.",
+      "Added a beginner-friendly weapons and quick-use gear section built around practical loadout roles instead of raw item dumping.",
+      "Integrated gear knowledge into the same focus-based navigation so new players can find it quickly."
+    ]
+  },
+  {
     version: "v1.9.0",
     date: "2026-03-30",
     summary: "Added a curated Latest From Embark news module so players can see recent official posts without leaving the training app.",
@@ -215,6 +225,11 @@ const focusViews = [
     id: "materials",
     label: "Materials",
     summary: "Jump into routing and the full catalog when crafting is blocking you."
+  },
+  {
+    id: "gear",
+    label: "Gear",
+    summary: "Learn what weapons, healing, and utility help newer players survive and finish their raids."
   },
   {
     id: "machines",
@@ -861,6 +876,121 @@ const materialCatalog = [
   }
 ];
 
+const materialUsageGuide = [
+  {
+    name: "Sensors",
+    usedFor: "Tech-heavy crafts, detection tools, advanced gadgets, and some higher-tier weapon or utility upgrades.",
+    keepRule: "Keep these when you are building recon, control, or advanced workshop capability.",
+    sellRule: "Sell only if your stash is jammed and you already have a healthy pile for your next project.",
+    recycleRule: "Recycle when you need broad workshop value more than one exact tech craft.",
+    note: "Public recipe visibility is incomplete, so think of Sensors as premium tech stock rather than vendor trash."
+  },
+  {
+    name: "Battery",
+    usedFor: "Powered gadgets, support tools, and general workshop tech crafts.",
+    keepRule: "Keep them if you like utility-heavy kits or expect to craft electronics soon.",
+    sellRule: "Safer to sell than Sensors once you have a stable stack, because Batteries are more general-purpose and less uniquely rare.",
+    recycleRule: "Good recycle candidates when you need workshop progression and are oversupplied.",
+    note: "Batteries are strong glue materials. They are rarely glamorous, but they keep a lot of tech recipes moving."
+  },
+  {
+    name: "Gun Parts",
+    usedFor: "Weapon crafts, weapon upkeep, and gun-focused workshop progress across light, medium, heavy, and complex branches.",
+    keepRule: "Keep these if you are still figuring out what weapon family you like, because they convert directly into future flexibility.",
+    sellRule: "Sell extras only after your core raid weapon path feels stable.",
+    recycleRule: "Usually better kept than recycled for newer players because weapons are an immediate quality-of-life upgrade.",
+    note: "If you do not know what to keep yet, gun parts are one of the safer materials to hold."
+  },
+  {
+    name: "Chemicals and Medical Stock",
+    usedFor: "Healing, support crafts, and utility items that keep your raid from collapsing after one bad fight.",
+    keepRule: "Keep these early. Survivability crafts are one of the highest-value uses of your stash.",
+    sellRule: "Only sell when you have more support stock than you can realistically spend.",
+    recycleRule: "Recycle if you urgently need broader workshop value, but avoid emptying your healing pipeline.",
+    note: "New players usually regret selling survivability materials before they regret selling damage materials."
+  },
+  {
+    name: "Arc Circuitry and Powercells",
+    usedFor: "Advanced crafting, stronger utility, and high-tier projects tied to ARC-derived tech.",
+    keepRule: "Almost always keep these unless you are flush with endgame stock.",
+    sellRule: "High-value sale candidates in emergencies only.",
+    recycleRule: "Usually not the first thing to recycle because their direct craft value is high.",
+    note: "These are the kinds of materials that often gate stronger workshop progress later."
+  },
+  {
+    name: "Duct Tape, Rope, Fabric, Rubber Parts",
+    usedFor: "General utility crafts, lower-to-mid tier support items, and practical workshop recipes.",
+    keepRule: "Keep a working stack because these fill a lot of boring-but-important recipe gaps.",
+    sellRule: "Good cleanup sale items once your stash is bloated and you have duplicate stacks.",
+    recycleRule: "Reasonable recycle candidates because they are more common and broadly replaceable.",
+    note: "These are foundation materials. They matter more than they look, but they are not sacred."
+  }
+];
+
+const weaponRoles = [
+  {
+    title: "Reliable All-Round Primary",
+    summary: "The best starter weapon is the one you can control in messy mid-range fights without panicking or mag-dumping into armor.",
+    bestFor: "Quest runs, mixed PvE/PvP, and newer players who need one gun that does a little of everything.",
+    guidance: "If you are not sure what to bring, favor a stable rifle or controllable automatic weapon over a niche high-risk pick.",
+    beginnerTip: "Consistency beats theorycraft. Bring a gun you can actually reset and finish kills with."
+  },
+  {
+    title: "Close-Quarters Backup",
+    summary: "A backup or aggressive short-range weapon helps when interiors, surprise pushes, or fast ARC collapse your spacing.",
+    bestFor: "Loot routes with lots of interiors, tunnel runs, and players who keep getting rushed while reloading.",
+    guidance: "Shotguns and faster close-range options are strongest when your primary struggles in tight spaces.",
+    beginnerTip: "If you panic indoors, a simple close-range answer can save more raids than a second greedy damage tool."
+  },
+  {
+    title: "Heavy ARC Breaker",
+    summary: "Some runs call for harder-hitting weapons or utility that can punish armor, leg joints, and exposed cores on bigger ARC.",
+    bestFor: "Machine hunting, boss prep, or any raid where you expect Bastions, Bombardiers, Matriarchs, or Queens.",
+    guidance: "Pair higher-pen damage with cover discipline so you are not standing in the open just because your weapon hits hard.",
+    beginnerTip: "Do not bring heavy ARC tools unless the raid objective actually justifies the weight, noise, and risk."
+  },
+  {
+    title: "Silent or Low-Drama Utility Pick",
+    summary: "Not every raid should be built to win open fights. Sometimes the best loadout is the one that helps you stay unnoticed and leave cleanly.",
+    bestFor: "Material farming, task-focused runs, and undergeared raids where survival matters more than kill pressure.",
+    guidance: "Choose gear that helps you disengage, finish quick threats, and avoid long loud fights.",
+    beginnerTip: "The right low-drama loadout often earns more progress than the flashy one."
+  }
+];
+
+const quickUseItems = [
+  {
+    title: "Healing",
+    summary: "Bandages, med-style quick-use items, and healing support are the easiest way to turn a near-failed raid into an extraction.",
+    bringWhen: "Always. This is not optional for learning players.",
+    tip: "If you keep dying with a full backpack, you probably cut healing too aggressively."
+  },
+  {
+    title: "Grenades and Burst Utility",
+    summary: "Explosives are one of the simplest ways to force movement, punish clustered ARC, or buy time in bad spaces.",
+    bringWhen: "Bring at least one when you expect interiors, boss windows, or aggressive ARC pressure.",
+    tip: "Do not throw them just because you have them. Save them for cover breaks, escape windows, or exposed weak points."
+  },
+  {
+    title: "Lures and Distraction Tools",
+    summary: "Distraction utility can peel pressure, move ARC off your line, or create a cleaner window for looting and extraction.",
+    bringWhen: "Best for solo learners, material runs, and routes where the goal is not to full-clear everything.",
+    tip: "These tools are strongest when they prevent a fight, not when they are used after the fight is already lost."
+  },
+  {
+    title: "Stuns and Control",
+    summary: "Control items make heavier ARC and messy rooms much more manageable by creating a short damage or escape window.",
+    bringWhen: "Great for Bastions, Bombardiers, Matriarch prep, or any run where panic usually starts from losing space.",
+    tip: "If you are new, control utility is often more valuable than one extra damage item."
+  },
+  {
+    title: "Movement or Escape Utility",
+    summary: "Any tool that helps you break line of sight, reposition, or reset is huge for newer players who overstay fights.",
+    bringWhen: "Especially useful on quest runs where finishing the objective matters more than winning every engagement.",
+    tip: "A run-saving escape item is usually worth more than one extra stack of loot."
+  }
+];
+
 const state = {
   activeView: "start",
   selectedReleaseId: "flashpoint-2026-03-31",
@@ -909,6 +1039,10 @@ const materialsListElement = document.querySelector("#materials-list");
 const materialsDetailElement = document.querySelector("#materials-detail");
 const materialsDetailPanelElement = document.querySelector(".materials-detail-panel");
 const materialsCatalogElement = document.querySelector("#materials-catalog");
+const materialUsageGuideElement = document.querySelector("#material-usage-guide");
+const gearOverviewElement = document.querySelector("#gear-overview");
+const weaponRoleListElement = document.querySelector("#weapon-role-list");
+const quickUseListElement = document.querySelector("#quick-use-list");
 const detailPanelElement = document.querySelector(".detail-panel");
 const lessonPanelElement = document.querySelector(".lesson-column");
 const backToTopElement = document.querySelector("#back-to-top");
@@ -1410,6 +1544,42 @@ function buildSearchIndex() {
         scrollElementIntoView(document.querySelector("#materials-intel"));
       }
     })),
+    ...materialUsageGuide.map((material) => ({
+      id: `usage-${material.name}`,
+      type: "Material use",
+      title: material.name,
+      body: `${material.usedFor} ${material.keepRule} ${material.sellRule} ${material.recycleRule}`,
+      action: () => {
+        state.activeView = "materials";
+        renderFocusNav();
+        syncFlowSections();
+        scrollElementIntoView(document.querySelector(".material-usage-panel"));
+      }
+    })),
+    ...weaponRoles.map((role) => ({
+      id: `weapon-role-${role.title}`,
+      type: "Weapon guide",
+      title: role.title,
+      body: `${role.summary} ${role.bestFor} ${role.guidance}`,
+      action: () => {
+        state.activeView = "gear";
+        renderFocusNav();
+        syncFlowSections();
+        scrollElementIntoView(document.querySelector("#gear-field-guide"));
+      }
+    })),
+    ...quickUseItems.map((item) => ({
+      id: `quick-use-${item.title}`,
+      type: "Quick-use",
+      title: item.title,
+      body: `${item.summary} ${item.bringWhen} ${item.tip}`,
+      action: () => {
+        state.activeView = "gear";
+        renderFocusNav();
+        syncFlowSections();
+        scrollElementIntoView(document.querySelector("#gear-field-guide"));
+      }
+    })),
     ...machines.map((machine) => ({
       id: machine.name,
       type: "Machine",
@@ -1710,6 +1880,99 @@ function renderMaterialsCatalog() {
   `).join("");
 }
 
+function renderMaterialUsageGuide() {
+  materialUsageGuideElement.innerHTML = materialUsageGuide.map((material) => `
+    <article class="usage-card">
+      <h3 class="usage-title">${material.name}</h3>
+      <p class="usage-copy">${material.usedFor}</p>
+      <div class="usage-meta">
+        <section class="usage-rule">
+          <span class="chip-label">Keep If</span>
+          <strong class="chip-value">${material.keepRule}</strong>
+        </section>
+        <section class="usage-rule">
+          <span class="chip-label">Sell If</span>
+          <strong class="chip-value">${material.sellRule}</strong>
+        </section>
+        <section class="usage-rule">
+          <span class="chip-label">Recycle If</span>
+          <strong class="chip-value">${material.recycleRule}</strong>
+        </section>
+      </div>
+      <p class="usage-note">${material.note}</p>
+    </article>
+  `).join("");
+}
+
+function renderGearOverview() {
+  gearOverviewElement.innerHTML = `
+    <article class="meta-pill">
+      <span class="meta-label">Core principle</span>
+      <strong class="meta-value">Build for survival first</strong>
+    </article>
+    <div class="source-note">
+      <strong>How to use this section:</strong>
+      <p class="release-note">Think in raid roles instead of chasing a perfect spreadsheet. Newer Raiders improve faster when they pick one reliable primary, one answer for emergencies, and one quick-use item that helps them reset bad fights.</p>
+    </div>
+    <article class="gear-card">
+      <h3 class="gear-title">Simple starter loadout</h3>
+      <p class="gear-copy">Bring one stable all-round primary, healing, and one quick-use tool that either creates space or saves you from a collapsed fight. Add heavier ARC tools only when the objective actually demands them.</p>
+      <div class="gear-meta">
+        <section class="gear-rule">
+          <span class="chip-label">Best for</span>
+          <strong class="chip-value">New Raider progression runs</strong>
+        </section>
+        <section class="gear-rule">
+          <span class="chip-label">Avoid</span>
+          <strong class="chip-value">Overbuilding for fights you do not need to take</strong>
+        </section>
+      </div>
+    </article>
+  `;
+}
+
+function renderWeaponRoles() {
+  weaponRoleListElement.innerHTML = weaponRoles.map((role) => `
+    <article class="gear-card">
+      <h3 class="gear-title">${role.title}</h3>
+      <p class="gear-copy">${role.summary}</p>
+      <div class="gear-meta">
+        <section class="gear-rule">
+          <span class="chip-label">Best For</span>
+          <strong class="chip-value">${role.bestFor}</strong>
+        </section>
+        <section class="gear-rule">
+          <span class="chip-label">What To Do</span>
+          <strong class="chip-value">${role.guidance}</strong>
+        </section>
+        <section class="gear-rule">
+          <span class="chip-label">Beginner Tip</span>
+          <strong class="chip-value">${role.beginnerTip}</strong>
+        </section>
+      </div>
+    </article>
+  `).join("");
+}
+
+function renderQuickUseItems() {
+  quickUseListElement.innerHTML = quickUseItems.map((item) => `
+    <article class="quick-use-card">
+      <h3 class="quick-use-title">${item.title}</h3>
+      <p class="quick-use-copy">${item.summary}</p>
+      <div class="gear-meta">
+        <section class="gear-rule">
+          <span class="chip-label">Bring When</span>
+          <strong class="chip-value">${item.bringWhen}</strong>
+        </section>
+        <section class="gear-rule">
+          <span class="chip-label">Field Tip</span>
+          <strong class="chip-value">${item.tip}</strong>
+        </section>
+      </div>
+    </article>
+  `).join("");
+}
+
 function syncBackToTopVisibility() {
   backToTopElement.classList.toggle("visible", window.scrollY > 520);
 }
@@ -1791,6 +2054,10 @@ function render() {
   renderMaterialsList();
   renderMaterialsDetail();
   renderMaterialsCatalog();
+  renderMaterialUsageGuide();
+  renderGearOverview();
+  renderWeaponRoles();
+  renderQuickUseItems();
   renderMachines();
   renderPrepList();
 }
