@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.13.1",
+    date: "2026-03-31",
+    summary: "Streamlined the top of the site with a tighter header, smaller hero, and lighter focus/community treatment.",
+    changes: [
+      "Removed the large standalone community panel from the top of the page and folded Discord into a smaller hero callout.",
+      "Reduced the visual size of the header, search row, hero, and dashboard cards so the first screen feels less crowded.",
+      "Compressed the focus area into a lighter strip so more actual guide content is visible sooner."
+    ]
+  },
+  {
     version: "v1.13.0",
     date: "2026-03-31",
     summary: "Improved update organization, expanded extraction-shooter onboarding, added Expeditions guidance, and rechecked materials after Flashpoint.",

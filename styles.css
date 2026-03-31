@@ -67,8 +67,8 @@ button { color: inherit; }
   position: sticky;
   top: 10px;
   z-index: 20;
-  padding: 14px 18px;
-  margin-bottom: 18px;
+  padding: 12px 16px;
+  margin-bottom: 14px;
   background: linear-gradient(180deg, rgba(37, 31, 27, 0.97), rgba(18, 15, 14, 0.97));
 }
 
@@ -118,7 +118,7 @@ button { color: inherit; }
 .site-title {
   margin: 0;
   font-family: var(--display-font);
-  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-size: clamp(1.2rem, 2.4vw, 1.75rem);
   line-height: 1;
   text-transform: uppercase;
   letter-spacing: 0.01em;
@@ -128,17 +128,17 @@ button { color: inherit; }
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
-  gap: 12px;
+  gap: 10px;
 }
 
 .site-header-body {
-  margin-top: 12px;
+  margin-top: 10px;
 }
 
 .site-tools-row {
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
-  gap: 16px;
+  gap: 12px;
   align-items: end;
 }
 
@@ -149,20 +149,42 @@ button { color: inherit; }
 .site-nav {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
   justify-content: center;
   flex: 1 1 auto;
-  padding: 0 16px;
+  padding: 0 12px;
 }
 
 .focus-strip {
-  padding: 18px 20px;
-  margin-bottom: 20px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+}
+
+.focus-strip-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin-bottom: 10px;
+}
+
+.focus-strip-head h2 {
+  margin: 0;
+  font-family: var(--display-font);
+  font-size: 1.15rem;
+  text-transform: uppercase;
+}
+
+.focus-strip-head p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
 }
 
 .search-label {
   display: block;
-  margin: 14px 0 8px;
+  margin: 0 0 8px;
   color: var(--soft);
   font-size: 0.84rem;
   font-weight: 800;
@@ -172,7 +194,7 @@ button { color: inherit; }
 
 .search-input {
   width: 100%;
-  padding: 14px 16px;
+  padding: 12px 14px;
   border-radius: 16px;
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.04);
@@ -187,7 +209,7 @@ button { color: inherit; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 38px;
+  min-height: 34px;
   padding: 0 12px;
   border-radius: 999px;
   border: 1px solid var(--line);
@@ -207,7 +229,7 @@ button { color: inherit; }
 .progress-strip {
   flex-wrap: wrap;
   justify-content: flex-start;
-  margin-top: 14px;
+  margin-top: 0;
 }
 
 .search-results-panel {
@@ -264,42 +286,6 @@ button { color: inherit; }
   display: none !important;
 }
 
-.community-panel {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 18px;
-  align-items: center;
-  padding: 20px;
-  margin-bottom: 18px;
-  background: linear-gradient(180deg, rgba(214, 117, 48, 0.14), rgba(255, 255, 255, 0.03));
-}
-
-.community-title {
-  margin: 0;
-  font-family: var(--display-font);
-  text-transform: uppercase;
-}
-
-.community-text,
-.community-note {
-  color: var(--muted);
-  line-height: 1.55;
-}
-
-.community-text {
-  margin: 10px 0 0;
-}
-
-.community-actions {
-  display: grid;
-  gap: 10px;
-  justify-items: end;
-}
-
-.community-note {
-  font-size: 0.9rem;
-}
-
 .search-results {
   display: grid;
   gap: 12px;
@@ -352,8 +338,8 @@ button { color: inherit; }
   display: grid;
   grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.7fr);
   gap: 22px;
-  padding: 28px;
-  margin-bottom: 20px;
+  padding: 20px;
+  margin-bottom: 16px;
   overflow: hidden;
   position: relative;
   background:
@@ -383,9 +369,9 @@ button { color: inherit; }
 }
 
 .hero h1, .hero h2 {
-  max-width: 11ch;
-  font-size: clamp(2.2rem, 6vw, 4.8rem);
-  line-height: 0.92;
+  max-width: 13ch;
+  font-size: clamp(1.9rem, 4vw, 3.4rem);
+  line-height: 0.94;
   text-transform: uppercase;
 }
 
@@ -394,17 +380,33 @@ button { color: inherit; }
 }
 
 .hero-text {
-  max-width: 60ch;
-  margin: 16px 0 0;
-  font-size: 1rem;
-  line-height: 1.6;
+  max-width: 58ch;
+  margin: 12px 0 0;
+  font-size: 0.98rem;
+  line-height: 1.55;
 }
 
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  margin-top: 22px;
+  margin-top: 18px;
+}
+
+.hero-community {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(244, 196, 139, 0.12);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.hero-community-copy {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
 }
 
 .hero-button, .track-button, .lesson-card, .back-to-top {
@@ -443,7 +445,7 @@ button { color: inherit; }
 }
 
 .hero-card, .briefing-item, .machine-card, .prep-card {
-  padding: 16px;
+  padding: 14px;
   border-radius: 18px;
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.03);
@@ -460,8 +462,8 @@ button { color: inherit; }
 }
 
 .hero-card strong {
-  margin-top: 10px;
-  font-size: 1.4rem;
+  margin-top: 8px;
+  font-size: 1.2rem;
   color: var(--signal);
 }
 
@@ -481,7 +483,7 @@ button { color: inherit; }
 }
 
 .hero-task {
-  padding: 12px 14px;
+  padding: 10px 12px;
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.03);
@@ -1428,15 +1430,13 @@ button { color: inherit; }
   .app-shell { width: min(100%, calc(100% - 16px)); padding-top: 12px; }
   .site-header,
   .search-results-panel,
-  .community-panel,
   .focus-strip { padding: 16px; }
   .hero, .status-card, .briefing, .pain-points-panel, .overview-panel, .rail-panel, .detail-panel, .intel-panel { padding: 16px; }
-  .hero h1, .hero h2 { font-size: clamp(1.9rem, 10vw, 2.8rem); max-width: 10ch; }
+  .hero h1, .hero h2 { font-size: clamp(1.7rem, 8vw, 2.5rem); max-width: 12ch; }
   .hero-actions { display: grid; grid-template-columns: 1fr; }
   .lesson-list, .machine-list, .track-list { grid-template-columns: 1fr; }
   .machine-priority-grid { grid-template-columns: 1fr; }
   .machine-tactics-grid { grid-template-columns: 1fr; }
-  .community-panel,
   .track-title-row, .lesson-title-row, .machine-top { align-items: flex-start; flex-direction: column; }
   .overview-meta, .detail-chip-row { display: grid; grid-template-columns: 1fr; }
   .release-title-row,
@@ -1492,7 +1492,7 @@ button { color: inherit; }
   .app-shell { width: min(100%, calc(100% - 12px)); padding-top: 8px; }
   .panel { border-radius: 18px; }
   .hero { padding: 14px; margin-bottom: 14px; }
-  .hero h1, .hero h2 { font-size: clamp(1.7rem, 11vw, 2.2rem); }
+  .hero h1, .hero h2 { font-size: clamp(1.55rem, 10vw, 2rem); }
   .status-grid, .intel-grid { gap: 14px; }
   .lesson-card, .track-button { padding: 14px; }
   .site-nav { grid-template-columns: 1fr; }
