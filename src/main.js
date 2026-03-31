@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.8.0",
+    date: "2026-03-30",
+    summary: "Simplified the training flow with focus-based navigation and rewrote the Discord promo as The MuthaShip community hub.",
+    changes: [
+      "Added a pick-your-focus navigation layer so players can narrow the guide to updates, learning, quests, materials, or machines.",
+      "Reduced the feeling of content overload by showing only the currently relevant training section instead of dumping every system at once.",
+      "Reframed the Discord promotion around Join The MuthaShip so the community callout feels more intentional and ARC-themed."
+    ]
+  },
+  {
     version: "v1.7.7",
     date: "2026-03-30",
     summary: "Fixed stale mobile cache behavior so new ARC intel and section updates appear correctly after deploys.",
@@ -165,6 +175,39 @@ const APP_VERSION = VERSION_HISTORY[0].version;
 const APP_UPDATED = VERSION_HISTORY[0].date;
 const STORAGE_KEY = "arc-raiders-guide-state";
 
+const focusViews = [
+  {
+    id: "start",
+    label: "Start Here",
+    summary: "Get oriented fast with the first-raid briefing and the biggest common problems."
+  },
+  {
+    id: "learn",
+    label: "Learn",
+    summary: "Work through the guided curriculum when you want structured improvement."
+  },
+  {
+    id: "quests",
+    label: "Quests",
+    summary: "Use the quest board when your next raid is about progression efficiency."
+  },
+  {
+    id: "materials",
+    label: "Materials",
+    summary: "Jump into routing and the full catalog when crafting is blocking you."
+  },
+  {
+    id: "machines",
+    label: "Machines",
+    summary: "Focus on threat reads and pre-raid combat prep before you drop."
+  },
+  {
+    id: "updates",
+    label: "Updates",
+    summary: "Check patch context first when Embark ships new info or a release goes live."
+  }
+];
+
 const releases = [
   {
     id: "flashpoint-2026-03-31",
@@ -289,21 +332,30 @@ const painPoints = [
     title: "I do not know where items or materials are",
     copy: "Players repeatedly get blocked by crafting and item-location knowledge, especially when a quest or workshop upgrade depends on one missing material.",
     actionLabel: "Open material routing",
-    onOpen: () => scrollElementIntoView(document.querySelector("#materials-intel"))
+    onOpen: () => {
+      setActiveView("materials");
+      scrollElementIntoView(document.querySelector("#materials-intel"));
+    }
   },
   {
     id: "quest-drift",
     title: "My raids feel random",
     copy: "A common trap is entering Topside without a single goal, then extracting nothing useful or dying with partial progress.",
     actionLabel: "Open quest board",
-    onOpen: () => scrollElementIntoView(document.querySelector("#quest-ops"))
+    onOpen: () => {
+      setActiveView("quests");
+      scrollElementIntoView(document.querySelector("#quest-ops"));
+    }
   },
   {
     id: "machine-pressure",
     title: "ARC fights get out of control fast",
     copy: "Newer players often aggro the wrong targets, stay too long after noise, or fail to reset after a messy fight.",
     actionLabel: "Open machine intel",
-    onOpen: () => scrollElementIntoView(document.querySelector("#machine-intel"))
+    onOpen: () => {
+      setActiveView("machines");
+      scrollElementIntoView(document.querySelector("#machine-intel"));
+    }
   },
   {
     id: "new-player-overload",
@@ -311,6 +363,7 @@ const painPoints = [
     copy: "The game and the official site surface a lot of systems quickly, so the app needs to behave like a guided training flow instead of a content dump.",
     actionLabel: "Start new raider path",
     onOpen: () => {
+      state.activeView = "learn";
       state.selectedTrackId = "new-raider";
       state.selectedLessonId = getLessonsForTrack("new-raider")[0]?.id ?? null;
       render();
@@ -322,7 +375,10 @@ const painPoints = [
     title: "I cannot tell what advice is still current",
     copy: "Frequent Embark posts and live-service updates make it easy for older route or threat advice to feel unclear without a patch-first view.",
     actionLabel: "Check update center",
-    onOpen: () => scrollElementIntoView(document.querySelector("#update-center"))
+    onOpen: () => {
+      setActiveView("updates");
+      scrollElementIntoView(document.querySelector("#update-center"));
+    }
   }
 ];
 
@@ -741,6 +797,7 @@ const materialCatalog = [
 ];
 
 const state = {
+  activeView: "start",
   selectedReleaseId: "flashpoint-2026-03-31",
   selectedTrackId: tracks[0].id,
   selectedLessonId: lessons.find((lesson) => lesson.trackId === tracks[0].id)?.id ?? null,
@@ -760,6 +817,7 @@ const commandBarElement = document.querySelector(".command-bar");
 const toggleCommandBarElement = document.querySelector("#toggle-command-bar");
 const searchResultsPanelElement = document.querySelector("#search-results-panel");
 const searchResultsElement = document.querySelector("#search-results");
+const focusNavElement = document.querySelector("#focus-nav");
 const updateSpotlightElement = document.querySelector("#update-spotlight");
 const releaseListElement = document.querySelector("#release-list");
 const releaseDetailElement = document.querySelector("#release-detail");
@@ -798,6 +856,8 @@ const modalBackdropElement = document.querySelector("#modal-backdrop");
 const changelogModalElement = document.querySelector("#changelog-modal");
 const closeChangelogElement = document.querySelector("#close-changelog");
 const changelogListElement = document.querySelector("#changelog-list");
+const flowSectionElements = Array.from(document.querySelectorAll(".flow-section"));
+const focusTriggerElements = Array.from(document.querySelectorAll("[data-focus-view]"));
 
 let deferredInstallPrompt = null;
 let easterEggTimeoutId = null;
@@ -840,6 +900,43 @@ function isMobileLayout() {
 function scrollElementIntoView(element) {
   if (element) {
     element.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
+function syncFlowSections() {
+  for (const section of flowSectionElements) {
+    section.hidden = section.dataset.view !== state.activeView;
+  }
+}
+
+function renderFocusNav() {
+  focusNavElement.innerHTML = focusViews.map((view) => `
+    <button class="focus-button ${view.id === state.activeView ? "active" : ""}" type="button" data-view-id="${view.id}">
+      <span class="eyebrow">Focus Mode</span>
+      <strong class="focus-title">${view.label}</strong>
+      <p class="focus-copy">${view.summary}</p>
+    </button>
+  `).join("");
+
+  for (const button of focusNavElement.querySelectorAll("[data-view-id]")) {
+    button.addEventListener("click", () => {
+      setActiveView(button.dataset.viewId, { scrollTarget: focusNavElement });
+    });
+  }
+}
+
+function setActiveView(viewId, options = {}) {
+  if (!focusViews.some((view) => view.id === viewId)) {
+    return;
+  }
+
+  state.activeView = viewId;
+  renderFocusNav();
+  syncFlowSections();
+  saveState();
+
+  if (options.scrollTarget) {
+    scrollElementIntoView(options.scrollTarget);
   }
 }
 
@@ -1133,6 +1230,7 @@ function getSelectedMaterial() {
 
 function saveState() {
   const persistableState = {
+    activeView: state.activeView,
     selectedReleaseId: state.selectedReleaseId,
     selectedTrackId: state.selectedTrackId,
     selectedLessonId: state.selectedLessonId,
@@ -1152,6 +1250,7 @@ function loadState() {
     }
 
     const parsedState = JSON.parse(rawState);
+    state.activeView = parsedState.activeView || state.activeView;
     state.selectedReleaseId = parsedState.selectedReleaseId || state.selectedReleaseId;
     state.selectedTrackId = parsedState.selectedTrackId || state.selectedTrackId;
     state.selectedLessonId = parsedState.selectedLessonId || state.selectedLessonId;
@@ -1178,9 +1277,12 @@ function buildSearchIndex() {
       title: release.title,
       body: `${release.summary} ${release.overview} ${release.confirmed.join(" ")}`,
       action: () => {
+        state.activeView = "updates";
         state.selectedReleaseId = release.id;
         renderReleaseList();
         renderReleaseDetail();
+        renderFocusNav();
+        syncFlowSections();
         scrollElementIntoView(updateCenterElement);
       }
     })),
@@ -1190,6 +1292,7 @@ function buildSearchIndex() {
       title: lesson.title,
       body: `${lesson.summary} ${lesson.body} ${lesson.category}`,
       action: () => {
+        state.activeView = "learn";
         state.selectedTrackId = lesson.trackId;
         state.selectedLessonId = lesson.id;
         render();
@@ -1202,9 +1305,12 @@ function buildSearchIndex() {
       title: quest.title,
       body: `${quest.summary} ${quest.overview} ${quest.category}`,
       action: () => {
+        state.activeView = "quests";
         state.selectedQuestId = quest.id;
         renderQuestList();
         renderQuestDetail();
+        renderFocusNav();
+        syncFlowSections();
         scrollElementIntoView(document.querySelector("#quest-ops"));
       }
     })),
@@ -1214,9 +1320,12 @@ function buildSearchIndex() {
       title: material.title,
       body: `${material.summary} ${material.overview} ${material.badge}`,
       action: () => {
+        state.activeView = "materials";
         state.selectedMaterialId = material.id;
         renderMaterialsList();
         renderMaterialsDetail();
+        renderFocusNav();
+        syncFlowSections();
         scrollElementIntoView(document.querySelector("#materials-intel"));
       }
     })),
@@ -1226,6 +1335,9 @@ function buildSearchIndex() {
       title: machine.name,
       body: `${machine.copy} ${machine.response} ${machine.threat}`,
       action: () => {
+        state.activeView = "machines";
+        renderFocusNav();
+        syncFlowSections();
         scrollElementIntoView(document.querySelector("#machine-intel"));
       }
     }))
@@ -1556,6 +1668,8 @@ function revealEasterEgg() {
 
 function render() {
   renderCounts();
+  renderFocusNav();
+  syncFlowSections();
   updateProgressSummary();
   renderHeroDashboard();
   renderUpdateSpotlight();
@@ -1593,6 +1707,32 @@ modalBackdropElement.addEventListener("click", closeChangelog);
 shareAppButtonElement.addEventListener("click", () => {
   shareApp().catch(() => undefined);
 });
+
+for (const trigger of focusTriggerElements) {
+  trigger.addEventListener("click", (event) => {
+    const { focusView } = trigger.dataset;
+    if (!focusView) {
+      return;
+    }
+
+    setActiveView(focusView);
+
+    const href = trigger.getAttribute("href");
+    if (!href || !href.startsWith("#")) {
+      return;
+    }
+
+    const targetElement = document.querySelector(href);
+    if (!targetElement) {
+      return;
+    }
+
+    event.preventDefault();
+    window.setTimeout(() => {
+      scrollElementIntoView(targetElement);
+    }, 30);
+  });
+}
 
 window.addEventListener("beforeinstallprompt", (event) => {
   event.preventDefault();

@@ -33,12 +33,12 @@
         <label class="search-label" for="global-search">Search the guide</label>
         <input id="global-search" class="search-input" type="search" placeholder="Search lessons, quests, materials, and machine intel">
         <div class="quick-links" aria-label="Quick links">
-          <a class="quick-link" href="#update-center">Updates</a>
-          <a class="quick-link" href="#curriculum">Curriculum</a>
-          <a class="quick-link" href="#quest-ops">Quests</a>
-          <a class="quick-link" href="#materials-intel">Materials</a>
-          <a class="quick-link" href="#machine-intel">Machines</a>
-          <a class="quick-link quick-link-discord" href="https://discord.gg/4JZ9f39h" target="_blank" rel="noreferrer">Join Discord</a>
+          <a class="quick-link" href="#update-center" data-focus-view="updates">Updates</a>
+          <a class="quick-link" href="#curriculum" data-focus-view="learn">Curriculum</a>
+          <a class="quick-link" href="#quest-ops" data-focus-view="quests">Quests</a>
+          <a class="quick-link" href="#materials-intel" data-focus-view="materials">Materials</a>
+          <a class="quick-link" href="#machine-intel" data-focus-view="machines">Machines</a>
+          <a class="quick-link quick-link-discord" href="https://discord.gg/4JZ9f39h" target="_blank" rel="noreferrer">Join The MuthaShip</a>
         </div>
         <div class="progress-strip">
           <article class="meta-pill">
@@ -56,13 +56,21 @@
     <section class="panel community-panel">
       <div class="community-copy">
         <p class="eyebrow">Play With Friends</p>
-        <h2 class="community-title">Need teammates or people to learn with?</h2>
-        <p class="community-text">Join the ARC Raiders Discord server to squad up, compare notes, and share update reactions with other players.</p>
+        <h2 class="community-title">Join The MuthaShip and learn with other Raiders.</h2>
+        <p class="community-text">Use the Discord as your squad hub for teammates, patch reactions, new-player questions, and runs with other like-minded Raiders.</p>
       </div>
       <div class="community-actions">
-        <a class="hero-button hero-button-primary" href="https://discord.gg/4JZ9f39h" target="_blank" rel="noreferrer">Join The Discord</a>
-        <span class="community-note">Invite link: `discord.gg/4JZ9f39h`</span>
+        <a class="hero-button hero-button-primary" href="https://discord.gg/4JZ9f39h" target="_blank" rel="noreferrer">Join The MuthaShip</a>
+        <span class="community-note">Drop in, find a squad, and experience ARC Raiders with other like-minded players.</span>
       </div>
+    </section>
+
+    <section class="panel focus-panel">
+      <div class="section-heading">
+        <h2>Pick Your Focus</h2>
+        <p>Choose the job you are trying to do right now and the guide will narrow itself to that slice of the app.</p>
+      </div>
+      <div id="focus-nav" class="focus-nav" aria-label="Guide focus navigation"></div>
     </section>
 
     <section id="search-results-panel" class="panel search-results-panel" hidden>
@@ -73,7 +81,7 @@
       <div id="search-results" class="search-results" aria-live="polite"></div>
     </section>
 
-    <section id="update-center" class="update-layout">
+    <section id="update-center" class="update-layout flow-section" data-view="updates">
       <section class="panel update-spotlight-panel">
         <div class="section-heading">
           <h2>Update Center</h2>
@@ -107,8 +115,8 @@
           Use this guide like a raid console: check the latest update, continue your learning path, and jump straight into quests, materials, or machine intel without hunting through the app.
         </p>
         <div class="hero-actions">
-          <a class="hero-button hero-button-primary" href="#curriculum">Continue learning</a>
-          <a class="hero-button hero-button-secondary" href="#update-center">View latest update</a>
+          <a class="hero-button hero-button-primary" href="#curriculum" data-focus-view="learn">Continue learning</a>
+          <a class="hero-button hero-button-secondary" href="#update-center" data-focus-view="updates">View latest update</a>
         </div>
       </div>
 
@@ -122,30 +130,30 @@
       </div>
     </section>
 
-    <section class="launchpad-grid">
-      <a class="panel launchpad-card" href="#curriculum">
+    <section class="launchpad-grid flow-section" data-view="start">
+      <a class="panel launchpad-card" href="#curriculum" data-focus-view="learn">
         <span class="status-label">Start here</span>
         <strong class="status-value">Learn the basics</strong>
         <p class="status-copy">Go straight into the New Raider path if you still feel overwhelmed by the game loop.</p>
       </a>
-      <a class="panel launchpad-card" href="#quest-ops">
+      <a class="panel launchpad-card" href="#quest-ops" data-focus-view="quests">
         <span class="status-label">Need progress</span>
         <strong class="status-value">Finish quests faster</strong>
         <p class="status-copy">Use the quest board when you want to turn raids into reliable progression instead of random looting.</p>
       </a>
-      <a class="panel launchpad-card" href="#materials-intel">
+      <a class="panel launchpad-card" href="#materials-intel" data-focus-view="materials">
         <span class="status-label">Stuck crafting</span>
         <strong class="status-value">Find materials</strong>
         <p class="status-copy">Jump into material families and route advice when your workshop or stash is blocking progress.</p>
       </a>
-      <a class="panel launchpad-card" href="#update-center">
+      <a class="panel launchpad-card" href="#update-center" data-focus-view="updates">
         <span class="status-label">Patch day</span>
         <strong class="status-value">Check what changed</strong>
         <p class="status-copy">Open the Update Center first when Embark ships new content so you know what advice may have shifted.</p>
       </a>
     </section>
 
-    <section class="panel briefing">
+    <section class="panel briefing flow-section" data-view="start">
       <div class="section-heading">
         <h2>First Raid Briefing</h2>
         <p>These are the habits that keep a new Raider alive long enough to learn.</p>
@@ -153,7 +161,7 @@
       <div id="briefing-list" class="briefing-list" aria-live="polite"></div>
     </section>
 
-    <section class="panel pain-points-panel">
+    <section class="panel pain-points-panel flow-section" data-view="start">
       <div class="section-heading">
         <h2>Fix the Most Common Problems</h2>
         <p>These are the biggest pain points players keep hitting, with direct paths to the part of the guide that helps most.</p>
@@ -161,7 +169,7 @@
       <div id="pain-point-list" class="pain-point-list" aria-live="polite"></div>
     </section>
 
-    <section id="curriculum" class="curriculum-layout">
+    <section id="curriculum" class="curriculum-layout flow-section" data-view="learn">
       <aside class="panel rail-panel">
         <div class="section-heading">
           <h2>Guide Tracks</h2>
@@ -191,7 +199,7 @@
       </aside>
     </section>
 
-    <section id="quest-ops" class="quest-layout">
+    <section id="quest-ops" class="quest-layout flow-section" data-view="quests">
       <section class="panel quest-overview-panel">
         <div class="section-heading">
           <h2>Quest Operations</h2>
@@ -217,7 +225,7 @@
       </aside>
     </section>
 
-    <section id="materials-intel" class="materials-layout">
+    <section id="materials-intel" class="materials-layout flow-section" data-view="materials">
       <section class="panel materials-overview-panel">
         <div class="section-heading">
           <h2>Crafting Materials Intel</h2>
@@ -243,7 +251,7 @@
       </aside>
     </section>
 
-    <section class="panel materials-catalog-panel">
+    <section class="panel materials-catalog-panel flow-section" data-view="materials">
       <div class="section-heading">
         <h2>Full Materials Catalog</h2>
         <p>A complete material reference based on the current community-supported ARC Raiders Wiki categories.</p>
@@ -251,7 +259,7 @@
       <div id="materials-catalog" class="materials-catalog" aria-live="polite"></div>
     </section>
 
-    <section id="machine-intel" class="intel-grid">
+    <section id="machine-intel" class="intel-grid flow-section" data-view="machines">
       <section class="panel intel-panel">
         <div class="section-heading">
           <h2>ARC Machine Intel</h2>
@@ -274,7 +282,7 @@
       <span class="footer-item">ARC Raiders Field Guide</span>
       <button id="app-version" class="footer-item footer-button" type="button" aria-haspopup="dialog" aria-controls="changelog-modal">v1.0.0</button>
       <span id="app-updated" class="footer-item">Updated 2026-03-30</span>
-      <a class="footer-item footer-link" href="https://discord.gg/4JZ9f39h" target="_blank" rel="noreferrer">ARC Raiders Discord</a>
+      <a class="footer-item footer-link" href="https://discord.gg/4JZ9f39h" target="_blank" rel="noreferrer">Join The MuthaShip</a>
       <span class="footer-item">Optimized for desktop and mobile browsers</span>
     </footer>
   </main>
