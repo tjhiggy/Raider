@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.12.0",
+    date: "2026-03-31",
+    summary: "Redesigned the top of the app into a clearer site header with integrated navigation, search, and focus controls.",
+    changes: [
+      "Replaced the floating quick-access console with a more cohesive header that explains what the site is for.",
+      "Integrated primary navigation, search, progress, and focus switching into one top-level menu system.",
+      "Improved the first-open experience so new players can understand the site faster and jump to the right content with less clutter."
+    ]
+  },
+  {
     version: "v1.11.0",
     date: "2026-03-31",
     summary: "Updated the app for Flashpoint launch with live official details from Embark's March 31, 2026 release coverage.",
@@ -1106,13 +1116,13 @@ function syncCommandBarState() {
   const isMobile = window.matchMedia("(max-width: 760px)").matches;
   if (!isMobile) {
     commandBarElement.classList.remove("mobile-collapsed");
-    toggleCommandBarElement.textContent = "Hide tools";
+    toggleCommandBarElement.textContent = "Hide menu";
     toggleCommandBarElement.setAttribute("aria-expanded", "true");
     return;
   }
 
   const isCollapsed = commandBarElement.classList.contains("mobile-collapsed");
-  toggleCommandBarElement.textContent = isCollapsed ? "Show tools" : "Hide tools";
+  toggleCommandBarElement.textContent = isCollapsed ? "Show menu" : "Hide menu";
   toggleCommandBarElement.setAttribute("aria-expanded", isCollapsed ? "false" : "true");
 }
 

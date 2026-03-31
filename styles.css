@@ -63,12 +63,15 @@ button { color: inherit; }
   padding: 24px 0 36px;
 }
 
-.command-bar {
+.site-header {
   position: sticky;
   top: 10px;
   z-index: 20;
-  padding: 18px;
+  padding: 22px;
   margin-bottom: 18px;
+  background:
+    linear-gradient(135deg, rgba(214, 117, 48, 0.22), transparent 38%),
+    linear-gradient(180deg, rgba(37, 31, 27, 0.97), rgba(18, 15, 14, 0.97));
 }
 
 .command-body {
@@ -79,9 +82,8 @@ button { color: inherit; }
   display: none;
 }
 
-.command-top,
+.site-header-top,
 .command-actions,
-.quick-links,
 .progress-strip,
 .search-result-top {
   display: flex;
@@ -90,15 +92,71 @@ button { color: inherit; }
   gap: 12px;
 }
 
-.command-title {
-  margin: 0;
-  font-family: var(--display-font);
-  text-transform: uppercase;
-}
-
 .command-actions {
   justify-content: flex-end;
   flex-wrap: wrap;
+}
+
+.site-header-top {
+  align-items: flex-start;
+}
+
+.site-brand {
+  max-width: 760px;
+}
+
+.site-title {
+  margin: 8px 0 0;
+  font-family: var(--display-font);
+  font-size: clamp(2.1rem, 5vw, 4.4rem);
+  line-height: 0.94;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+
+.site-subtitle {
+  max-width: 62ch;
+  margin: 14px 0 0;
+  color: var(--muted);
+  line-height: 1.6;
+  font-size: 1rem;
+}
+
+.site-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.site-header-body {
+  margin-top: 20px;
+}
+
+.site-tools-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+  gap: 16px;
+  align-items: end;
+}
+
+.site-search {
+  min-width: 0;
+}
+
+.site-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.site-focus-panel {
+  margin-top: 18px;
+  padding: 18px;
+  border-radius: 20px;
+  border: 1px solid rgba(244, 196, 139, 0.12);
+  background: rgba(255, 255, 255, 0.025);
 }
 
 .search-label {
@@ -122,12 +180,6 @@ button { color: inherit; }
 
 .search-input::placeholder {
   color: var(--soft);
-}
-
-.quick-links {
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  margin-top: 12px;
 }
 
 .quick-link {
@@ -158,11 +210,6 @@ button { color: inherit; }
 }
 
 .search-results-panel {
-  padding: 20px;
-  margin-bottom: 18px;
-}
-
-.focus-panel {
   padding: 20px;
   margin-bottom: 18px;
 }
@@ -329,12 +376,12 @@ button { color: inherit; }
   color: var(--accent-soft);
 }
 
-.hero h1, .section-heading h2, .overview-title, .lesson-title, .detail-title, .machine-name {
+.hero h1, .hero h2, .section-heading h2, .overview-title, .lesson-title, .detail-title, .machine-name {
   margin: 0;
   font-family: var(--display-font);
 }
 
-.hero h1 {
+.hero h1, .hero h2 {
   max-width: 11ch;
   font-size: clamp(2.2rem, 6vw, 4.8rem);
   line-height: 0.92;
@@ -1371,16 +1418,16 @@ button { color: inherit; }
   .hero, .update-layout, .curriculum-layout, .quest-layout, .materials-layout, .gear-layout, .intel-grid, .status-grid, .briefing-list, .launchpad-grid { grid-template-columns: 1fr; }
   .curriculum-layout { gap: 16px; }
   .materials-catalog { grid-template-columns: 1fr; }
+  .site-tools-row { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 760px) {
   .app-shell { width: min(100%, calc(100% - 16px)); padding-top: 12px; }
-  .command-bar,
+  .site-header,
   .search-results-panel,
-  .community-panel,
-  .focus-panel { padding: 16px; }
+  .community-panel { padding: 16px; }
   .hero, .status-card, .briefing, .pain-points-panel, .overview-panel, .rail-panel, .detail-panel, .intel-panel { padding: 16px; }
-  .hero h1 { font-size: clamp(1.9rem, 10vw, 2.8rem); max-width: 10ch; }
+  .hero h1, .hero h2 { font-size: clamp(1.9rem, 10vw, 2.8rem); max-width: 10ch; }
   .hero-actions { display: grid; grid-template-columns: 1fr; }
   .lesson-list, .machine-list, .track-list { grid-template-columns: 1fr; }
   .machine-priority-grid { grid-template-columns: 1fr; }
@@ -1389,10 +1436,10 @@ button { color: inherit; }
   .track-title-row, .lesson-title-row, .machine-top { align-items: flex-start; flex-direction: column; }
   .overview-meta, .detail-chip-row { display: grid; grid-template-columns: 1fr; }
   .release-title-row,
-  .command-top,
+  .site-header-top,
   .search-result-top,
   .spotlight-heading { align-items: flex-start; flex-direction: column; }
-  .command-bar {
+  .site-header {
     position: sticky;
     top: 8px;
   }
@@ -1405,9 +1452,19 @@ button { color: inherit; }
   .command-bar.mobile-collapsed {
     padding-bottom: 12px;
   }
-  .command-actions {
+  .site-header-actions {
     width: 100%;
     justify-content: flex-start;
+  }
+  .site-title {
+    font-size: clamp(1.75rem, 9vw, 2.6rem);
+  }
+  .site-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .site-focus-panel {
+    padding: 16px;
   }
   .quest-overview-panel,
   .quest-list-panel,
@@ -1430,9 +1487,10 @@ button { color: inherit; }
   .app-shell { width: min(100%, calc(100% - 12px)); padding-top: 8px; }
   .panel { border-radius: 18px; }
   .hero { padding: 14px; margin-bottom: 14px; }
-  .hero h1 { font-size: clamp(1.7rem, 11vw, 2.2rem); }
+  .hero h1, .hero h2 { font-size: clamp(1.7rem, 11vw, 2.2rem); }
   .status-grid, .intel-grid { gap: 14px; }
   .lesson-card, .track-button { padding: 14px; }
+  .site-nav { grid-template-columns: 1fr; }
   .app-footer { flex-direction: column; gap: 6px; }
   .back-to-top { right: 12px; bottom: 12px; }
   .easter-egg-trigger { left: 10px; bottom: 96px; width: 32px; height: 32px; }

@@ -17,42 +17,54 @@
 <body>
   <button id="easter-egg-trigger" class="easter-egg-trigger" type="button" aria-label="Hidden easter egg trigger"></button>
   <main class="app-shell">
-    <section class="panel command-bar">
-      <div class="command-top">
-        <div>
-          <p class="eyebrow">Field Console</p>
-          <h2 class="command-title">Quick access</h2>
+    <header class="panel site-header command-bar">
+      <div class="site-header-top">
+        <div class="site-brand">
+          <p class="eyebrow">ARC Raiders Training Hub</p>
+          <h1 class="site-title">Learn ARC Raiders faster, with less noise.</h1>
+          <p class="site-subtitle">A player-focused training site for new and improving Raiders. Use it to understand the game, pick a focus, and jump straight into the guide that helps your next run.</p>
         </div>
-        <div class="command-actions">
-          <button id="toggle-command-bar" class="hero-button hero-button-secondary command-toggle" type="button" aria-expanded="true" aria-controls="command-bar-body">Hide tools</button>
+        <div class="site-header-actions">
+          <button id="toggle-command-bar" class="hero-button hero-button-secondary command-toggle" type="button" aria-expanded="true" aria-controls="command-bar-body">Hide menu</button>
           <button id="share-app" class="hero-button hero-button-secondary" type="button">Share</button>
           <button id="install-app" class="hero-button hero-button-secondary" type="button" hidden>Install app</button>
+          <a class="hero-button hero-button-primary" href="https://discord.gg/4JZ9f39h" target="_blank" rel="noreferrer">Join The MuthaShip</a>
         </div>
       </div>
-      <div id="command-bar-body" class="command-body">
-        <label class="search-label" for="global-search">Search the guide</label>
-        <input id="global-search" class="search-input" type="search" placeholder="Search lessons, quests, materials, and machine intel">
-        <div class="quick-links" aria-label="Quick links">
-          <a class="quick-link" href="#update-center" data-focus-view="updates">Updates</a>
-          <a class="quick-link" href="#curriculum" data-focus-view="learn">Curriculum</a>
-          <a class="quick-link" href="#quest-ops" data-focus-view="quests">Quests</a>
-          <a class="quick-link" href="#materials-intel" data-focus-view="materials">Materials</a>
-          <a class="quick-link" href="#gear-field-guide" data-focus-view="gear">Gear</a>
-          <a class="quick-link" href="#machine-intel" data-focus-view="machines">Machines</a>
-          <a class="quick-link quick-link-discord" href="https://discord.gg/4JZ9f39h" target="_blank" rel="noreferrer">Join The MuthaShip</a>
+      <div id="command-bar-body" class="command-body site-header-body">
+        <div class="site-tools-row">
+          <div class="site-search">
+            <label class="search-label" for="global-search">Search the guide</label>
+            <input id="global-search" class="search-input" type="search" placeholder="Search lessons, quests, materials, weapons, and machine intel">
+          </div>
+          <div class="progress-strip">
+            <article class="meta-pill">
+              <span class="meta-label">Reviewed lessons</span>
+              <strong id="reviewed-count" class="meta-value">0</strong>
+            </article>
+            <article class="meta-pill">
+              <span class="meta-label">Continue from</span>
+              <strong id="continue-label" class="meta-value">New Raider</strong>
+            </article>
+          </div>
         </div>
-        <div class="progress-strip">
-          <article class="meta-pill">
-            <span class="meta-label">Reviewed lessons</span>
-            <strong id="reviewed-count" class="meta-value">0</strong>
-          </article>
-          <article class="meta-pill">
-            <span class="meta-label">Continue from</span>
-            <strong id="continue-label" class="meta-value">New Raider</strong>
-          </article>
-        </div>
+        <nav class="site-nav" aria-label="Primary guide navigation">
+          <a class="quick-link" href="#curriculum" data-focus-view="learn">Start Learning</a>
+          <a class="quick-link" href="#quest-ops" data-focus-view="quests">Quest Help</a>
+          <a class="quick-link" href="#materials-intel" data-focus-view="materials">Crafting and Materials</a>
+          <a class="quick-link" href="#gear-field-guide" data-focus-view="gear">Weapons and Gear</a>
+          <a class="quick-link" href="#machine-intel" data-focus-view="machines">ARC Intel</a>
+          <a class="quick-link" href="#update-center" data-focus-view="updates">Latest Update</a>
+        </nav>
+        <section class="site-focus-panel">
+          <div class="section-heading">
+            <h2>Pick Your Focus</h2>
+            <p>Choose the job you are trying to do right now and the guide will narrow itself to that slice of the site.</p>
+          </div>
+          <div id="focus-nav" class="focus-nav" aria-label="Guide focus navigation"></div>
+        </section>
       </div>
-    </section>
+    </header>
 
     <section class="panel community-panel">
       <div class="community-copy">
@@ -64,14 +76,6 @@
         <a class="hero-button hero-button-primary" href="https://discord.gg/4JZ9f39h" target="_blank" rel="noreferrer">Join The MuthaShip</a>
         <span class="community-note">Drop in, find a squad, and experience ARC Raiders with other like-minded players.</span>
       </div>
-    </section>
-
-    <section class="panel focus-panel">
-      <div class="section-heading">
-        <h2>Pick Your Focus</h2>
-        <p>Choose the job you are trying to do right now and the guide will narrow itself to that slice of the app.</p>
-      </div>
-      <div id="focus-nav" class="focus-nav" aria-label="Guide focus navigation"></div>
     </section>
 
     <section id="search-results-panel" class="panel search-results-panel" hidden>
@@ -119,7 +123,7 @@
     <section class="hero panel">
       <div class="hero-copy">
         <p class="eyebrow">ARC Raiders Learning App</p>
-        <h1>Know what to run, what to learn, and what changed.</h1>
+        <h2>Know what to run, what to learn, and what changed.</h2>
         <p class="hero-text">
           Use this guide like a raid console: check the latest update, continue your learning path, and jump straight into quests, materials, or machine intel without hunting through the app.
         </p>
