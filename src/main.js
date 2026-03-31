@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.12.1",
+    date: "2026-03-31",
+    summary: "Trimmed the oversized header into a simpler top navigation and fixed focus buttons so they jump to the correct section.",
+    changes: [
+      "Reduced the header footprint to a more familiar top-nav layout inspired by the official site pattern.",
+      "Moved the larger site introduction back into the page content so the menu does not dominate the first screen.",
+      "Fixed focus navigation so repeated clicks do not keep stepping down the page."
+    ]
+  },
+  {
     version: "v1.12.0",
     date: "2026-03-31",
     summary: "Redesigned the top of the app into a clearer site header with integrated navigation, search, and focus controls.",
@@ -1155,6 +1165,20 @@ function syncFlowSections() {
   }
 }
 
+function getFocusTarget(viewId) {
+  const viewTargets = {
+    start: document.querySelector(".launchpad-grid"),
+    learn: document.querySelector("#curriculum"),
+    quests: document.querySelector("#quest-ops"),
+    materials: document.querySelector("#materials-intel"),
+    gear: document.querySelector("#gear-field-guide"),
+    machines: document.querySelector("#machine-intel"),
+    updates: document.querySelector("#update-center")
+  };
+
+  return viewTargets[viewId] ?? null;
+}
+
 function renderFocusNav() {
   focusNavElement.innerHTML = focusViews.map((view) => `
     <button class="focus-button ${view.id === state.activeView ? "active" : ""}" type="button" data-view-id="${view.id}">
@@ -1166,7 +1190,7 @@ function renderFocusNav() {
 
   for (const button of focusNavElement.querySelectorAll("[data-view-id]")) {
     button.addEventListener("click", () => {
-      setActiveView(button.dataset.viewId, { scrollTarget: focusNavElement });
+      setActiveView(button.dataset.viewId, { scrollTarget: getFocusTarget(button.dataset.viewId) });
     });
   }
 }

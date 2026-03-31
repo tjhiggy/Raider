@@ -67,11 +67,9 @@ button { color: inherit; }
   position: sticky;
   top: 10px;
   z-index: 20;
-  padding: 22px;
+  padding: 14px 18px;
   margin-bottom: 18px;
-  background:
-    linear-gradient(135deg, rgba(214, 117, 48, 0.22), transparent 38%),
-    linear-gradient(180deg, rgba(37, 31, 27, 0.97), rgba(18, 15, 14, 0.97));
+  background: linear-gradient(180deg, rgba(37, 31, 27, 0.97), rgba(18, 15, 14, 0.97));
 }
 
 .command-body {
@@ -98,28 +96,32 @@ button { color: inherit; }
 }
 
 .site-header-top {
-  align-items: flex-start;
+  align-items: center;
 }
 
 .site-brand {
-  max-width: 760px;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.site-kicker {
+  margin: 0;
+  color: var(--accent-soft);
+  font-size: 0.9rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .site-title {
-  margin: 8px 0 0;
+  margin: 0;
   font-family: var(--display-font);
-  font-size: clamp(2.1rem, 5vw, 4.4rem);
-  line-height: 0.94;
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  line-height: 1;
   text-transform: uppercase;
   letter-spacing: 0.01em;
-}
-
-.site-subtitle {
-  max-width: 62ch;
-  margin: 14px 0 0;
-  color: var(--muted);
-  line-height: 1.6;
-  font-size: 1rem;
 }
 
 .site-header-actions {
@@ -130,7 +132,7 @@ button { color: inherit; }
 }
 
 .site-header-body {
-  margin-top: 20px;
+  margin-top: 12px;
 }
 
 .site-tools-row {
@@ -148,15 +150,14 @@ button { color: inherit; }
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-top: 16px;
+  justify-content: center;
+  flex: 1 1 auto;
+  padding: 0 16px;
 }
 
-.site-focus-panel {
-  margin-top: 18px;
-  padding: 18px;
-  border-radius: 20px;
-  border: 1px solid rgba(244, 196, 139, 0.12);
-  background: rgba(255, 255, 255, 0.025);
+.focus-strip {
+  padding: 18px 20px;
+  margin-bottom: 20px;
 }
 
 .search-label {
@@ -1419,13 +1420,16 @@ button { color: inherit; }
   .curriculum-layout { gap: 16px; }
   .materials-catalog { grid-template-columns: 1fr; }
   .site-tools-row { grid-template-columns: 1fr; }
+  .site-header-top { align-items: flex-start; flex-direction: column; }
+  .site-nav { justify-content: flex-start; padding: 0; }
 }
 
 @media (max-width: 760px) {
   .app-shell { width: min(100%, calc(100% - 16px)); padding-top: 12px; }
   .site-header,
   .search-results-panel,
-  .community-panel { padding: 16px; }
+  .community-panel,
+  .focus-strip { padding: 16px; }
   .hero, .status-card, .briefing, .pain-points-panel, .overview-panel, .rail-panel, .detail-panel, .intel-panel { padding: 16px; }
   .hero h1, .hero h2 { font-size: clamp(1.9rem, 10vw, 2.8rem); max-width: 10ch; }
   .hero-actions { display: grid; grid-template-columns: 1fr; }
@@ -1456,15 +1460,16 @@ button { color: inherit; }
     width: 100%;
     justify-content: flex-start;
   }
-  .site-title {
-    font-size: clamp(1.75rem, 9vw, 2.6rem);
-  }
   .site-nav {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    width: 100%;
+    margin-top: 6px;
   }
-  .site-focus-panel {
-    padding: 16px;
+  .site-brand {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
   }
   .quest-overview-panel,
   .quest-list-panel,
