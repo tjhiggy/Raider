@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.9.0",
+    date: "2026-03-30",
+    summary: "Added a curated Latest From Embark news module so players can see recent official posts without leaving the training app.",
+    changes: [
+      "Added an official-news watch panel inside the updates flow of the app.",
+      "Seeded it with recent Embark posts and direct links back to the official ARC Raiders news site.",
+      "Structured the module so it can be refreshed regularly without needing a full page redesign."
+    ]
+  },
+  {
     version: "v1.8.1",
     date: "2026-03-30",
     summary: "Expanded ARC Machine Intel with practical kill tips, weak points, and recommended weapon or tactic types.",
@@ -314,6 +324,51 @@ const releases = [
       "Let roadmap items graduate into live release cards later without changing layout.",
       "Keep patch planning and live patch coverage in the same section."
     ]
+  }
+];
+
+const embarkFeed = [
+  {
+    title: "Patch Notes 1.21.0",
+    date: "2026-03-24",
+    source: "Official news",
+    summary: "A weekly patch-note update that helps players understand what changed immediately before the March 31, 2026 Flashpoint release window.",
+    url: "https://arcraiders.com/news/patch-notes-1-21-0"
+  },
+  {
+    title: "Patch Notes 1.20.0",
+    date: "2026-03-17",
+    source: "Official news",
+    summary: "Embark's weekly update cadence continued here, reinforcing why the app needs a fast current-news surface before deeper guide reading.",
+    url: "https://arcraiders.com/news/patch-notes-1-20-0"
+  },
+  {
+    title: "Patch Notes 1.19.0",
+    date: "2026-03-10",
+    source: "Official news",
+    summary: "Another official patch-note checkpoint that supports the app's live-service update tracking model.",
+    url: "https://arcraiders.com/news/patch-notes-1-19-0"
+  },
+  {
+    title: "Trials Season 3: what you need to know",
+    date: "2026-03-03",
+    source: "Official news",
+    summary: "A rules-and-progress post that matters to players using the guide for repeatable performance and challenge prep.",
+    url: "https://arcraiders.com/news/trials-season-3-what-you-need-to-know"
+  },
+  {
+    title: "Patch Notes 1.18.0",
+    date: "2026-03-03",
+    source: "Official news",
+    summary: "A same-day patch note that helps anchor March 2026 update history inside the app.",
+    url: "https://arcraiders.com/news/patch-notes-1-18-0"
+  },
+  {
+    title: "Firefly and Comet: How to combat the new ARC enemies",
+    date: "2026-02-25",
+    source: "Official news",
+    summary: "A particularly valuable official combat explainer that feeds directly into the app's machine-intel guidance.",
+    url: "https://arcraiders.com/news/firefly-and-comet-how-to-combat-the-new-arc-enemies"
   }
 ];
 
@@ -832,6 +887,7 @@ const updateSpotlightElement = document.querySelector("#update-spotlight");
 const releaseListElement = document.querySelector("#release-list");
 const releaseDetailElement = document.querySelector("#release-detail");
 const updateCenterElement = document.querySelector("#update-center");
+const embarkFeedElement = document.querySelector("#embark-feed");
 const heroUpdateCardElement = document.querySelector("#hero-update-card");
 const heroPersonalCardElement = document.querySelector("#hero-personal-card");
 const heroTaskListElement = document.querySelector("#hero-task-list");
@@ -1402,6 +1458,27 @@ function renderUpdateSpotlight() {
   `;
 }
 
+function renderEmbarkFeed() {
+  embarkFeedElement.innerHTML = `
+    ${embarkFeed.map((item) => `
+      <article class="embark-feed-card">
+        <span class="embark-feed-date">${item.date}</span>
+        <h3 class="embark-feed-title">${item.title}</h3>
+        <p class="embark-feed-copy">${item.summary}</p>
+        <div class="embark-feed-meta">
+          <span class="embark-feed-source">${item.source}</span>
+          <a class="hero-button hero-button-secondary embark-feed-link" href="${item.url}" target="_blank" rel="noreferrer">Open post</a>
+        </div>
+      </article>
+    `).join("")}
+    <article class="source-note">
+      <strong>How this works:</strong>
+      <p class="release-note">This module is a curated official-news watch, not a noisy live embed. It is designed to be refreshed from Embark's official news page on a regular cadence while the app keeps the deeper guide content organized for players.</p>
+      <a class="hero-button hero-button-secondary embark-feed-link" href="https://arcraiders.com/en/news" target="_blank" rel="noreferrer">Open official news hub</a>
+    </article>
+  `;
+}
+
 function renderHeroDashboard() {
   const currentRelease = releases[0];
   const selectedLesson = getSelectedLesson();
@@ -1698,6 +1775,7 @@ function render() {
   updateProgressSummary();
   renderHeroDashboard();
   renderUpdateSpotlight();
+  renderEmbarkFeed();
   renderReleaseList();
   renderReleaseDetail();
   renderBriefing();
