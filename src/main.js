@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.14.0",
+    date: "2026-04-03",
+    summary: "Expanded the guide tracks with more intentional ARC Raiders-specific lessons and less generic shooter filler.",
+    changes: [
+      "Restructured the learning paths around higher-signal themes inspired by strong extraction-game companion sites: progression planning, route intent, and system-specific decision support.",
+      "Added more ARC Raiders-specific lessons covering operations, conditions, Scrappy, locked-room value, workshop decisions, and expedition timing.",
+      "Shifted the tracks further away from obvious shooter advice and toward the game knowledge that actually improves runs in ARC Raiders."
+    ]
+  },
+  {
     version: "v1.13.1",
     date: "2026-03-31",
     summary: "Streamlined the top of the site with a tighter header, smaller hero, and lighter focus/community treatment.",
@@ -520,20 +530,29 @@ const painPoints = [
 const tracks = [
   {
     id: "new-raider",
-    title: "New Raider",
-    subtitle: "Build fundamentals that keep you alive",
-    summary: "Start here if you are still learning what matters on a run, how progression works, and how to read danger without panicking.",
-    focus: "Extraction basics, loot priorities, progression, and simple decision-making.",
-    bestFor: "First-time players and anyone returning after a long break.",
-    tone: "Stay calm, stay mobile, and avoid unnecessary fights."
+    title: "Raid Fundamentals",
+    subtitle: "Understand what actually wins runs in ARC Raiders",
+    summary: "Start here if you need the extraction-shooter mental model, the logic of a raid, and the ARC Raiders-specific habits that stop runs from collapsing.",
+    focus: "Raid structure, survival economics, progression logic, and objective-first decision-making.",
+    bestFor: "First-time players and anyone who understands shooters but not yet ARC Raiders as a system.",
+    tone: "Treat every raid like a plan under pressure, not a free-roam deathmatch."
   },
   {
-    id: "advanced-ops",
-    title: "Advanced Ops",
+    id: "rust-belt-systems",
+    title: "Rust Belt Systems",
+    subtitle: "Learn the systems that quietly decide progression",
+    summary: "This track is for players who want to understand the moving pieces behind efficient progression: map conditions, locked-room value, Scrappy, Workshop flow, Projects, and Expeditions.",
+    focus: "Conditions, resource routing, workshop choices, and long-cycle progression systems.",
+    bestFor: "Players who survive enough raids but still feel like their account progression is inefficient.",
+    tone: "The Rust Belt rewards players who notice systems before they notice loot."
+  },
+  {
+    id: "combat-and-operations",
+    title: "Combat and Operations",
     subtitle: "Turn survival into repeatable high-value raids",
-    summary: "This track is for players who already understand the loop and want better route planning, stronger threat management, and more intentional risk-taking.",
-    focus: "Map conditions, squad pacing, threat layering, and extract timing.",
-    bestFor: "Confident solos and organized squads looking for cleaner raids.",
+    summary: "This track is for players who already understand the basics and want stronger ARC counterplay, operation routing, squad pacing, and cleaner late-run decisions.",
+    focus: "ARC behavior, map pressure, operation prep, and advanced risk control.",
+    bestFor: "Confident solos and organized squads looking for more reliable high-pressure raids.",
     tone: "Only take chaos when the reward is worth the attention it creates."
   }
 ];
@@ -576,6 +595,25 @@ const lessons = [
       "If things go wrong, where is my disengage and extraction plan?"
     ],
     fieldNote: "Your best raid may look boring in the moment. Quiet, efficient runs are how progress stacks."
+  },
+  {
+    id: "raid-concepts",
+    trackId: "new-raider",
+    title: "Read the Phases of a Raid",
+    category: "Foundations",
+    time: "5 min",
+    summary: "ARC Raiders raids have a rhythm: approach, probe, commit, reset, and extract. Players who learn the phase they are in make better decisions faster.",
+    body: "A lot of bad runs happen because players use the wrong mindset for the current phase of the raid. The approach phase is about information and avoiding noise. The probe phase is about checking whether a route, loot spot, or fight is actually worth it. The commit phase is when you intentionally spend ammo, healing, and attention. The reset phase is where better players re-plate their plan instead of wandering into another problem. Extraction is its own phase, not an afterthought.",
+    bullets: [
+      "Ask what phase you are in before taking another fight or detour.",
+      "Do not use commit-phase aggression while you are still probing a route.",
+      "Treat the reset phase seriously after every major fight, especially if machines were involved."
+    ],
+    checks: [
+      "Am I still gathering information, or have I already committed resources?",
+      "If this phase changes right now, what should my next move become?"
+    ],
+    fieldNote: "Most players die because they are mentally one phase behind the raid."
   },
   {
     id: "topside-basics",
@@ -636,7 +674,7 @@ const lessons = [
   },
   {
     id: "conditions-and-routing",
-    trackId: "advanced-ops",
+    trackId: "combat-and-operations",
     title: "Route Around Map Conditions",
     category: "Map Mastery",
     time: "5 min",
@@ -655,7 +693,7 @@ const lessons = [
   },
   {
     id: "machine-attention",
-    trackId: "advanced-ops",
+    trackId: "combat-and-operations",
     title: "Manage Machine Attention",
     category: "Threat Control",
     time: "6 min",
@@ -674,7 +712,7 @@ const lessons = [
   },
   {
     id: "squad-pacing",
-    trackId: "advanced-ops",
+    trackId: "combat-and-operations",
     title: "Sharpen Squad Pacing",
     category: "Teamplay",
     time: "5 min",
@@ -693,7 +731,7 @@ const lessons = [
   },
   {
     id: "risk-and-extracts",
-    trackId: "advanced-ops",
+    trackId: "combat-and-operations",
     title: "Control Risk and Extraction Timing",
     category: "Decision-Making",
     time: "6 min",
@@ -709,6 +747,120 @@ const lessons = [
       "What is the actual reward of staying, and is it better than what I can lose?"
     ],
     fieldNote: "The strongest greed control is remembering that extracted value compounds."
+  },
+  {
+    id: "conditions-as-economy",
+    trackId: "rust-belt-systems",
+    title: "Treat Conditions Like Economic Events",
+    category: "Systems",
+    time: "5 min",
+    summary: "Map conditions are not just atmosphere. In ARC Raiders they change what is worth contesting, what gets overrun, and what kind of materials or player traffic a run will generate.",
+    body: "Strong ARC Raiders players use conditions the same way Tarkov players use map knowledge or cycle timing: as an economic signal. A condition changes where value appears, which routes become expensive, and what kinds of mistakes get punished. The point is not only to chase the condition. Sometimes the best play is to let everyone else overcommit to the obvious hotspot while you route the edge that condition creates.",
+    bullets: [
+      "Before deploying, decide whether the condition is something you are exploiting directly or avoiding indirectly.",
+      "Use conditions to predict player clustering, not just loot changes.",
+      "Recalculate extraction timing on volatile conditions because value and attention both rise together."
+    ],
+    checks: [
+      "What is this condition making more valuable right now?",
+      "Where will other players probably overcommit because of it?"
+    ],
+    fieldNote: "Conditions change the economy of a run before they change the combat."
+  },
+  {
+    id: "locked-room-value",
+    trackId: "rust-belt-systems",
+    title: "Know When Locked Rooms Are Worth It",
+    category: "Systems",
+    time: "4 min",
+    summary: "Locked rooms are not automatically good. Their value depends on route risk, key scarcity, and how much attention you will spend reaching them.",
+    body: "One of the easiest ways to waste raid tempo in ARC Raiders is to treat every locked room like a mandatory jackpot. The right question is whether the room improves your run more than the danger created by pathing to it, fighting around it, and extracting afterward. The best guide sites for similar games are strong here because they teach value judgment, not just point-of-interest names. That is the right model for ARC too.",
+    bullets: [
+      "Judge locked rooms by route efficiency, not by hype.",
+      "If opening the room drags you through two dangerous spaces and a late extract, the key may not be worth using right now.",
+      "Use locked rooms to support a raid objective, not to replace one."
+    ],
+    checks: [
+      "Would I still take this route if the locked room was not here?",
+      "Does this room improve my objective or just tempt my greed?"
+    ],
+    fieldNote: "The value of a locked room is the value you can still carry out."
+  },
+  {
+    id: "scrappy-and-projects",
+    trackId: "rust-belt-systems",
+    title: "Use Scrappy and Projects Intentionally",
+    category: "Progression",
+    time: "4 min",
+    summary: "Scrappy, Projects, and workshop systems matter because they turn extracted value into account momentum instead of dead stash weight.",
+    body: "ARC Raiders is full of systems that look secondary until your progression stalls. Scrappy is not just flavor; it is a converter for value and now matters even more after Flashpoint's feeding boost. Projects are not just giant checklists; they tell you what your next several raids should probably support. Better players use these systems to decide what loot matters before they even deploy.",
+    bullets: [
+      "Feed systems and project systems should influence what you keep, sell, or route for.",
+      "Look at your next project milestone before every session so your raids stay aligned.",
+      "Treat stash value as fuel for systems, not as a trophy cabinet."
+    ],
+    checks: [
+      "What part of my current progression actually needs support right now?",
+      "Am I extracting useful value or just increasing inventory clutter?"
+    ],
+    fieldNote: "Progression friction in ARC Raiders usually comes from system neglect, not lack of raid hours."
+  },
+  {
+    id: "workshop-decisions",
+    trackId: "rust-belt-systems",
+    title: "Make Better Workshop Decisions",
+    category: "Progression",
+    time: "5 min",
+    summary: "The Workshop is where many players waste value. Crafting should solve problems in your raid loop, not just consume materials because a button is available.",
+    body: "After Flashpoint, Embark added a clearer material-source helper to the workshop experience, which signals the system is meant to be used as a planning tool. The strongest use of the Workshop is to remove friction: better healing uptime, more consistent utility, a weapon path you can actually sustain, and project support. The weakest use is reactive crafting with no idea what it is fixing.",
+    bullets: [
+      "Craft for bottlenecks first: healing, utility, sustainable primaries, and project gates.",
+      "Use the workshop to plan what to keep in raid, not just to spend what you already have.",
+      "If a craft does not improve your next several raids, it may be a low-priority sink."
+    ],
+    checks: [
+      "What repeated raid problem is this craft solving?",
+      "Would these materials create more value if I kept them for a bigger gate?"
+    ],
+    fieldNote: "A good workshop decision makes future raids cleaner, not just your inventory emptier."
+  },
+  {
+    id: "operations-and-assessor",
+    trackId: "combat-and-operations",
+    title: "Read Operations Like Close Scrutiny",
+    category: "Operations",
+    time: "5 min",
+    summary: "Operations in ARC Raiders concentrate risk and reward. Close Scrutiny teaches the right lesson: concentrated value means concentrated pressure.",
+    body: "Flashpoint's Close Scrutiny is a good example of how ARC Raiders wants players to think about event-like content. Embark explicitly says there is less loot around the map and the Assessor at the center is the main prize. That means the operation is not just a new location to wander into. It is a declaration about tempo, loadout, and escape planning before you deploy.",
+    bullets: [
+      "If the operation is the goal, build for contesting and resetting, not for broad looting.",
+      "Expect more player pressure because concentrated value naturally creates collisions.",
+      "Plan your exit route before you enter the operation center, not after you win it."
+    ],
+    checks: [
+      "Am I entering this operation to contest the objective or just to watch other teams spend resources?",
+      "Does my loadout support both the fight and the escape?"
+    ],
+    fieldNote: "Operations are not random chaos zones. They are designed to punish uncommitted planning."
+  },
+  {
+    id: "arc-priority-logic",
+    trackId: "combat-and-operations",
+    title: "Use ARC Priority Logic, Not Raw DPS Logic",
+    category: "Threat Control",
+    time: "5 min",
+    summary: "ARC Raiders fights are often lost by target priority, not by aim. The most dangerous unit is usually the one changing the shape of the fight.",
+    body: "The common mistake is to shoot whatever looks biggest or closest. In ARC Raiders, the unit that matters most is often the one adding detection, forced movement, or route denial. That is why anti-air, spotter removal, and damage timing around heavy ARC windows matter so much. Similar games' best guides teach threat layers, not just enemy names, and ARC benefits from that approach too.",
+    bullets: [
+      "Kill what expands the fight before what simply occupies the fight.",
+      "Do not spend your best cooldowns or burst tools on the wrong layer of the encounter.",
+      "Think in chains: who spots, who punishes, who blocks the reset, and who is left after that."
+    ],
+    checks: [
+      "Which unit is making the rest of this fight worse right now?",
+      "If I kill this target first, does the battlefield actually get simpler?"
+    ],
+    fieldNote: "Better target order often feels like easier aim because the fight stops multiplying."
   }
 ];
 
