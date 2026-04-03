@@ -807,6 +807,46 @@ button { color: inherit; }
   gap: 12px;
 }
 
+.quest-directory {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.quest-directory-group {
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.quest-directory-title {
+  margin: 0 0 10px;
+  font-family: var(--display-font);
+  font-size: 0.98rem;
+  text-transform: uppercase;
+}
+
+.quest-directory-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.quest-directory-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
 .embark-feed {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));

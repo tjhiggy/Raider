@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.14.1",
+    date: "2026-04-03",
+    summary: "Added a current community-tracked quest directory and made the material and gear sections more decision-focused for new Raiders.",
+    changes: [
+      "Added a named quest directory grouped by Trader with a link to the current public walkthrough index.",
+      "Reworked the materials section toward stash decisions and progression value instead of weaker generic lookup content.",
+      "Reworked the gear section around loadout blueprints so new Raiders can choose kits based on raid purpose."
+    ]
+  },
+  {
     version: "v1.14.0",
     date: "2026-04-03",
     summary: "Expanded the guide tracks with more intentional ARC Raiders-specific lessons and less generic shooter filler.",
@@ -991,6 +1001,65 @@ const questSystems = [
   }
 ];
 
+const communityTrackedQuestGroups = [
+  {
+    trader: "Shani",
+    quests: [
+      "Picking Up The Pieces",
+      "Clearer Skies",
+      "Trash Into Treasure",
+      "Off The Radar",
+      "Eyes in the Sky",
+      "With a Trace",
+      "Lost in Transmission",
+      "A Toxic Trail",
+      "A Prime Specimen",
+      "A Dead End",
+      "Dust on the Wires"
+    ]
+  },
+  {
+    trader: "Celeste",
+    quests: [
+      "Water Troubles",
+      "The Root of the Matter",
+      "Keeping the Memory",
+      "Source of the Contamination",
+      "Greasing Her Palms",
+      "A Bad Feeling",
+      "Switching the Supply",
+      "Worth Your Salt"
+    ]
+  },
+  {
+    trader: "Tian Wen",
+    quests: [
+      "The Right Tool",
+      "A Better Use",
+      "Broken Monument",
+      "Snap and Salvage"
+    ]
+  },
+  {
+    trader: "Apollo",
+    quests: [
+      "A First Foothold",
+      "What Goes Around",
+      "The Clean Dream",
+      "Paving the Way",
+      "The League",
+      "Movie Night"
+    ]
+  },
+  {
+    trader: "Lance",
+    quests: [
+      "Community tracking page available",
+      "Named quest coverage is public but not fully expanded in the current source snapshot"
+    ]
+  }
+];
+
 const materialFamilies = [
   {
     id: "basic-scrap",
@@ -1121,99 +1190,84 @@ const materialCatalog = [
   }
 ];
 
-const materialUsageGuide = [
+const materialPriorityGuide = [
   {
-    name: "Sensors",
-    usedFor: "Tech-heavy crafts, detection tools, advanced gadgets, and some higher-tier weapon or utility upgrades.",
-    keepRule: "Keep these when you are building recon, control, or advanced workshop capability.",
-    sellRule: "Sell only if your stash is jammed and you already have a healthy pile for your next project.",
-    recycleRule: "Recycle when you need broad workshop value more than one exact tech craft.",
-    note: "Public recipe visibility is incomplete, so think of Sensors as premium tech stock rather than vendor trash."
+    name: "Always keep: survival and utility stock",
+    usedFor: "Chemicals, bandage-type inputs, batteries, wires, and other support materials that keep healing, gadgets, and workshop flexibility alive.",
+    keepRule: "Keep these if they help you stay alive, reposition, or keep basic utility crafts online.",
+    sellRule: "Sell only once you have multiple comfortable stacks and your workshop path is stable.",
+    recycleRule: "Recycle overflow only after checking whether you are about to craft healing, gadgets, or project requirements.",
+    note: "For a new Raider, survivability materials are usually worth more than speculative high-tier hoarding."
   },
   {
-    name: "Battery",
-    usedFor: "Powered gadgets, support tools, and general workshop tech crafts.",
-    keepRule: "Keep them if you like utility-heavy kits or expect to craft electronics soon.",
-    sellRule: "Safer to sell than Sensors once you have a stable stack, because Batteries are more general-purpose and less uniquely rare.",
-    recycleRule: "Good recycle candidates when you need workshop progression and are oversupplied.",
-    note: "Batteries are strong glue materials. They are rarely glamorous, but they keep a lot of tech recipes moving."
+    name: "Protect your weapon pipeline",
+    usedFor: "Gun parts, springs, processors, and general weapon-support materials that keep your chosen gun family sustainable.",
+    keepRule: "Keep these when you are still figuring out your primary weapon path or relying on crafted replacements.",
+    sellRule: "Sell duplicates only after you can consistently replace the loadout you actually use.",
+    recycleRule: "Recycle extras when they are clearly outside your weapon path and you need broader workshop value.",
+    note: "Weapon materials matter because they determine whether your next raid starts with confidence or compromise."
   },
   {
-    name: "Gun Parts",
-    usedFor: "Weapon crafts, weapon upkeep, and gun-focused workshop progress across light, medium, heavy, and complex branches.",
-    keepRule: "Keep these if you are still figuring out what weapon family you like, because they convert directly into future flexibility.",
-    sellRule: "Sell extras only after your core raid weapon path feels stable.",
-    recycleRule: "Usually better kept than recycled for newer players because weapons are an immediate quality-of-life upgrade.",
-    note: "If you do not know what to keep yet, gun parts are one of the safer materials to hold."
+    name: "Save premium ARC tech for big gates",
+    usedFor: "Arc Circuitry, ARC Powercells, advanced electrical/mechanical parts, sensors, and high-tier systems tied to stronger workshop options or project gates.",
+    keepRule: "Keep these almost by default unless you are absolutely sure you do not need them soon.",
+    sellRule: "Only emergency-sell premium ARC tech when stash space is a bigger problem than progression speed.",
+    recycleRule: "Do not make these your first recycle targets; they often gate the more meaningful upgrades later.",
+    note: "Premium tech is where careless selling hurts the most."
   },
   {
-    name: "Chemicals and Medical Stock",
-    usedFor: "Healing, support crafts, and utility items that keep your raid from collapsing after one bad fight.",
-    keepRule: "Keep these early. Survivability crafts are one of the highest-value uses of your stash.",
-    sellRule: "Only sell when you have more support stock than you can realistically spend.",
-    recycleRule: "Recycle if you urgently need broader workshop value, but avoid emptying your healing pipeline.",
-    note: "New players usually regret selling survivability materials before they regret selling damage materials."
+    name: "Use common bulk loot as pressure valves",
+    usedFor: "Duct Tape, Rope, Fabric, Rubber Parts, Metal Parts, and other common stack fillers that support many recipes but are also easier to replace.",
+    keepRule: "Keep a working stack because these fill boring-but-important recipe gaps.",
+    sellRule: "Good sell candidates when your stash is clogged and you need fast breathing room.",
+    recycleRule: "Often the safest recycle bucket because the materials are broader and more replaceable.",
+    note: "Common materials are useful, but they should not crowd out premium tech or survival stock."
   },
   {
-    name: "Arc Circuitry and Powercells",
-    usedFor: "Advanced crafting, stronger utility, and high-tier projects tied to ARC-derived tech.",
-    keepRule: "Almost always keep these unless you are flush with endgame stock.",
-    sellRule: "High-value sale candidates in emergencies only.",
-    recycleRule: "Usually not the first thing to recycle because their direct craft value is high.",
-    note: "These are the kinds of materials that often gate stronger workshop progress later."
-  },
-  {
-    name: "Duct Tape, Rope, Fabric, Rubber Parts",
-    usedFor: "General utility crafts, lower-to-mid tier support items, and practical workshop recipes.",
-    keepRule: "Keep a working stack because these fill a lot of boring-but-important recipe gaps.",
-    sellRule: "Good cleanup sale items once your stash is bloated and you have duplicate stacks.",
-    recycleRule: "Reasonable recycle candidates because they are more common and broadly replaceable.",
-    note: "These are foundation materials. They matter more than they look, but they are not sacred."
+    name: "Check projects before every sell session",
+    usedFor: "Projects, Scrappy feeding, Expedition prep, and crafting all compete for stash value.",
+    keepRule: "Keep materials that clearly support your next named project, Expedition goal, or weapon/healing bottleneck.",
+    sellRule: "Sell things that do not support your next several raids or your next major system milestone.",
+    recycleRule: "Recycle when the workshop value is more useful than the item sitting idle in storage.",
+    note: "The right keep-or-sell decision depends on what your account is trying to unlock next, not on a universal material ranking."
   }
 ];
 
-const weaponRoles = [
+const loadoutBlueprints = [
   {
-    title: "Reliable All-Round Primary",
-    summary: "The best starter weapon is the one you can control in messy mid-range fights without panicking or mag-dumping into armor.",
-    bestFor: "Quest runs, mixed PvE/PvP, and newer players who need one gun that does a little of everything.",
-    guidance: "If you are not sure what to bring, favor a stable rifle or controllable automatic weapon over a niche high-risk pick.",
-    beginnerTip: "Consistency beats theorycraft. Bring a gun you can actually reset and finish kills with."
+    title: "Questing Loadout",
+    summary: "Bring a stable mid-range primary, reliable healing, and one utility item that helps you disengage or force space.",
+    bestFor: "Trader quests, named quest walkthroughs, and objective-first runs where finishing the task matters more than farming kills.",
+    guidance: "Avoid overly specialized heavy gear unless the quest explicitly pushes you into major ARC pressure or a contested event.",
+    beginnerTip: "The right quest loadout gets you in, completes the step, and still has enough left to extract."
   },
   {
-    title: "Close-Quarters Backup",
-    summary: "A backup or aggressive short-range weapon helps when interiors, surprise pushes, or fast ARC collapse your spacing.",
-    bestFor: "Loot routes with lots of interiors, tunnel runs, and players who keep getting rushed while reloading.",
-    guidance: "Shotguns and faster close-range options are strongest when your primary struggles in tight spaces.",
-    beginnerTip: "If you panic indoors, a simple close-range answer can save more raids than a second greedy damage tool."
+    title: "Material Run Loadout",
+    summary: "Build around mobility, low-drama survival, and enough self-defense to escape machine pressure without turning the raid into a war.",
+    bestFor: "Workshop farming, condition routing, and stash-value runs.",
+    guidance: "Favor sustainable weapons, healing, and distraction or reset tools over expensive contest gear.",
+    beginnerTip: "If the raid goal is materials, every loud unnecessary fight is stealing value from the run."
   },
   {
-    title: "Heavy ARC Breaker",
-    summary: "Some runs call for harder-hitting weapons or utility that can punish armor, leg joints, and exposed cores on bigger ARC.",
-    bestFor: "Machine hunting, boss prep, or any raid where you expect Bastions, Bombardiers, Matriarchs, or Queens.",
-    guidance: "Pair higher-pen damage with cover discipline so you are not standing in the open just because your weapon hits hard.",
-    beginnerTip: "Do not bring heavy ARC tools unless the raid objective actually justifies the weight, noise, and risk."
+    title: "Operation Contest Loadout",
+    summary: "Operations like Close Scrutiny reward players who can fight, reset, and survive concentrated pressure instead of just looting broadly.",
+    bestFor: "Close Scrutiny, hotspot events, and lobbies where you expect both ARC and player collision.",
+    guidance: "Bring a primary you trust under pressure, stronger anti-ARC or burst utility, and one item that protects your reset window.",
+    beginnerTip: "Do not enter concentrated-value content with a farming loadout and hope tempo will somehow slow down for you."
   },
   {
-    title: "Silent or Low-Drama Utility Pick",
-    summary: "Not every raid should be built to win open fights. Sometimes the best loadout is the one that helps you stay unnoticed and leave cleanly.",
-    bestFor: "Material farming, task-focused runs, and undergeared raids where survival matters more than kill pressure.",
-    guidance: "Choose gear that helps you disengage, finish quick threats, and avoid long loud fights.",
-    beginnerTip: "The right low-drama loadout often earns more progress than the flashy one."
+    title: "Heavy ARC Hunt Loadout",
+    summary: "When the raid goal is Bastions, Bombardiers, Matriarchs, Queens, or Vaporizer-heavy areas, your loadout needs actual weak-point punishment and reset tools.",
+    bestFor: "Machine hunting, boss prep, and dangerous project steps.",
+    guidance: "Bring harder-hitting gear only when the objective justifies it, and pair it with cover discipline instead of treating raw damage as permission to stand in open angles.",
+    beginnerTip: "The best ARC-hunt loadout is the one that still lets you leave after the fight, not just win the fight."
   },
   {
-    title: "Flashpoint: Canto",
-    summary: "Canto is Flashpoint's new submachine gun and Embark positions it as a close-quarters weapon that still gives Raiders a fighting chance against ARC.",
-    bestFor: "Close interiors, operation fights, and players who need a medium-ammo weapon that can handle both Raiders and nearby machines.",
-    guidance: "Treat it as a pressure tool for tight spaces instead of a universal long-range answer.",
-    beginnerTip: "If you are learning Close Scrutiny, Canto makes more sense as a secondary pressure gun than as your only ranged plan."
-  },
-  {
-    title: "Flashpoint: Dolabra",
-    summary: "Dolabra is Flashpoint's new energy shotgun with a variable focus that can either spread damage wide or concentrate it into a tighter burst for ARC armor.",
-    bestFor: "Close Scrutiny, heavy ARC fights, and players who want a dedicated close-range armor puncher.",
-    guidance: "Use the focused fire mode when you need to punish armor or exposed weak points instead of wasting the shot on broad body damage.",
-    beginnerTip: "Only force Dolabra fights if you have cover and space to reset after the shot."
+    title: "Cheap Recovery Loadout",
+    summary: "A recovery loadout should be affordable, sustainable, and honest about its purpose: restore progression stability, not pretend you are geared for every fight.",
+    bestFor: "Post-loss recovery, shaky stash periods, and sessions where you need one solid run to stabilize.",
+    guidance: "Bring weapons you can replace, healing you can afford, and utility that gives you second chances instead of flashy overkill.",
+    beginnerTip: "Recovery kits win by lowering risk, not by recreating your dream build on a budget."
   }
 ];
 
@@ -1297,6 +1351,7 @@ const machineListElement = document.querySelector("#machine-list");
 const prepListElement = document.querySelector("#prep-list");
 const questOverviewElement = document.querySelector("#quest-overview");
 const questListElement = document.querySelector("#quest-list");
+const questDirectoryElement = document.querySelector("#quest-directory");
 const questDetailElement = document.querySelector("#quest-detail");
 const questDetailPanelElement = document.querySelector(".quest-detail-panel");
 const materialsOverviewElement = document.querySelector("#materials-overview");
@@ -1693,6 +1748,24 @@ function renderQuestList() {
   }
 }
 
+function renderQuestDirectory() {
+  questDirectoryElement.innerHTML = `
+    <div class="source-note">
+      <strong>Current named quest coverage:</strong>
+      <p class="quest-note">A full official live quest database is not publicly exposed in one reliable source after Flashpoint. This directory shows the current community-tracked named quest coverage available right now, grouped by Trader so new Raiders can see what exists and jump into walkthrough support.</p>
+      <a class="hero-button hero-button-secondary" href="https://www.dexerto.com/wikis/arc-raiders/quest-list-arc-raiders-full-walkthrough/" target="_blank" rel="noreferrer">Open full community quest walkthrough index</a>
+    </div>
+    ${communityTrackedQuestGroups.map((group) => `
+      <section class="quest-directory-group">
+        <h3 class="quest-directory-title">${group.trader}</h3>
+        <div class="quest-directory-list">
+          ${group.quests.map((quest) => `<span class="quest-directory-item">${quest}</span>`).join("")}
+        </div>
+      </section>
+    `).join("")}
+  `;
+}
+
 function renderQuestDetail() {
   const quest = getSelectedQuest();
   questDetailElement.innerHTML = `
@@ -1823,7 +1896,7 @@ function buildSearchIndex() {
         scrollElementIntoView(document.querySelector("#materials-intel"));
       }
     })),
-    ...materialUsageGuide.map((material) => ({
+    ...materialPriorityGuide.map((material) => ({
       id: `usage-${material.name}`,
       type: "Material use",
       title: material.name,
@@ -1835,7 +1908,7 @@ function buildSearchIndex() {
         scrollElementIntoView(document.querySelector(".material-usage-panel"));
       }
     })),
-    ...weaponRoles.map((role) => ({
+    ...loadoutBlueprints.map((role) => ({
       id: `weapon-role-${role.title}`,
       type: "Weapon guide",
       title: role.title,
@@ -2171,7 +2244,12 @@ function renderMaterialsCatalog() {
 }
 
 function renderMaterialUsageGuide() {
-  materialUsageGuideElement.innerHTML = materialUsageGuide.map((material) => `
+  materialUsageGuideElement.innerHTML = `
+    <div class="source-note">
+      <strong>What this should help you decide:</strong>
+      <p class="material-note">This section is no longer just a weak lookup board. It is meant to help a Raider decide what materials are solving real account problems right now: survival uptime, weapon sustain, project progress, or stash-space pressure.</p>
+    </div>
+    ${materialPriorityGuide.map((material) => `
     <article class="usage-card">
       <h3 class="usage-title">${material.name}</h3>
       <p class="usage-copy">${material.usedFor}</p>
@@ -2191,22 +2269,23 @@ function renderMaterialUsageGuide() {
       </div>
       <p class="usage-note">${material.note}</p>
     </article>
-  `).join("");
+  `).join("")}
+  `;
 }
 
 function renderGearOverview() {
   gearOverviewElement.innerHTML = `
     <article class="meta-pill">
       <span class="meta-label">Core principle</span>
-      <strong class="meta-value">Build for survival first</strong>
+      <strong class="meta-value">Build for the actual raid objective</strong>
     </article>
     <div class="source-note">
-      <strong>How to use this section:</strong>
-      <p class="release-note">Think in raid roles instead of chasing a perfect spreadsheet. Newer Raiders improve faster when they pick one reliable primary, one answer for emergencies, and one quick-use item that helps them reset bad fights.</p>
+      <strong>What this section should do for a new Raider:</strong>
+      <p class="release-note">This is now a loadout-planning section, not a generic weapon overview. Use it to answer: what kind of kit should I bring for questing, farming, operations, recovery, or heavy ARC pressure?</p>
     </div>
     <article class="gear-card">
-      <h3 class="gear-title">Simple starter loadout</h3>
-      <p class="gear-copy">Bring one stable all-round primary, healing, and one quick-use tool that either creates space or saves you from a collapsed fight. Add heavier ARC tools only when the objective actually demands them.</p>
+      <h3 class="gear-title">Simple starter rule</h3>
+      <p class="gear-copy">Pick one reliable primary, carry healing you can sustain, then choose the rest of the kit based on the goal of the raid. The wrong loadout problem in ARC Raiders is usually not raw power. It is mismatch between gear and raid purpose.</p>
       <div class="gear-meta">
         <section class="gear-rule">
           <span class="chip-label">Best for</span>
@@ -2222,7 +2301,7 @@ function renderGearOverview() {
 }
 
 function renderWeaponRoles() {
-  weaponRoleListElement.innerHTML = weaponRoles.map((role) => `
+  weaponRoleListElement.innerHTML = loadoutBlueprints.map((role) => `
     <article class="gear-card">
       <h3 class="gear-title">${role.title}</h3>
       <p class="gear-copy">${role.summary}</p>
@@ -2339,6 +2418,7 @@ function render() {
   renderLessonDetail();
   renderQuestOverview();
   renderQuestList();
+  renderQuestDirectory();
   renderQuestDetail();
   renderMaterialsOverview();
   renderMaterialsList();
