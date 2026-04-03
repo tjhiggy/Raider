@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.15.0",
+    date: "2026-04-03",
+    summary: "Performed a full UI/UX pass to simplify navigation, tighten the header and hero, and make the app feel more like one guided training product.",
+    changes: [
+      "Collapsed the top of the app into one clearer navigation system so the header, hero, and section entry points stop competing with each other.",
+      "Tightened the visual density of the header, hero, card shadows, and launch area so more useful guide content appears sooner on both desktop and mobile.",
+      "Improved the top-level information architecture by reducing repeated emphasis, simplifying entry choices, and making the current focus clearer from the main nav."
+    ]
+  },
+  {
     version: "v1.14.1",
     date: "2026-04-03",
     summary: "Added a current community-tracked quest directory and made the material and gear sections more decision-focused for new Raiders.",
@@ -1444,18 +1454,29 @@ function getFocusTarget(viewId) {
 }
 
 function renderFocusNav() {
-  focusNavElement.innerHTML = focusViews.map((view) => `
-    <button class="focus-button ${view.id === state.activeView ? "active" : ""}" type="button" data-view-id="${view.id}">
-      <span class="eyebrow">Focus Mode</span>
-      <strong class="focus-title">${view.label}</strong>
-      <p class="focus-copy">${view.summary}</p>
-    </button>
-  `).join("");
+  if (focusNavElement) {
+    focusNavElement.innerHTML = focusViews.map((view) => `
+      <button class="focus-button ${view.id === state.activeView ? "active" : ""}" type="button" data-view-id="${view.id}">
+        <span class="eyebrow">Focus Mode</span>
+        <strong class="focus-title">${view.label}</strong>
+        <p class="focus-copy">${view.summary}</p>
+      </button>
+    `).join("");
 
-  for (const button of focusNavElement.querySelectorAll("[data-view-id]")) {
-    button.addEventListener("click", () => {
-      setActiveView(button.dataset.viewId, { scrollTarget: getFocusTarget(button.dataset.viewId) });
-    });
+    for (const button of focusNavElement.querySelectorAll("[data-view-id]")) {
+      button.addEventListener("click", () => {
+        setActiveView(button.dataset.viewId, { scrollTarget: getFocusTarget(button.dataset.viewId) });
+      });
+    }
+  }
+
+  for (const link of focusTriggerElements) {
+    const focusView = link.dataset.focusView;
+    if (!focusView) {
+      continue;
+    }
+
+    link.classList.toggle("active", focusView === state.activeView);
   }
 }
 

@@ -68,8 +68,8 @@ button { color: inherit; }
   top: 10px;
   z-index: 20;
   padding: 12px 16px;
-  margin-bottom: 14px;
-  background: linear-gradient(180deg, rgba(37, 31, 27, 0.97), rgba(18, 15, 14, 0.97));
+  margin-bottom: 16px;
+  background: linear-gradient(180deg, rgba(37, 31, 27, 0.94), rgba(18, 15, 14, 0.94));
 }
 
 .command-body {
@@ -101,9 +101,14 @@ button { color: inherit; }
 
 .site-brand {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 12px;
   flex-shrink: 0;
+}
+
+.site-brand-copy {
+  display: grid;
+  gap: 3px;
 }
 
 .site-kicker {
@@ -118,10 +123,17 @@ button { color: inherit; }
 .site-title {
   margin: 0;
   font-family: var(--display-font);
-  font-size: clamp(1.2rem, 2.4vw, 1.75rem);
+  font-size: clamp(1.15rem, 2.3vw, 1.65rem);
   line-height: 1;
   text-transform: uppercase;
   letter-spacing: 0.01em;
+}
+
+.site-tagline {
+  margin: 0;
+  color: var(--soft);
+  font-size: 0.84rem;
+  line-height: 1.35;
 }
 
 .site-header-actions {
@@ -149,37 +161,10 @@ button { color: inherit; }
 .site-nav {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 4px 10px;
   justify-content: center;
   flex: 1 1 auto;
-  padding: 0 12px;
-}
-
-.focus-strip {
-  padding: 14px 18px;
-  margin-bottom: 16px;
-}
-
-.focus-strip-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px 16px;
-  margin-bottom: 10px;
-}
-
-.focus-strip-head h2 {
-  margin: 0;
-  font-family: var(--display-font);
-  font-size: 1.15rem;
-  text-transform: uppercase;
-}
-
-.focus-strip-head p {
-  margin: 0;
-  color: var(--muted);
-  line-height: 1.5;
+  padding: 0 8px;
 }
 
 .search-label {
@@ -209,16 +194,28 @@ button { color: inherit; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 34px;
-  padding: 0 12px;
+  min-height: 36px;
+  padding: 0 10px;
   border-radius: 999px;
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid transparent;
+  background: transparent;
   color: var(--signal);
   font-size: 0.8rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.06em;
+}
+
+.site-nav .quick-link:hover,
+.site-nav .quick-link:focus-visible {
+  border-color: var(--line);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.site-nav .quick-link.active {
+  border-color: rgba(214, 117, 48, 0.42);
+  background: rgba(214, 117, 48, 0.14);
+  color: var(--accent-soft);
 }
 
 .quick-link-discord {
@@ -235,51 +232,6 @@ button { color: inherit; }
 .search-results-panel {
   padding: 20px;
   margin-bottom: 18px;
-}
-
-.focus-nav {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 12px;
-}
-
-.focus-button {
-  width: 100%;
-  padding: 16px;
-  border-radius: 18px;
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.03);
-  color: inherit;
-  text-align: left;
-  cursor: pointer;
-  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
-}
-
-.focus-button:hover,
-.focus-button:focus-visible {
-  transform: translateY(-2px);
-}
-
-.focus-button.active {
-  border-color: rgba(214, 117, 48, 0.72);
-  box-shadow: 0 12px 30px rgba(214, 117, 48, 0.12);
-  background: linear-gradient(180deg, rgba(214, 117, 48, 0.14), rgba(255, 255, 255, 0.03));
-}
-
-.focus-title {
-  display: block;
-  margin-top: 8px;
-  font-family: var(--display-font);
-  font-size: 1rem;
-  text-transform: uppercase;
-  color: var(--signal);
-}
-
-.focus-copy {
-  margin: 10px 0 0;
-  color: var(--muted);
-  line-height: 1.5;
-  font-size: 0.94rem;
 }
 
 .flow-section[hidden] {
@@ -330,7 +282,7 @@ button { color: inherit; }
     linear-gradient(180deg, var(--panel), var(--panel-strong));
   border: 1px solid var(--line);
   border-radius: 22px;
-  box-shadow: 0 22px 60px var(--shadow);
+  box-shadow: 0 12px 34px var(--shadow);
   backdrop-filter: blur(8px);
 }
 
@@ -338,8 +290,8 @@ button { color: inherit; }
   display: grid;
   grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.7fr);
   gap: 22px;
-  padding: 20px;
-  margin-bottom: 16px;
+  padding: 18px;
+  margin-bottom: 18px;
   overflow: hidden;
   position: relative;
   background:
@@ -381,23 +333,30 @@ button { color: inherit; }
 
 .hero-text {
   max-width: 58ch;
-  margin: 12px 0 0;
-  font-size: 0.98rem;
+  margin: 10px 0 0;
+  font-size: 0.95rem;
   line-height: 1.55;
+}
+
+.hero-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
 }
 
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  margin-top: 18px;
+  margin-top: 16px;
 }
 
 .hero-community {
   display: grid;
   gap: 10px;
-  margin-top: 18px;
-  padding: 14px 16px;
+  margin-top: 16px;
+  padding: 12px 14px;
   border-radius: 18px;
   border: 1px solid rgba(244, 196, 139, 0.12);
   background: rgba(255, 255, 255, 0.025);
@@ -523,19 +482,19 @@ button { color: inherit; }
 .launchpad-grid,
 .status-grid,
 .intel-grid { display: grid; gap: 18px; }
-.launchpad-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-bottom: 20px; }
+.launchpad-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom: 20px; }
 .status-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom: 20px; }
 .status-card, .briefing, .overview-panel, .rail-panel, .detail-panel, .intel-panel { padding: 20px; }
 .status-value { margin-top: 10px; font-size: 2rem; color: var(--accent-soft); }
-.briefing { margin-bottom: 20px; }
+.briefing { margin-bottom: 18px; }
 .pain-points-panel { padding: 20px; margin-bottom: 20px; }
 .section-heading { margin-bottom: 18px; }
 .section-heading p { margin: 8px 0 0; }
-.briefing-list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.briefing-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
 .launchpad-card {
   display: block;
-  padding: 20px;
+  padding: 18px;
   transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
 }
 
@@ -549,7 +508,7 @@ button { color: inherit; }
 
 .pain-point-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 12px;
 }
 
@@ -604,21 +563,21 @@ button { color: inherit; }
 .update-layout {
   display: grid;
   grid-template-columns: 0.95fr 1fr 0.95fr;
-  gap: 20px;
+  gap: 18px;
   margin-bottom: 20px;
 }
 
 .quest-layout {
   display: grid;
   grid-template-columns: 0.9fr 1fr 0.95fr;
-  gap: 20px;
+  gap: 18px;
   margin-bottom: 20px;
 }
 
 .materials-layout {
   display: grid;
   grid-template-columns: 0.9fr 1fr 0.95fr;
-  gap: 20px;
+  gap: 18px;
   margin-bottom: 20px;
 }
 
@@ -1464,13 +1423,13 @@ button { color: inherit; }
   .site-tools-row { grid-template-columns: 1fr; }
   .site-header-top { align-items: flex-start; flex-direction: column; }
   .site-nav { justify-content: flex-start; padding: 0; }
+  .pain-point-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 760px) {
   .app-shell { width: min(100%, calc(100% - 16px)); padding-top: 12px; }
   .site-header,
-  .search-results-panel,
-  .focus-strip { padding: 16px; }
+  .search-results-panel { padding: 16px; }
   .hero, .status-card, .briefing, .pain-points-panel, .overview-panel, .rail-panel, .detail-panel, .intel-panel { padding: 16px; }
   .hero h1, .hero h2 { font-size: clamp(1.7rem, 8vw, 2.5rem); max-width: 12ch; }
   .hero-actions { display: grid; grid-template-columns: 1fr; }
@@ -1501,16 +1460,24 @@ button { color: inherit; }
     justify-content: flex-start;
   }
   .site-nav {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    width: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    width: calc(100% + 4px);
+    margin-left: -2px;
+    padding-bottom: 2px;
     margin-top: 6px;
+    scrollbar-width: none;
   }
+  .site-nav::-webkit-scrollbar { display: none; }
   .site-brand {
     flex-direction: column;
     align-items: flex-start;
     gap: 4px;
   }
+  .site-tagline { font-size: 0.8rem; }
+  .hero-meta-row { margin-top: 12px; }
+  .pain-point-list { grid-template-columns: 1fr; }
   .quest-overview-panel,
   .quest-list-panel,
   .quest-detail-panel,
@@ -1535,7 +1502,6 @@ button { color: inherit; }
   .hero h1, .hero h2 { font-size: clamp(1.55rem, 10vw, 2rem); }
   .status-grid, .intel-grid { gap: 14px; }
   .lesson-card, .track-button { padding: 14px; }
-  .site-nav { grid-template-columns: 1fr; }
   .app-footer { flex-direction: column; gap: 6px; }
   .back-to-top { right: 12px; bottom: 12px; }
   .easter-egg-trigger { left: 10px; bottom: 96px; width: 32px; height: 32px; }
