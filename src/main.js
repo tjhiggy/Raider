@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.16.0",
+    date: "2026-04-08",
+    summary: "Refreshed the official update watch for ARC Raiders' April post-Flashpoint patch cycle and aligned guide advice with the latest official posts.",
+    changes: [
+      "Added official April release records for Hotfix 1.22.1, the April 4 UX update, and Patch Notes 1.23.0.",
+      "Updated the workshop and materials guidance around the new Acquire Resources flow and current official crafting friction fixes.",
+      "Reframed the update spotlight so the newest official post drives the app instead of stale pre-April Flashpoint copy."
+    ]
+  },
+  {
     version: "v1.15.0",
     date: "2026-04-03",
     summary: "Performed a full UI/UX pass to simplify navigation, tighten the header and hero, and make the app feel more like one guided training product.",
@@ -325,6 +335,75 @@ const focusViews = [
 
 const releases = [
   {
+    id: "patch-notes-1-23-0-2026-04-08",
+    title: "Patch Notes 1.23.0",
+    date: "2026-04-08",
+    status: "Latest patch",
+    summary: "Embark's news hub now lists Patch Notes 1.23.0 as the newest official ARC Raiders post, making it the current live patch baseline.",
+    overview: "The official news index confirms Patch Notes 1.23.0 landed on April 8, 2026. The indexed listing does not expose the full body in the source we could verify here, so treat this as the current patch anchor while deeper mechanic-by-mechanic implications await manual review from the full official post.",
+    confirmed: [
+      "Officially listed on the ARC Raiders news hub on April 8, 2026",
+      "Newest patch-note post in the official archive",
+      "Newer than Hotfix 1.22.1 and the April 4 UX update"
+    ],
+    prep: [
+      "Use this as the current official patch baseline before trusting older Flashpoint-era assumptions.",
+      "Manually review the full official patch body and fold any gameplay, map, or economy changes into the guide once confirmed.",
+      "Keep Hotfix 1.22.1 in mind for stability context until the full 1.23.0 notes are checked line by line."
+    ],
+    appIdeas: [
+      "Keep the latest-patch card honest even when the full note body is not yet summarized in the app.",
+      "Flag guide sections touched by April fixes so returners know where advice changed.",
+      "Replace this high-level placeholder with deeper per-system notes after manual verification."
+    ]
+  },
+  {
+    id: "reducing-friction-2026-04-04",
+    title: "Reducing Friction",
+    date: "2026-04-04",
+    status: "UX update",
+    summary: "Embark's April 4 UX post adds an Acquire Resources flow that lets players source missing crafting materials directly from the crafting screen.",
+    overview: "The official UX post says Embark targeted a common pain point: crafting friction. Missing ingredients can now be sourced through a new Acquire Resources button that shows every currently available path, including recycling, buying from Celeste, and other available options, instead of forcing players through multiple menu hops.",
+    confirmed: [
+      "New Acquire Resources button in the crafting screen",
+      "Shows every currently available source for missing materials",
+      "Official examples include recycling and buying from Celeste"
+    ],
+    prep: [
+      "Use the button before launching a panic material run because the missing piece may already be solvable inside the workshop flow.",
+      "Treat Celeste and recycling as part of the same planning loop instead of separate stash chores.",
+      "Keep farming routes focused on materials that still cannot be solved through currently available sources."
+    ],
+    appIdeas: [
+      "Update workshop lessons to teach decision-making around Acquire Resources instead of menu-hopping.",
+      "Tie materials guidance more directly to recycling and trader fallback options.",
+      "Call out this UX change in the hero and update center because it directly changes how players resolve crafting bottlenecks."
+    ]
+  },
+  {
+    id: "hotfix-1-22-1-2026-04-01",
+    title: "Hotfix 1.22.1",
+    date: "2026-04-01",
+    status: "Hotfix",
+    summary: "Embark deployed Hotfix 1.22.1 to address a crash affecting some players and said an Xbox patch would follow later.",
+    overview: "The official April 1 hotfix note is short and blunt: a crash fix shipped immediately, and an Xbox patch was still pending at the time of the post. That makes it primarily a stability marker, not a systems or economy update, but it still matters for returners checking whether Flashpoint launch issues were addressed.",
+    confirmed: [
+      "Crash fix deployed on April 1, 2026",
+      "Players were told to restart the game to download it",
+      "Official post says an Xbox patch would follow later"
+    ],
+    prep: [
+      "Treat this as a stability checkpoint between Flashpoint launch and the next weekly patch.",
+      "Verify separately whether Embark later confirmed the Xbox follow-up.",
+      "Do not overread this post as a balance patch because the official note only mentions crash resolution."
+    ],
+    appIdeas: [
+      "Keep low-detail hotfixes in the archive so players can distinguish stability fixes from content drops.",
+      "Use short summaries for hotfix entries instead of pretending every patch changed gameplay.",
+      "Surface platform follow-up items when Embark says a patch is staggered."
+    ]
+  },
+  {
     id: "flashpoint-2026-03-31",
     title: "Flashpoint",
     date: "2026-03-31",
@@ -428,6 +507,27 @@ const releases = [
 ];
 
 const embarkFeed = [
+  {
+    title: "Patch Notes 1.23.0",
+    date: "2026-04-08",
+    source: "Official news",
+    summary: "The official news hub now lists Patch Notes 1.23.0 as the latest ARC Raiders post. Full note details still need manual verification from the body.",
+    url: "https://arcraiders.com/news"
+  },
+  {
+    title: "Reducing friction in ARC Raiders",
+    date: "2026-04-04",
+    source: "Official news",
+    summary: "Embark added an Acquire Resources button so missing craft materials can be sourced directly from the crafting screen.",
+    url: "https://arcraiders.com/news/user-experience-improvements"
+  },
+  {
+    title: "Hotfix 1.22.1",
+    date: "2026-04-01",
+    source: "Official news",
+    summary: "A short official hotfix note confirms a crash fix went live and said an Xbox patch would follow later.",
+    url: "https://arcraiders.com/news/hotfix-1-22-1"
+  },
   {
     title: "Flashpoint - Patch Notes 1.22.0",
     date: "2026-03-31",
@@ -794,9 +894,10 @@ const lessons = [
     category: "Systems",
     time: "4 min",
     summary: "Locked rooms are not automatically good. Their value depends on route risk, key scarcity, and how much attention you will spend reaching them.",
-    body: "One of the easiest ways to waste raid tempo in ARC Raiders is to treat every locked room like a mandatory jackpot. The right question is whether the room improves your run more than the danger created by pathing to it, fighting around it, and extracting afterward. The best guide sites for similar games are strong here because they teach value judgment, not just point-of-interest names. That is the right model for ARC too.",
+    body: "One of the easiest ways to waste raid tempo in ARC Raiders is to treat every locked room like a mandatory jackpot. Flashpoint increased locked-room loot value, which makes the temptation more real, not more automatic. The right question is still whether the room improves your run more than the danger created by pathing to it, fighting around it, and extracting afterward. The best guide sites for similar games are strong here because they teach value judgment, not just point-of-interest names. That is the right model for ARC too.",
     bullets: [
       "Judge locked rooms by route efficiency, not by hype.",
+      "Better loot does not erase bad extraction math, so do not confuse a buffed room with a guaranteed winning detour.",
       "If opening the room drags you through two dangerous spaces and a late extract, the key may not be worth using right now.",
       "Use locked rooms to support a raid objective, not to replace one."
     ],
@@ -832,9 +933,10 @@ const lessons = [
     category: "Progression",
     time: "5 min",
     summary: "The Workshop is where many players waste value. Crafting should solve problems in your raid loop, not just consume materials because a button is available.",
-    body: "After Flashpoint, Embark added a clearer material-source helper to the workshop experience, which signals the system is meant to be used as a planning tool. The strongest use of the Workshop is to remove friction: better healing uptime, more consistent utility, a weapon path you can actually sustain, and project support. The weakest use is reactive crafting with no idea what it is fixing.",
+    body: "After Flashpoint, Embark kept iterating on crafting flow and on April 4 formally added an Acquire Resources button to the crafting screen. That matters because the workshop is supposed to be a planning tool, not a menu maze. The strongest use of the Workshop is to remove friction: better healing uptime, more consistent utility, a weapon path you can actually sustain, and project support. The weakest use is reactive crafting with no idea what it is fixing.",
     bullets: [
       "Craft for bottlenecks first: healing, utility, sustainable primaries, and project gates.",
+      "If a craft is blocked, hit Acquire Resources first so you can compare recycling, Celeste, and other available sources before forcing another raid.",
       "Use the workshop to plan what to keep in raid, not just to spend what you already have.",
       "If a craft does not improve your next several raids, it may be a low-priority sink."
     ],
@@ -851,7 +953,7 @@ const lessons = [
     category: "Operations",
     time: "5 min",
     summary: "Operations in ARC Raiders concentrate risk and reward. Close Scrutiny teaches the right lesson: concentrated value means concentrated pressure.",
-    body: "Flashpoint's Close Scrutiny is a good example of how ARC Raiders wants players to think about event-like content. Embark explicitly says there is less loot around the map and the Assessor at the center is the main prize. That means the operation is not just a new location to wander into. It is a declaration about tempo, loadout, and escape planning before you deploy.",
+    body: "Flashpoint's Close Scrutiny is a good example of how ARC Raiders wants players to think about event-like content. Embark explicitly says there is less loot around the map and the Assessor at the center is the main prize. That means the operation is not just a new location to wander into. It is a declaration about tempo, loadout, and escape planning before you deploy. Post-launch fixes have kept sanding down rough edges around the operation, which is useful, but the core lesson has not changed: concentrated value creates concentrated danger.",
     bullets: [
       "If the operation is the goal, build for contesting and resetting, not for broad looting.",
       "Expect more player pressure because concentrated value naturally creates collisions.",
@@ -1239,7 +1341,7 @@ const materialPriorityGuide = [
     keepRule: "Keep materials that clearly support your next named project, Expedition goal, or weapon/healing bottleneck.",
     sellRule: "Sell things that do not support your next several raids or your next major system milestone.",
     recycleRule: "Recycle when the workshop value is more useful than the item sitting idle in storage.",
-    note: "The right keep-or-sell decision depends on what your account is trying to unlock next, not on a universal material ranking."
+    note: "The right keep-or-sell decision depends on what your account is trying to unlock next, not on a universal material ranking. If the workshop can now solve a missing ingredient through Acquire Resources, that should change what you sell or recycle."
   }
 ];
 
@@ -1322,7 +1424,7 @@ const quickUseItems = [
 
 const state = {
   activeView: "start",
-  selectedReleaseId: "flashpoint-2026-03-31",
+  selectedReleaseId: "patch-notes-1-23-0-2026-04-08",
   selectedTrackId: tracks[0].id,
   selectedLessonId: lessons.find((lesson) => lesson.trackId === tracks[0].id)?.id ?? null,
   selectedQuestId: "trader-quests",
@@ -1984,7 +2086,7 @@ function renderUpdateSpotlight() {
     <section class="spotlight-panel">
       <div class="spotlight-heading">
         <div>
-          <p class="eyebrow">Next release window</p>
+          <p class="eyebrow">Latest official watch</p>
           <h3 class="spotlight-title">${release.title}</h3>
         </div>
         <span class="spotlight-date">${release.date}</span>
@@ -2029,7 +2131,7 @@ function renderHeroDashboard() {
   const nextFocus = reviewedCount >= 3 ? "Advanced Ops" : "New Raider";
 
   heroUpdateCardElement.innerHTML = `
-    <span class="hero-card-label">Current update watch</span>
+    <span class="hero-card-label">Latest official update</span>
     <strong>${currentRelease.title}</strong>
     <p>${currentRelease.summary}</p>
     <div class="hero-stat-row">
@@ -2194,12 +2296,12 @@ function renderMaterialsOverview() {
     </article>
     <p class="materials-copy">ARC Raiders' public material information is best understood as a routing problem, not a perfect loot-table spreadsheet. Official sources tell us which map types exist, which conditions boost certain loot, and which material families are definitely in circulation. This section translates that into practical material-hunting advice.</p>
     <div class="callout">
-      <strong>Post-Flashpoint verification:</strong>
-      <p class="detail-copy">Current official Flashpoint coverage describes crafting improvements and a new material-source helper in the workshop, but it does not publicly list new material families or a replaced material catalog. Based on current public information, the catalog below still holds after the March 31, 2026 update.</p>
+      <strong>April verification status:</strong>
+      <p class="detail-copy">Official April posts confirm the workshop now includes Acquire Resources support for missing ingredients, but they still do not publish a brand-new material family list or a replaced material catalog. Based on current public information, the catalog below still holds after the April 8, 2026 patch cycle.</p>
     </div>
     <div class="source-note">
       <strong>Source scope:</strong>
-      <p class="material-note">This guide uses official public details about the Workshop, maps, special conditions, boosted cache drops, the named basic materials used in the tunnel restoration event, and post-Flashpoint workshop changes.</p>
+      <p class="material-note">This guide uses official public details about the Workshop, Acquire Resources flow, maps, special conditions, boosted cache drops, the named basic materials used in the tunnel restoration event, and post-Flashpoint workshop changes.</p>
     </div>
   `;
 }
