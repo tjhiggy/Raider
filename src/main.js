@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.16.1",
+    date: "2026-04-08",
+    summary: "Replaced the April 8 patch placeholder with confirmed 1.23.0 fixes and tightened the release guidance around Close Scrutiny, maps, and workshop flow.",
+    changes: [
+      "Replaced the vague 1.23.0 placeholder with confirmed official fixes for Trigger 'Nades, shoulder swap, weapon and item firing behavior, Stella Montis, Buried City, and Close Scrutiny.",
+      "Updated the official-news module and release guidance so the latest patch reflects real April 8 gameplay and map fixes instead of pending-review language.",
+      "Fixed the release detail panel separator rendering and kept the April workshop guidance aligned with Embark's Acquire Resources UX update."
+    ]
+  },
+  {
     version: "v1.16.0",
     date: "2026-04-08",
     summary: "Refreshed the official update watch for ARC Raiders' April post-Flashpoint patch cycle and aligned guide advice with the latest official posts.",
@@ -339,22 +349,25 @@ const releases = [
     title: "Patch Notes 1.23.0",
     date: "2026-04-08",
     status: "Latest patch",
-    summary: "Embark's news hub now lists Patch Notes 1.23.0 as the newest official ARC Raiders post, making it the current live patch baseline.",
-    overview: "The official news index confirms Patch Notes 1.23.0 landed on April 8, 2026. The indexed listing does not expose the full body in the source we could verify here, so treat this as the current patch anchor while deeper mechanic-by-mechanic implications await manual review from the full official post.",
+    summary: "Patch 1.23.0 is the current live baseline and it focuses on gameplay cleanup, map fixes, and a substantial Close Scrutiny stability pass rather than a broad balance reset.",
+    overview: "Embark's official April 8 patch notes confirm a new Vanguard Set in the shop plus fixes to Trigger 'Nades damage stacking, item and weapon firing behavior, shoulder swap, anvil splitter exploitation, barricade placement on ziplines, Stella Montis and Buried City map issues, and several Close Scrutiny problems around Assessors, Vaporizers, Rocketeers, platforms, and map pinging.",
     confirmed: [
-      "Officially listed on the ARC Raiders news hub on April 8, 2026",
-      "Newest patch-note post in the official archive",
-      "Newer than Hotfix 1.22.1 and the April 4 UX update"
+      "Vanguard Set added to the shop",
+      "Trigger 'Nades damage-stacking issue fixed",
+      "Shoulder swap, auto-fire, and item-use timing issues fixed",
+      "Barricades can no longer be placed on ziplines",
+      "Stella Montis and Buried City map issues fixed",
+      "Close Scrutiny got movement, platform, Assessor, and ping fixes"
     ],
     prep: [
-      "Use this as the current official patch baseline before trusting older Flashpoint-era assumptions.",
-      "Manually review the full official patch body and fold any gameplay, map, or economy changes into the guide once confirmed.",
-      "Keep Hotfix 1.22.1 in mind for stability context until the full 1.23.0 notes are checked line by line."
+      "Treat Close Scrutiny as more reliable after this patch, especially for Assessor behavior, platform flow, reconnects, and Vaporizer pathing.",
+      "If you play Stella Montis or Buried City routes, trust April 8 pathing and interaction behavior over older player reports.",
+      "Recheck grenade and shoulder-swap habits if you learned around Flashpoint launch edge cases, because the current live behavior is cleaner now."
     ],
     appIdeas: [
-      "Keep the latest-patch card honest even when the full note body is not yet summarized in the app.",
-      "Flag guide sections touched by April fixes so returners know where advice changed.",
-      "Replace this high-level placeholder with deeper per-system notes after manual verification."
+      "Update operation guidance to acknowledge that Close Scrutiny is still high-risk, but some roughest platform and Assessor issues were officially fixed on April 8.",
+      "Keep materials and workshop guidance focused on April 4's UX improvements, because 1.23.0 was mostly cleanup rather than a new economy patch.",
+      "Use patch cards to separate live-behavior fixes from major content drops so players know whether advice changed because of systems or stability."
     ]
   },
   {
@@ -511,8 +524,8 @@ const embarkFeed = [
     title: "Patch Notes 1.23.0",
     date: "2026-04-08",
     source: "Official news",
-    summary: "The official news hub now lists Patch Notes 1.23.0 as the latest ARC Raiders post. Full note details still need manual verification from the body.",
-    url: "https://arcraiders.com/news"
+    summary: "Embark fixed Trigger 'Nades stacking, weapon and item firing issues, Stella Montis and Buried City map problems, and several Close Scrutiny Assessor and Vaporizer issues.",
+    url: "https://arcraiders.com/news/patch-notes-1-23-0"
   },
   {
     title: "Reducing friction in ARC Raiders",
@@ -953,7 +966,7 @@ const lessons = [
     category: "Operations",
     time: "5 min",
     summary: "Operations in ARC Raiders concentrate risk and reward. Close Scrutiny teaches the right lesson: concentrated value means concentrated pressure.",
-    body: "Flashpoint's Close Scrutiny is a good example of how ARC Raiders wants players to think about event-like content. Embark explicitly says there is less loot around the map and the Assessor at the center is the main prize. That means the operation is not just a new location to wander into. It is a declaration about tempo, loadout, and escape planning before you deploy. Post-launch fixes have kept sanding down rough edges around the operation, which is useful, but the core lesson has not changed: concentrated value creates concentrated danger.",
+    body: "Flashpoint's Close Scrutiny is a good example of how ARC Raiders wants players to think about event-like content. Embark explicitly says there is less loot around the map and the Assessor at the center is the main prize. That means the operation is not just a new location to wander into. It is a declaration about tempo, loadout, and escape planning before you deploy. Patch 1.23.0 then cleaned up several reliability issues around Assessors, Vaporizers, reconnect visibility, and platform flow, but the core lesson has not changed: concentrated value creates concentrated danger.",
     bullets: [
       "If the operation is the goal, build for contesting and resetting, not for broad looting.",
       "Expect more player pressure because concentrated value naturally creates collisions.",
@@ -2221,7 +2234,7 @@ function renderReleaseDetail() {
     <section class="detail-block">
       <div class="callout">
         <strong>Confirmed in this release:</strong>
-        <p class="detail-copy">${release.confirmed.join(" • ")}</p>
+        <p class="detail-copy">${release.confirmed.join(" | ")}</p>
       </div>
     </section>
   `;
