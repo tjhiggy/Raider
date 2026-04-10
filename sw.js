@@ -1,4 +1,4 @@
-const CACHE_NAME = "arc-raiders-guide-v1-16-1";
+const CACHE_NAME = "arc-raiders-guide-v1-16-2";
 const APP_ASSETS = [
   "./",
   "./index.html",

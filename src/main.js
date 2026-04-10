@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.16.2",
+    date: "2026-04-10",
+    summary: "Added a visible official-verification stamp so players can see when the guide was last checked against Embark posts.",
+    changes: [
+      "Added a footer stamp that shows the last official ARC Raiders post verification date.",
+      "Connected the stamp to the app metadata so it updates alongside normal guide versioning.",
+      "Keeps the guide's update credibility easier to understand for returning players."
+    ]
+  },
+  {
     version: "v1.16.1",
     date: "2026-04-08",
     summary: "Replaced the April 8 patch placeholder with confirmed 1.23.0 fixes and tightened the release guidance around Close Scrutiny, maps, and workshop flow.",
@@ -303,6 +313,7 @@ const VERSION_HISTORY = [
 
 const APP_VERSION = VERSION_HISTORY[0].version;
 const APP_UPDATED = VERSION_HISTORY[0].date;
+const OFFICIAL_POSTS_VERIFIED = "2026-04-10";
 const STORAGE_KEY = "arc-raiders-guide-state";
 
 const focusViews = [
@@ -1449,6 +1460,7 @@ const trackCountElement = document.querySelector("#track-count");
 const lessonCountElement = document.querySelector("#lesson-count");
 const machineCountElement = document.querySelector("#machine-count");
 const appUpdatedElement = document.querySelector("#app-updated");
+const appVerifiedElement = document.querySelector("#app-verified");
 const reviewedCountElement = document.querySelector("#reviewed-count");
 const continueLabelElement = document.querySelector("#continue-label");
 const globalSearchElement = document.querySelector("#global-search");
@@ -1622,6 +1634,9 @@ function renderCounts() {
   }
   appVersionButtonElement.textContent = APP_VERSION;
   appUpdatedElement.textContent = `Updated ${APP_UPDATED}`;
+  if (appVerifiedElement) {
+    appVerifiedElement.textContent = `Official posts verified ${OFFICIAL_POSTS_VERIFIED}`;
+  }
 }
 
 function renderChangelog() {
