@@ -1,5 +1,25 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.18.0",
+    date: "2026-04-12",
+    summary: "Upgraded content discovery with richer metadata, real filters, better search presentation, and related-content links across the guide.",
+    changes: [
+      "Converted major guide modules into stronger discovery cards with level, priority, tags, mode, goal, and read-time metadata where relevant.",
+      "Added real filters for tracks, lessons, quests, materials, loadouts, quick-use items, and ARC intel so users can scan by beginner fit, progression goal, and pressure level.",
+      "Added related-content patterns and improved search suggestions, result cards, and empty states so the site feels connected instead of dumped."
+    ]
+  },
+  {
+    version: "v1.17.0",
+    date: "2026-04-12",
+    summary: "Redesigned the homepage hero and tightened the ARC Raiders visual system into a more premium, cohesive companion-app style.",
+    changes: [
+      "Rebuilt the hero into a stronger landing section with clearer headline hierarchy, better CTA emphasis, and a more game-focused visual treatment.",
+      "Established stronger design tokens for color, type scale, surfaces, badges, buttons, shadows, and spacing so the homepage feels consistent and intentional.",
+      "Polished homepage cards and section styling so the site reads like a dedicated ARC Raiders utility app instead of a generic content page."
+    ]
+  },
+  {
     version: "v1.16.3",
     date: "2026-04-12",
     summary: "Reverified the guide against official ARC Raiders posts and confirmed the site is still current after the April 8 patch cycle.",
@@ -1456,6 +1476,182 @@ const quickUseItems = [
   }
 ];
 
+const TRACK_META = {
+  "new-raider": {
+    level: "Beginner",
+    priority: "Essential",
+    mode: "Solo + squad",
+    goal: "Learn the loop",
+    tags: ["extraction basics", "survival", "new raider"]
+  },
+  "rust-belt-systems": {
+    level: "Intermediate",
+    priority: "Recommended",
+    mode: "Solo + squad",
+    goal: "Progress faster",
+    tags: ["workshop", "materials", "projects"]
+  },
+  "combat-and-operations": {
+    level: "Advanced",
+    priority: "Advanced",
+    mode: "Squad leaning",
+    goal: "High-pressure raids",
+    tags: ["operations", "arc control", "risk management"]
+  }
+};
+
+const LESSON_META = {
+  "extraction-shooter-basics": { level: "Beginner", priority: "Essential", mode: "Solo + squad", goal: "Learn the loop", tags: ["extraction", "raid loop", "fundamentals"] },
+  "raid-loop": { level: "Beginner", priority: "Essential", mode: "Solo + squad", goal: "Learn the loop", tags: ["survival", "objective", "extraction"] },
+  "raid-concepts": { level: "Beginner", priority: "Recommended", mode: "Solo + squad", goal: "Decision-making", tags: ["raid phases", "tempo", "discipline"] },
+  "topside-basics": { level: "Beginner", priority: "Essential", mode: "Solo + squad", goal: "Stay alive", tags: ["topside", "awareness", "cover"] },
+  "speranza-progression": { level: "Beginner", priority: "Recommended", mode: "Solo + squad", goal: "Progress faster", tags: ["traders", "workshop", "skills"] },
+  "loadouts-and-recovery": { level: "Beginner", priority: "Recommended", mode: "Solo + squad", goal: "Build a kit", tags: ["loadouts", "recovery", "gear"] },
+  "conditions-and-routing": { level: "Intermediate", priority: "Recommended", mode: "Solo + squad", goal: "Find value", tags: ["conditions", "routing", "loot"] },
+  "machine-attention": { level: "Advanced", priority: "Recommended", mode: "Solo + squad", goal: "Win fights", tags: ["arc", "threat control", "reset"] },
+  "squad-pacing": { level: "Advanced", priority: "Advanced", mode: "Squad", goal: "Teamplay", tags: ["squad", "spacing", "extract"] },
+  "risk-and-extracts": { level: "Advanced", priority: "Essential", mode: "Solo + squad", goal: "Extract more", tags: ["risk", "late raid", "greed control"] },
+  "conditions-as-economy": { level: "Intermediate", priority: "Recommended", mode: "Solo + squad", goal: "Progress faster", tags: ["economy", "conditions", "routing"] },
+  "locked-room-value": { level: "Intermediate", priority: "Recommended", mode: "Solo + squad", goal: "Find value", tags: ["keys", "locked rooms", "route value"] },
+  "scrappy-and-projects": { level: "Intermediate", priority: "Recommended", mode: "Solo + squad", goal: "Progress faster", tags: ["scrappy", "projects", "stash"] },
+  "workshop-decisions": { level: "Intermediate", priority: "Essential", mode: "Solo + squad", goal: "Craft smarter", tags: ["workshop", "acquire resources", "crafting"] },
+  "operations-and-assessor": { level: "Advanced", priority: "Advanced", mode: "Solo + squad", goal: "High-pressure raids", tags: ["close scrutiny", "operations", "assessor"] },
+  "arc-priority-logic": { level: "Advanced", priority: "Essential", mode: "Solo + squad", goal: "Win fights", tags: ["arc intel", "target priority", "machines"] }
+};
+
+const QUEST_META = {
+  "trader-quests": { level: "Beginner", priority: "Essential", mode: "Solo + squad", goal: "Progress faster", tags: ["traders", "story", "objectives"] },
+  feats: { level: "Beginner", priority: "Recommended", mode: "Solo + squad", goal: "Passive progress", tags: ["cred", "background progress", "arc kills"] },
+  trials: { level: "Advanced", priority: "Advanced", mode: "Solo + squad", goal: "Weekly challenge", tags: ["weekly", "ranking", "challenge"] },
+  projects: { level: "Intermediate", priority: "Recommended", mode: "Solo + squad", goal: "Long progression", tags: ["projects", "stash value", "milestones"] },
+  expeditions: { level: "Advanced", priority: "Advanced", mode: "Solo + squad", goal: "Prestige timing", tags: ["expedition", "departure", "long cycle"] }
+};
+
+const MATERIAL_META = {
+  "basic-scrap": { level: "Beginner", priority: "Essential", goal: "Craft starter gear", tags: ["workshop", "healing", "easy farm"] },
+  "nature-yield": { level: "Intermediate", priority: "Recommended", goal: "Condition farming", tags: ["harvest season", "environment", "routing"] },
+  "industrial-tech": { level: "Intermediate", priority: "Advanced", goal: "High-tier crafts", tags: ["spaceport", "advanced tech", "high risk"] },
+  "medical-chemical": { level: "Beginner", priority: "Recommended", goal: "Healing support", tags: ["chemicals", "hospital", "research"] }
+};
+
+const LOADOUT_META = {
+  "Questing Loadout": { level: "Beginner", priority: "Essential", mode: "Solo + squad", goal: "Finish quests", tags: ["quests", "stable", "mid-risk"] },
+  "Material Run Loadout": { level: "Beginner", priority: "Essential", mode: "Solo", goal: "Find materials", tags: ["farming", "mobility", "low drama"] },
+  "Operation Contest Loadout": { level: "Advanced", priority: "Advanced", mode: "Squad leaning", goal: "Contest operations", tags: ["close scrutiny", "pressure", "reset"] },
+  "Heavy ARC Hunt Loadout": { level: "Advanced", priority: "Recommended", mode: "Solo + squad", goal: "Kill heavy ARC", tags: ["boss", "weak points", "high pen"] },
+  "Cheap Recovery Loadout": { level: "Beginner", priority: "Recommended", mode: "Solo + squad", goal: "Recover stash", tags: ["budget", "recovery", "stability"] }
+};
+
+const QUICK_USE_META = {
+  Healing: { level: "Beginner", priority: "Essential", mode: "Solo + squad", goal: "Stay alive", tags: ["healing", "survival", "always bring"] },
+  "Grenades and Burst Utility": { level: "Intermediate", priority: "Recommended", mode: "Solo + squad", goal: "Force space", tags: ["grenades", "burst", "cover break"] },
+  "Lures and Distraction Tools": { level: "Beginner", priority: "Recommended", mode: "Solo", goal: "Avoid bad fights", tags: ["lure", "stealth", "reset"] },
+  "Stuns and Control": { level: "Intermediate", priority: "Recommended", mode: "Solo + squad", goal: "Control heavy ARC", tags: ["stun", "control", "boss prep"] },
+  "Movement or Escape Utility": { level: "Beginner", priority: "Essential", mode: "Solo + squad", goal: "Escape cleanly", tags: ["mobility", "escape", "reset"] },
+  "Flashpoint: Surge Coil": { level: "Intermediate", priority: "Advanced", mode: "Solo + squad", goal: "Hold space", tags: ["flashpoint", "surge coil", "anti flank"] }
+};
+
+const DISCOVERY_FILTERS = {
+  tracks: [
+    { id: "all", label: "All" },
+    { id: "beginner", label: "Beginner" },
+    { id: "progression", label: "Progression" },
+    { id: "squad", label: "Squad" }
+  ],
+  lessons: [
+    { id: "all", label: "All lessons" },
+    { id: "beginner", label: "Beginner" },
+    { id: "progression", label: "Progression" },
+    { id: "combat", label: "Combat" },
+    { id: "solo", label: "Solo friendly" }
+  ],
+  quests: [
+    { id: "all", label: "All quest types" },
+    { id: "beginner", label: "Beginner" },
+    { id: "progression", label: "Progression" },
+    { id: "weekly", label: "Weekly" },
+    { id: "advanced", label: "Advanced" }
+  ],
+  materials: [
+    { id: "all", label: "All materials" },
+    { id: "beginner", label: "Beginner" },
+    { id: "workshop", label: "Workshop" },
+    { id: "healing", label: "Healing" },
+    { id: "high-tier", label: "High tier" }
+  ],
+  weaponRoles: [
+    { id: "all", label: "All loadouts" },
+    { id: "beginner", label: "Beginner" },
+    { id: "solo", label: "Solo" },
+    { id: "squad", label: "Squad" },
+    { id: "pressure", label: "High pressure" }
+  ],
+  quickUse: [
+    { id: "all", label: "All essentials" },
+    { id: "essential", label: "Essential" },
+    { id: "control", label: "Control" },
+    { id: "escape", label: "Escape" },
+    { id: "flashpoint", label: "Flashpoint" }
+  ],
+  machines: [
+    { id: "all", label: "All ARC" },
+    { id: "essential", label: "Essential" },
+    { id: "air", label: "Air threats" },
+    { id: "heavy", label: "Heavies" },
+    { id: "boss", label: "Boss class" }
+  ]
+};
+
+const SEARCH_SUGGESTIONS = [
+  { label: "Beginner lessons", query: "beginner" },
+  { label: "Close Scrutiny", query: "close scrutiny" },
+  { label: "Acquire Resources", query: "acquire resources" },
+  { label: "Questing loadout", query: "questing loadout" },
+  { label: "Sensors", query: "sensors" },
+  { label: "Matriarch", query: "matriarch" }
+];
+
+function getTrackMeta(track) {
+  return TRACK_META[track.id] ?? { level: "Beginner", priority: "Recommended", mode: "Solo + squad", goal: "Learn", tags: [] };
+}
+
+function getLessonMeta(lesson) {
+  return LESSON_META[lesson.id] ?? { level: "Intermediate", priority: "Recommended", mode: "Solo + squad", goal: "Improve", tags: [] };
+}
+
+function getQuestMeta(quest) {
+  return QUEST_META[quest.id] ?? { level: "Intermediate", priority: "Recommended", mode: "Solo + squad", goal: "Progress faster", tags: [] };
+}
+
+function getMaterialMeta(material) {
+  return MATERIAL_META[material.id] ?? { level: "Intermediate", priority: "Recommended", goal: "Craft smarter", tags: [] };
+}
+
+function getLoadoutMeta(role) {
+  return LOADOUT_META[role.title] ?? { level: "Intermediate", priority: "Recommended", mode: "Solo + squad", goal: "Build a kit", tags: [] };
+}
+
+function getQuickUseMeta(item) {
+  return QUICK_USE_META[item.title] ?? { level: "Intermediate", priority: "Recommended", mode: "Solo + squad", goal: "Stay alive", tags: [] };
+}
+
+function getMachineMeta(machine) {
+  const isBoss = ["Matriarch", "Queen"].includes(machine.name);
+  const isAir = machine.threat.toLowerCase().includes("air") || ["Snitch", "Spotter", "Surveyor", "Rocketeer", "Firefly", "Comet", "Vaporizer", "Hornet", "Wasp"].includes(machine.name);
+  const isHeavy = ["Bombardier", "Bastion", "Sentinel", "Leaper", "Shredder", "ARC Orbiter", "Baron Husk", "Deforester Husk"].includes(machine.name);
+  return {
+    level: isBoss ? "Advanced" : isHeavy ? "Intermediate" : "Beginner",
+    priority: ["Snitch", "Spotter", "Vaporizer", "Shredder", "Matriarch", "Queen"].includes(machine.name) ? "Essential" : isBoss ? "Advanced" : "Recommended",
+    mode: isBoss ? "Squad leaning" : "Solo + squad",
+    goal: isBoss ? "Boss prep" : isAir ? "Control air threats" : "Win fights",
+    tags: [
+      isAir ? "air threat" : "ground threat",
+      isBoss ? "boss" : isHeavy ? "heavy" : "core intel",
+      machine.name.toLowerCase()
+    ]
+  };
+}
+
 const state = {
   activeView: "start",
   selectedReleaseId: "patch-notes-1-23-0-2026-04-08",
@@ -1463,7 +1659,16 @@ const state = {
   selectedLessonId: lessons.find((lesson) => lesson.trackId === tracks[0].id)?.id ?? null,
   selectedQuestId: "trader-quests",
   selectedMaterialId: "basic-scrap",
-  reviewedLessons: []
+  reviewedLessons: [],
+  filters: {
+    tracks: "all",
+    lessons: "all",
+    quests: "all",
+    materials: "all",
+    weaponRoles: "all",
+    quickUse: "all",
+    machines: "all"
+  }
 };
 
 const trackCountElement = document.querySelector("#track-count");
@@ -1474,6 +1679,7 @@ const appVerifiedElement = document.querySelector("#app-verified");
 const reviewedCountElement = document.querySelector("#reviewed-count");
 const continueLabelElement = document.querySelector("#continue-label");
 const globalSearchElement = document.querySelector("#global-search");
+const searchSuggestionsElement = document.querySelector("#search-suggestions");
 const commandBarElement = document.querySelector(".command-bar");
 const toggleCommandBarElement = document.querySelector("#toggle-command-bar");
 const searchResultsPanelElement = document.querySelector("#search-results-panel");
@@ -1491,25 +1697,35 @@ const machineOverviewElement = document.querySelector("#machine-overview");
 const painPointListElement = document.querySelector("#pain-point-list");
 const briefingListElement = document.querySelector("#briefing-list");
 const trackListElement = document.querySelector("#track-list");
+const trackFiltersElement = document.querySelector("#track-filters");
 const trackOverviewElement = document.querySelector("#track-overview");
 const lessonListElement = document.querySelector("#lesson-list");
+const lessonFiltersElement = document.querySelector("#lesson-filters");
 const lessonDetailElement = document.querySelector("#lesson-detail");
+const lessonRelatedElement = document.querySelector("#lesson-related");
 const machineListElement = document.querySelector("#machine-list");
+const machineFiltersElement = document.querySelector("#machine-filters");
 const prepListElement = document.querySelector("#prep-list");
 const questOverviewElement = document.querySelector("#quest-overview");
 const questListElement = document.querySelector("#quest-list");
+const questFiltersElement = document.querySelector("#quest-filters");
 const questDirectoryElement = document.querySelector("#quest-directory");
 const questDetailElement = document.querySelector("#quest-detail");
+const questRelatedElement = document.querySelector("#quest-related");
 const questDetailPanelElement = document.querySelector(".quest-detail-panel");
 const materialsOverviewElement = document.querySelector("#materials-overview");
 const materialsListElement = document.querySelector("#materials-list");
+const materialFiltersElement = document.querySelector("#material-filters");
 const materialsDetailElement = document.querySelector("#materials-detail");
+const materialRelatedElement = document.querySelector("#material-related");
 const materialsDetailPanelElement = document.querySelector(".materials-detail-panel");
 const materialsCatalogElement = document.querySelector("#materials-catalog");
 const materialUsageGuideElement = document.querySelector("#material-usage-guide");
 const gearOverviewElement = document.querySelector("#gear-overview");
 const weaponRoleListElement = document.querySelector("#weapon-role-list");
+const weaponFiltersElement = document.querySelector("#weapon-filters");
 const quickUseListElement = document.querySelector("#quick-use-list");
+const quickUseFiltersElement = document.querySelector("#quickuse-filters");
 const detailPanelElement = document.querySelector(".detail-panel");
 const lessonPanelElement = document.querySelector(".lesson-column");
 const backToTopElement = document.querySelector("#back-to-top");
@@ -1558,6 +1774,149 @@ function getLessonsForTrack(trackId) {
 function getSelectedLesson() {
   const trackLessons = getLessonsForTrack(state.selectedTrackId);
   return trackLessons.find((lesson) => lesson.id === state.selectedLessonId) ?? trackLessons[0] ?? null;
+}
+
+function renderTagMarkup(tags = []) {
+  return tags.map((tag) => `<span class="content-tag">${tag}</span>`).join("");
+}
+
+function renderCardMeta(meta, extras = []) {
+  const badges = [meta.level, meta.priority, ...extras].filter(Boolean);
+  return `
+    <div class="card-meta-row">
+      <div class="card-badges">${badges.map((badge) => `<span class="card-badge">${badge}</span>`).join("")}</div>
+      <span class="card-meta-mode">${meta.mode ?? meta.goal ?? ""}</span>
+    </div>
+  `;
+}
+
+function renderFilterBar(element, sectionKey) {
+  if (!element) {
+    return;
+  }
+
+  const filters = DISCOVERY_FILTERS[sectionKey] ?? [];
+  element.innerHTML = filters.map((filter) => `
+    <button class="filter-chip ${state.filters[sectionKey] === filter.id ? "active" : ""}" type="button" data-filter-section="${sectionKey}" data-filter-id="${filter.id}">
+      ${filter.label}
+    </button>
+  `).join("");
+
+  for (const button of element.querySelectorAll("[data-filter-id]")) {
+    button.addEventListener("click", () => {
+      state.filters[sectionKey] = button.dataset.filterId;
+      render();
+      saveState();
+    });
+  }
+}
+
+function lessonMatchesFilter(lesson) {
+  const filterId = state.filters.lessons;
+  const meta = getLessonMeta(lesson);
+  if (filterId === "all") return true;
+  if (filterId === "beginner") return meta.level === "Beginner";
+  if (filterId === "progression") return meta.goal === "Progress faster" || meta.tags.includes("workshop") || meta.tags.includes("traders");
+  if (filterId === "combat") return lesson.trackId === "combat-and-operations" || meta.goal === "Win fights";
+  if (filterId === "solo") return meta.mode.includes("Solo");
+  return true;
+}
+
+function trackMatchesFilter(track) {
+  const filterId = state.filters.tracks;
+  const meta = getTrackMeta(track);
+  if (filterId === "all") return true;
+  if (filterId === "beginner") return meta.level === "Beginner";
+  if (filterId === "progression") return meta.goal === "Progress faster" || meta.tags.includes("projects");
+  if (filterId === "squad") return meta.mode.includes("Squad");
+  return true;
+}
+
+function questMatchesFilter(quest) {
+  const filterId = state.filters.quests;
+  const meta = getQuestMeta(quest);
+  if (filterId === "all") return true;
+  if (filterId === "beginner") return meta.level === "Beginner";
+  if (filterId === "progression") return meta.goal === "Progress faster" || meta.tags.includes("traders") || meta.tags.includes("projects");
+  if (filterId === "weekly") return quest.id === "trials" || meta.tags.includes("weekly");
+  if (filterId === "advanced") return meta.level === "Advanced";
+  return true;
+}
+
+function materialMatchesFilter(material) {
+  const filterId = state.filters.materials;
+  const meta = getMaterialMeta(material);
+  if (filterId === "all") return true;
+  if (filterId === "beginner") return meta.level === "Beginner";
+  if (filterId === "workshop") return meta.tags.includes("workshop") || meta.goal === "Craft starter gear";
+  if (filterId === "healing") return meta.tags.includes("healing") || material.title.includes("Medical");
+  if (filterId === "high-tier") return meta.tags.includes("high risk") || meta.goal === "High-tier crafts";
+  return true;
+}
+
+function loadoutMatchesFilter(role) {
+  const filterId = state.filters.weaponRoles;
+  const meta = getLoadoutMeta(role);
+  if (filterId === "all") return true;
+  if (filterId === "beginner") return meta.level === "Beginner";
+  if (filterId === "solo") return meta.mode.includes("Solo");
+  if (filterId === "squad") return meta.mode.includes("Squad");
+  if (filterId === "pressure") return meta.goal === "Contest operations" || meta.tags.includes("pressure");
+  return true;
+}
+
+function quickUseMatchesFilter(item) {
+  const filterId = state.filters.quickUse;
+  const meta = getQuickUseMeta(item);
+  if (filterId === "all") return true;
+  if (filterId === "essential") return meta.priority === "Essential";
+  if (filterId === "control") return meta.tags.includes("control") || meta.tags.includes("grenades");
+  if (filterId === "escape") return meta.tags.includes("escape") || meta.tags.includes("reset");
+  if (filterId === "flashpoint") return meta.tags.includes("flashpoint");
+  return true;
+}
+
+function machineMatchesFilter(machine) {
+  const filterId = state.filters.machines;
+  const meta = getMachineMeta(machine);
+  if (filterId === "all") return true;
+  if (filterId === "essential") return meta.priority === "Essential";
+  if (filterId === "air") return meta.tags.includes("air threat");
+  if (filterId === "heavy") return meta.tags.includes("heavy");
+  if (filterId === "boss") return meta.tags.includes("boss");
+  return true;
+}
+
+function renderRelatedCards(element, items, emptyCopy) {
+  if (!element) {
+    return;
+  }
+
+  if (!items.length) {
+    element.innerHTML = `<article class="related-card related-card-empty"><p class="related-copy">${emptyCopy}</p></article>`;
+    return;
+  }
+
+  element.innerHTML = items.map((item) => `
+    <button class="related-card" type="button" data-related-id="${item.id}">
+      <span class="related-type">${item.type}</span>
+      <strong class="related-title">${item.title}</strong>
+      <p class="related-copy">${item.copy}</p>
+      <div class="related-tags">${renderTagMarkup(item.tags ?? [])}</div>
+    </button>
+  `).join("");
+
+  for (const button of element.querySelectorAll("[data-related-id]")) {
+    button.addEventListener("click", () => {
+      const match = items.find((item) => item.id === button.dataset.relatedId);
+      if (!match) {
+        return;
+      }
+
+      match.action();
+      saveState();
+    });
+  }
 }
 
 function isMobileLayout() {
@@ -1697,15 +2056,26 @@ function renderPainPoints() {
 }
 
 function renderTracks() {
-  trackListElement.innerHTML = tracks.map((track) => `
+  renderFilterBar(trackFiltersElement, "tracks");
+  const visibleTracks = tracks.filter(trackMatchesFilter);
+  if (!visibleTracks.some((track) => track.id === state.selectedTrackId)) {
+    state.selectedTrackId = visibleTracks[0]?.id ?? tracks[0].id;
+    state.selectedLessonId = getLessonsForTrack(state.selectedTrackId)[0]?.id ?? null;
+  }
+  trackListElement.innerHTML = visibleTracks.map((track) => {
+    const meta = getTrackMeta(track);
+    return `
     <button class="track-button ${track.id === state.selectedTrackId ? "active" : ""}" type="button" data-track-id="${track.id}">
       <div class="track-title-row">
         <h3>${track.title}</h3>
         <span class="track-badge">${getLessonsForTrack(track.id).length} lessons</span>
       </div>
+      ${renderCardMeta(meta, [track.bestFor.includes("First-time") ? "Beginner path" : null])}
       <p class="track-summary">${track.subtitle}</p>
+      <div class="card-tags">${renderTagMarkup(meta.tags)}</div>
     </button>
-  `).join("");
+  `;
+  }).join("");
 
   for (const button of trackListElement.querySelectorAll("[data-track-id]")) {
     button.addEventListener("click", () => {
@@ -1726,12 +2096,14 @@ function renderTrackOverview() {
     trackOverviewElement.innerHTML = "";
     return;
   }
+  const meta = getTrackMeta(track);
 
   trackOverviewElement.innerHTML = `
     <p class="eyebrow">Current Track</p>
     <h2 class="overview-title">${track.title}</h2>
     <p class="overview-subtitle">${track.subtitle}</p>
     <p class="overview-copy">${track.summary}</p>
+    <div class="card-tags">${renderTagMarkup(meta.tags)}</div>
     <div class="overview-meta">
       <article class="meta-pill"><span class="meta-label">Focus</span><strong class="meta-value">${track.focus}</strong></article>
       <article class="meta-pill"><span class="meta-label">Best For</span><strong class="meta-value">${track.bestFor}</strong></article>
@@ -1741,17 +2113,25 @@ function renderTrackOverview() {
 }
 
 function renderLessons() {
-  const trackLessons = getLessonsForTrack(state.selectedTrackId);
-  lessonListElement.innerHTML = trackLessons.map((lesson) => `
+  renderFilterBar(lessonFiltersElement, "lessons");
+  const trackLessons = getLessonsForTrack(state.selectedTrackId).filter(lessonMatchesFilter);
+  if (!trackLessons.some((lesson) => lesson.id === state.selectedLessonId)) {
+    state.selectedLessonId = trackLessons[0]?.id ?? getLessonsForTrack(state.selectedTrackId)[0]?.id ?? null;
+  }
+  lessonListElement.innerHTML = trackLessons.map((lesson) => {
+    const meta = getLessonMeta(lesson);
+    return `
     <button class="lesson-card ${lesson.id === state.selectedLessonId ? "active" : ""} ${state.reviewedLessons.includes(lesson.id) ? "reviewed" : ""}" type="button" data-lesson-id="${lesson.id}">
       <div class="lesson-title-row">
         <h3 class="lesson-title">${lesson.title}</h3>
         <span class="tag">${lesson.time}</span>
       </div>
-      <p class="lesson-meta">${lesson.category}</p>
+      ${renderCardMeta(meta, [lesson.category])}
       <p class="lesson-summary">${lesson.summary}</p>
+      <div class="card-tags">${renderTagMarkup(meta.tags)}</div>
     </button>
-  `).join("");
+  `;
+  }).join("");
 
   for (const button of lessonListElement.querySelectorAll("[data-lesson-id]")) {
     button.addEventListener("click", () => {
@@ -1772,8 +2152,10 @@ function renderLessonDetail() {
   if (!lesson) {
     lessonDetailElement.innerHTML = '<p class="detail-copy">Select a lesson to load the breakdown.</p>';
     markReviewedButtonElement.hidden = true;
+    renderRelatedCards(lessonRelatedElement, [], "Select a lesson to load related content.");
     return;
   }
+  const meta = getLessonMeta(lesson);
 
   markReviewedButtonElement.hidden = false;
   markReviewedButtonElement.textContent = state.reviewedLessons.includes(lesson.id)
@@ -1790,7 +2172,9 @@ function renderLessonDetail() {
       <div class="detail-chip-row">
         <article class="meta-pill"><span class="chip-label">Track</span><strong class="chip-value">${getSelectedTrack()?.title ?? "Guide"}</strong></article>
         <article class="meta-pill"><span class="chip-label">Lesson Time</span><strong class="chip-value">${lesson.time}</strong></article>
+        <article class="meta-pill"><span class="chip-label">Level</span><strong class="chip-value">${meta.level}</strong></article>
       </div>
+      <div class="card-tags">${renderTagMarkup(meta.tags)}</div>
     </section>
     <section class="detail-block">
       <p class="detail-kicker">What to do</p>
@@ -1804,9 +2188,36 @@ function renderLessonDetail() {
       <div class="callout"><strong>Field note:</strong><p class="detail-copy">${lesson.fieldNote}</p></div>
     </section>
   `;
+
+  const relatedLessons = lessons
+    .filter((entry) => entry.id !== lesson.id)
+    .map((entry) => ({ lesson: entry, meta: getLessonMeta(entry) }))
+    .filter(({ lesson: entry, meta: entryMeta }) =>
+      entry.trackId === lesson.trackId ||
+      entryMeta.goal === meta.goal ||
+      entryMeta.tags.some((tag) => meta.tags.includes(tag))
+    )
+    .slice(0, 3)
+    .map(({ lesson: entry, meta: entryMeta }) => ({
+      id: entry.id,
+      type: "Lesson",
+      title: entry.title,
+      copy: entry.summary,
+      tags: [entryMeta.level, ...entryMeta.tags.slice(0, 2)],
+      action: () => {
+        state.activeView = "learn";
+        state.selectedTrackId = entry.trackId;
+        state.selectedLessonId = entry.id;
+        render();
+        scrollElementIntoView(document.querySelector("#curriculum"));
+      }
+    }));
+
+  renderRelatedCards(lessonRelatedElement, relatedLessons, "No related lessons yet. Try switching tracks for a different skill path.");
 }
 
 function renderMachines() {
+  renderFilterBar(machineFiltersElement, "machines");
   machineOverviewElement.innerHTML = `
     <section class="machine-intel-note">
       <strong class="hero-card-label">Threat priority</strong>
@@ -1832,13 +2243,17 @@ function renderMachines() {
     </div>
   `;
 
-  machineListElement.innerHTML = machines.map((machine) => `
+  machineListElement.innerHTML = machines.filter(machineMatchesFilter).map((machine) => {
+    const meta = getMachineMeta(machine);
+    return `
     <article class="machine-card">
       <div class="machine-top">
         <h3 class="machine-name">${machine.name}</h3>
         <span class="machine-threat">${machine.threat}</span>
       </div>
+      ${renderCardMeta(meta, [machine.threat])}
       <p class="machine-copy">${machine.copy}</p>
+      <div class="card-tags">${renderTagMarkup(meta.tags)}</div>
       <div class="machine-tactics-grid">
         <article class="machine-tactic">
           <span class="chip-label">Weak Point</span>
@@ -1852,7 +2267,8 @@ function renderMachines() {
       <div class="callout"><strong>Response:</strong><p class="detail-copy">${machine.response}</p></div>
       <div class="callout"><strong>How to kill it:</strong><p class="detail-copy">${machine.tactic}</p></div>
     </article>
-  `).join("");
+  `;
+  }).join("");
 }
 
 function renderPrepList() {
@@ -1886,15 +2302,25 @@ function renderQuestOverview() {
 }
 
 function renderQuestList() {
-  questListElement.innerHTML = questSystems.map((quest) => `
+  renderFilterBar(questFiltersElement, "quests");
+  const visibleQuests = questSystems.filter(questMatchesFilter);
+  if (!visibleQuests.some((quest) => quest.id === state.selectedQuestId)) {
+    state.selectedQuestId = visibleQuests[0]?.id ?? questSystems[0].id;
+  }
+  questListElement.innerHTML = visibleQuests.map((quest) => {
+    const meta = getQuestMeta(quest);
+    return `
     <button class="quest-card ${quest.id === state.selectedQuestId ? "active" : ""}" type="button" data-quest-id="${quest.id}">
       <div class="quest-title-row">
         <h3 class="quest-title">${quest.title}</h3>
         <span class="quest-badge">${quest.category}</span>
       </div>
+      ${renderCardMeta(meta)}
       <p class="quest-summary">${quest.summary}</p>
+      <div class="card-tags">${renderTagMarkup(meta.tags)}</div>
     </button>
-  `).join("");
+  `;
+  }).join("");
 
   for (const button of questListElement.querySelectorAll("[data-quest-id]")) {
     button.addEventListener("click", () => {
@@ -1929,6 +2355,7 @@ function renderQuestDirectory() {
 
 function renderQuestDetail() {
   const quest = getSelectedQuest();
+  const meta = getQuestMeta(quest);
   questDetailElement.innerHTML = `
     <section class="detail-block">
       <p class="detail-kicker">${quest.category}</p>
@@ -1944,12 +2371,77 @@ function renderQuestDetail() {
       <ul class="detail-list">${quest.mistakes.map((item) => `<li>${item}</li>`).join("")}</ul>
     </section>
     <section class="detail-block">
+      <div class="detail-chip-row">
+        <article class="meta-pill"><span class="chip-label">Level</span><strong class="chip-value">${meta.level}</strong></article>
+        <article class="meta-pill"><span class="chip-label">Priority</span><strong class="chip-value">${meta.priority}</strong></article>
+        <article class="meta-pill"><span class="chip-label">Mode</span><strong class="chip-value">${meta.mode}</strong></article>
+      </div>
+      <div class="card-tags">${renderTagMarkup(meta.tags)}</div>
+    </section>
+    <section class="detail-block">
       <div class="callout">
         <strong>Field note:</strong>
         <p class="detail-copy">${quest.fieldNote}</p>
       </div>
     </section>
   `;
+
+  const relatedItems = [
+    ...lessons.filter((lesson) => {
+      const lessonMeta = getLessonMeta(lesson);
+      return lessonMeta.goal === meta.goal || lessonMeta.tags.some((tag) => meta.tags.includes(tag));
+    }).slice(0, 2).map((lesson) => ({
+      id: lesson.id,
+      type: "Lesson",
+      title: lesson.title,
+      copy: lesson.summary,
+      tags: getLessonMeta(lesson).tags.slice(0, 2),
+      action: () => {
+        state.activeView = "learn";
+        state.selectedTrackId = lesson.trackId;
+        state.selectedLessonId = lesson.id;
+        render();
+        scrollElementIntoView(document.querySelector("#curriculum"));
+      }
+    })),
+    ...loadoutBlueprints.filter((role) => {
+      const roleMeta = getLoadoutMeta(role);
+      return roleMeta.goal === "Finish quests" || roleMeta.tags.includes("quests") || meta.goal.includes("Progress");
+    }).slice(0, 1).map((role) => ({
+      id: `related-${role.title}`,
+      type: "Loadout",
+      title: role.title,
+      copy: role.summary,
+      tags: getLoadoutMeta(role).tags.slice(0, 2),
+      action: () => {
+        state.activeView = "gear";
+        renderFocusNav();
+        syncFlowSections();
+        scrollElementIntoView(document.querySelector("#gear-field-guide"));
+      }
+    })),
+    ...materialFamilies.filter((material) => {
+      const materialMeta = getMaterialMeta(material);
+      return meta.tags.includes("projects") ? materialMeta.goal.includes("Craft") || material.title.includes("Industrial") : materialMeta.tags.includes("healing") || materialMeta.tags.includes("workshop");
+    }).slice(0, 1).map((material) => ({
+      id: material.id,
+      type: "Material",
+      title: material.title,
+      copy: material.summary,
+      tags: getMaterialMeta(material).tags.slice(0, 2),
+      action: () => {
+        state.activeView = "materials";
+        state.selectedMaterialId = material.id;
+        renderMaterialsList();
+        renderMaterialsDetail();
+        renderFocusNav();
+        syncFlowSections();
+        scrollElementIntoView(document.querySelector("#materials-intel"));
+      }
+    }))
+  ].slice(0, 4);
+
+  renderRelatedCards(questRelatedElement, relatedItems, "Questing connections will appear here as more guide links are added.");
 }
 
 function getSelectedMaterial() {
@@ -1964,7 +2456,8 @@ function saveState() {
     selectedLessonId: state.selectedLessonId,
     selectedQuestId: state.selectedQuestId,
     selectedMaterialId: state.selectedMaterialId,
-    reviewedLessons: state.reviewedLessons
+    reviewedLessons: state.reviewedLessons,
+    filters: state.filters
   };
 
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(persistableState));
@@ -1985,6 +2478,7 @@ function loadState() {
     state.selectedQuestId = parsedState.selectedQuestId || state.selectedQuestId;
     state.selectedMaterialId = parsedState.selectedMaterialId || state.selectedMaterialId;
     state.reviewedLessons = Array.isArray(parsedState.reviewedLessons) ? parsedState.reviewedLessons : [];
+    state.filters = { ...state.filters, ...(parsedState.filters ?? {}) };
   } catch (_error) {
     state.reviewedLessons = [];
   }
@@ -2004,6 +2498,8 @@ function buildSearchIndex() {
       type: "Release",
       title: release.title,
       body: `${release.summary} ${release.overview} ${release.confirmed.join(" ")}`,
+      meta: [release.status, release.date],
+      tags: release.confirmed.slice(0, 3),
       action: () => {
         state.activeView = "updates";
         state.selectedReleaseId = release.id;
@@ -2019,6 +2515,8 @@ function buildSearchIndex() {
       type: "Lesson",
       title: lesson.title,
       body: `${lesson.summary} ${lesson.body} ${lesson.category}`,
+      meta: [getLessonMeta(lesson).level, lesson.time, lesson.category],
+      tags: getLessonMeta(lesson).tags,
       action: () => {
         state.activeView = "learn";
         state.selectedTrackId = lesson.trackId;
@@ -2032,6 +2530,8 @@ function buildSearchIndex() {
       type: "Quest",
       title: quest.title,
       body: `${quest.summary} ${quest.overview} ${quest.category}`,
+      meta: [getQuestMeta(quest).level, getQuestMeta(quest).priority, quest.category],
+      tags: getQuestMeta(quest).tags,
       action: () => {
         state.activeView = "quests";
         state.selectedQuestId = quest.id;
@@ -2047,6 +2547,8 @@ function buildSearchIndex() {
       type: "Material",
       title: material.title,
       body: `${material.summary} ${material.overview} ${material.badge}`,
+      meta: [getMaterialMeta(material).level, getMaterialMeta(material).goal],
+      tags: getMaterialMeta(material).tags,
       action: () => {
         state.activeView = "materials";
         state.selectedMaterialId = material.id;
@@ -2062,6 +2564,8 @@ function buildSearchIndex() {
       type: "Material use",
       title: material.name,
       body: `${material.usedFor} ${material.keepRule} ${material.sellRule} ${material.recycleRule}`,
+      meta: ["Workshop", "Decision guide"],
+      tags: ["stash", "crafting", "recycle"],
       action: () => {
         state.activeView = "materials";
         renderFocusNav();
@@ -2074,6 +2578,8 @@ function buildSearchIndex() {
       type: "Weapon guide",
       title: role.title,
       body: `${role.summary} ${role.bestFor} ${role.guidance}`,
+      meta: [getLoadoutMeta(role).level, getLoadoutMeta(role).mode],
+      tags: getLoadoutMeta(role).tags,
       action: () => {
         state.activeView = "gear";
         renderFocusNav();
@@ -2086,6 +2592,8 @@ function buildSearchIndex() {
       type: "Quick-use",
       title: item.title,
       body: `${item.summary} ${item.bringWhen} ${item.tip}`,
+      meta: [getQuickUseMeta(item).priority, getQuickUseMeta(item).mode],
+      tags: getQuickUseMeta(item).tags,
       action: () => {
         state.activeView = "gear";
         renderFocusNav();
@@ -2098,6 +2606,8 @@ function buildSearchIndex() {
       type: "Machine",
       title: machine.name,
       body: `${machine.copy} ${machine.response} ${machine.threat}`,
+      meta: [getMachineMeta(machine).level, machine.threat],
+      tags: getMachineMeta(machine).tags,
       action: () => {
         state.activeView = "machines";
         renderFocusNav();
@@ -2191,15 +2701,18 @@ function renderHeroDashboard() {
   const taskItems = [
     {
       title: "Check the patch first",
-      copy: "Start in Update Center when a release is near so you know what systems changed before following older advice."
+      copy: "Start in Update Center when a release is near so you know what systems changed before following older advice.",
+      badges: ["Essential", "Patch aware"]
     },
     {
       title: "Run one focused goal",
-      copy: "Use the quest and materials sections together so each raid has one clear purpose instead of random scavenging."
+      copy: "Use the quest and materials sections together so each raid has one clear purpose instead of random scavenging.",
+      badges: ["Recommended", "Progression"]
     },
     {
       title: "Review one weak spot",
-      copy: "Use the lesson track or machine intel to close the one problem that keeps ending your raids."
+      copy: "Use the lesson track or machine intel to close the one problem that keeps ending your raids.",
+      badges: ["Beginner", "Skill builder"]
     }
   ];
 
@@ -2207,6 +2720,7 @@ function renderHeroDashboard() {
     <article class="hero-task">
       <strong>${item.title}</strong>
       <p>${item.copy}</p>
+      <div class="card-tags">${item.badges.map((badge) => `<span class="content-tag">${badge}</span>`).join("")}</div>
     </article>
   `).join("");
 }
@@ -2298,7 +2812,21 @@ function renderSearchResults(query) {
   searchResultsPanelElement.hidden = false;
 
   if (matches.length === 0) {
-    searchResultsElement.innerHTML = '<article class="search-result"><h3 class="search-result-title">No matches</h3><p class="search-result-copy">Try a broader term like quest, material, machine, extraction, or trader.</p></article>';
+    searchResultsElement.innerHTML = `
+      <article class="search-result search-result-empty">
+        <h3 class="search-result-title">No matches</h3>
+        <p class="search-result-copy">Try a broader term like quest, material, machine, extraction, or trader. You can also jump into one of these common searches.</p>
+        <div class="search-empty-actions">
+          ${SEARCH_SUGGESTIONS.slice(0, 4).map((item) => `<button class="filter-chip" type="button" data-search-suggestion="${item.query}">${item.label}</button>`).join("")}
+        </div>
+      </article>
+    `;
+    for (const button of searchResultsElement.querySelectorAll("[data-search-suggestion]")) {
+      button.addEventListener("click", () => {
+        globalSearchElement.value = button.dataset.searchSuggestion;
+        renderSearchResults(button.dataset.searchSuggestion);
+      });
+    }
     return;
   }
 
@@ -2308,7 +2836,9 @@ function renderSearchResults(query) {
         <h3 class="search-result-title">${entry.title}</h3>
         <span class="search-result-type">${entry.type}</span>
       </div>
+      ${(entry.meta ?? []).length ? `<div class="search-result-meta">${(entry.meta ?? []).map((item) => `<span class="card-badge">${item}</span>`).join("")}</div>` : ""}
       <p class="search-result-copy">${entry.body}</p>
+      ${(entry.tags ?? []).length ? `<div class="search-result-tags">${renderTagMarkup(entry.tags ?? [])}</div>` : ""}
       <button class="hero-button hero-button-secondary search-result-action" type="button" data-search-target="${entry.id}">Open</button>
     </article>
   `).join("");
@@ -2322,6 +2852,23 @@ function renderSearchResults(query) {
 
       match.action();
       saveState();
+    });
+  }
+}
+
+function renderSearchSuggestions() {
+  if (!searchSuggestionsElement) {
+    return;
+  }
+
+  searchSuggestionsElement.innerHTML = SEARCH_SUGGESTIONS.map((item) => `
+    <button class="search-suggestion" type="button" data-search-suggestion="${item.query}">${item.label}</button>
+  `).join("");
+
+  for (const button of searchSuggestionsElement.querySelectorAll("[data-search-suggestion]")) {
+    button.addEventListener("click", () => {
+      globalSearchElement.value = button.dataset.searchSuggestion;
+      renderSearchResults(button.dataset.searchSuggestion);
     });
   }
 }
@@ -2345,15 +2892,25 @@ function renderMaterialsOverview() {
 }
 
 function renderMaterialsList() {
-  materialsListElement.innerHTML = materialFamilies.map((material) => `
+  renderFilterBar(materialFiltersElement, "materials");
+  const visibleMaterials = materialFamilies.filter(materialMatchesFilter);
+  if (!visibleMaterials.some((material) => material.id === state.selectedMaterialId)) {
+    state.selectedMaterialId = visibleMaterials[0]?.id ?? materialFamilies[0].id;
+  }
+  materialsListElement.innerHTML = visibleMaterials.map((material) => {
+    const meta = getMaterialMeta(material);
+    return `
     <button class="material-card ${material.id === state.selectedMaterialId ? "active" : ""}" type="button" data-material-id="${material.id}">
       <div class="quest-title-row">
         <h3 class="material-title">${material.title}</h3>
         <span class="quest-badge">${material.badge}</span>
       </div>
+      ${renderCardMeta({ ...meta, mode: meta.goal })}
       <p class="material-summary">${material.summary}</p>
+      <div class="card-tags">${renderTagMarkup(meta.tags)}</div>
     </button>
-  `).join("");
+  `;
+  }).join("");
 
   for (const button of materialsListElement.querySelectorAll("[data-material-id]")) {
     button.addEventListener("click", () => {
@@ -2370,6 +2927,7 @@ function renderMaterialsList() {
 
 function renderMaterialsDetail() {
   const material = getSelectedMaterial();
+  const meta = getMaterialMeta(material);
   materialsDetailElement.innerHTML = `
     <section class="detail-block">
       <p class="detail-kicker">${material.badge}</p>
@@ -2385,12 +2943,74 @@ function renderMaterialsDetail() {
       <ul class="detail-list">${material.routeTips.map((item) => `<li>${item}</li>`).join("")}</ul>
     </section>
     <section class="detail-block">
+      <div class="detail-chip-row">
+        <article class="meta-pill"><span class="chip-label">Level</span><strong class="chip-value">${meta.level}</strong></article>
+        <article class="meta-pill"><span class="chip-label">Priority</span><strong class="chip-value">${meta.priority}</strong></article>
+        <article class="meta-pill"><span class="chip-label">Goal</span><strong class="chip-value">${meta.goal}</strong></article>
+      </div>
+      <div class="card-tags">${renderTagMarkup(meta.tags)}</div>
+    </section>
+    <section class="detail-block">
       <div class="callout">
         <strong>Field note:</strong>
         <p class="detail-copy">${material.fieldNote}</p>
       </div>
     </section>
   `;
+
+  const relatedItems = [
+    {
+      id: `usage-${material.id}`,
+      type: "Material value",
+      title: "Material Value Guide",
+      copy: "See whether this should be kept, sold, or recycled before you burn stash value blindly.",
+      tags: ["crafting", "stash", "workshop"],
+      action: () => {
+        state.activeView = "materials";
+        renderFocusNav();
+        syncFlowSections();
+        scrollElementIntoView(document.querySelector(".material-usage-panel"));
+      }
+    },
+    ...questSystems.filter((quest) => {
+      const questMeta = getQuestMeta(quest);
+      return meta.tags.includes("workshop") ? questMeta.tags.includes("projects") || questMeta.tags.includes("traders") : questMeta.goal.includes("Progress");
+    }).slice(0, 1).map((quest) => ({
+      id: quest.id,
+      type: "Quest",
+      title: quest.title,
+      copy: quest.summary,
+      tags: getQuestMeta(quest).tags.slice(0, 2),
+      action: () => {
+        state.activeView = "quests";
+        state.selectedQuestId = quest.id;
+        renderQuestList();
+        renderQuestDetail();
+        renderFocusNav();
+        syncFlowSections();
+        scrollElementIntoView(document.querySelector("#quest-ops"));
+      }
+    })),
+    ...lessons.filter((lesson) => {
+      const lessonMeta = getLessonMeta(lesson);
+      return lessonMeta.tags.includes("workshop") || lessonMeta.tags.includes("materials") || lessonMeta.goal === "Craft smarter";
+    }).slice(0, 2).map((lesson) => ({
+      id: lesson.id,
+      type: "Lesson",
+      title: lesson.title,
+      copy: lesson.summary,
+      tags: getLessonMeta(lesson).tags.slice(0, 2),
+      action: () => {
+        state.activeView = "learn";
+        state.selectedTrackId = lesson.trackId;
+        state.selectedLessonId = lesson.id;
+        render();
+        scrollElementIntoView(document.querySelector("#curriculum"));
+      }
+    }))
+  ].slice(0, 4);
+
+  renderRelatedCards(materialRelatedElement, relatedItems, "Material connections will appear here as the guide expands.");
 }
 
 function renderMaterialsCatalog() {
@@ -2462,10 +3082,15 @@ function renderGearOverview() {
 }
 
 function renderWeaponRoles() {
-  weaponRoleListElement.innerHTML = loadoutBlueprints.map((role) => `
+  renderFilterBar(weaponFiltersElement, "weaponRoles");
+  weaponRoleListElement.innerHTML = loadoutBlueprints.filter(loadoutMatchesFilter).map((role) => {
+    const meta = getLoadoutMeta(role);
+    return `
     <article class="gear-card">
       <h3 class="gear-title">${role.title}</h3>
+      ${renderCardMeta(meta, [role.bestFor.includes("Quest") ? "Recommended" : null])}
       <p class="gear-copy">${role.summary}</p>
+      <div class="card-tags">${renderTagMarkup(meta.tags)}</div>
       <div class="gear-meta">
         <section class="gear-rule">
           <span class="chip-label">Best For</span>
@@ -2481,14 +3106,20 @@ function renderWeaponRoles() {
         </section>
       </div>
     </article>
-  `).join("");
+  `;
+  }).join("");
 }
 
 function renderQuickUseItems() {
-  quickUseListElement.innerHTML = quickUseItems.map((item) => `
+  renderFilterBar(quickUseFiltersElement, "quickUse");
+  quickUseListElement.innerHTML = quickUseItems.filter(quickUseMatchesFilter).map((item) => {
+    const meta = getQuickUseMeta(item);
+    return `
     <article class="quick-use-card">
       <h3 class="quick-use-title">${item.title}</h3>
+      ${renderCardMeta(meta)}
       <p class="quick-use-copy">${item.summary}</p>
+      <div class="card-tags">${renderTagMarkup(meta.tags)}</div>
       <div class="gear-meta">
         <section class="gear-rule">
           <span class="chip-label">Bring When</span>
@@ -2500,7 +3131,8 @@ function renderQuickUseItems() {
         </section>
       </div>
     </article>
-  `).join("");
+  `;
+  }).join("");
 }
 
 function syncBackToTopVisibility() {
@@ -2563,10 +3195,9 @@ function revealEasterEgg() {
 
 function render() {
   renderCounts();
+  renderSearchSuggestions();
   renderFocusNav();
   syncFlowSections();
-  updateProgressSummary();
-  renderHeroDashboard();
   renderUpdateSpotlight();
   renderEmbarkFeed();
   renderReleaseList();
@@ -2577,6 +3208,8 @@ function render() {
   renderTrackOverview();
   renderLessons();
   renderLessonDetail();
+  updateProgressSummary();
+  renderHeroDashboard();
   renderQuestOverview();
   renderQuestList();
   renderQuestDirectory();
