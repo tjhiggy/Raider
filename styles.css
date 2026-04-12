@@ -298,6 +298,12 @@ button { color: inherit; }
   margin-bottom: 18px;
 }
 
+.media-intel-panel,
+.tools-panel {
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
 .flow-section[hidden] {
   display: none !important;
 }
@@ -367,6 +373,161 @@ button { color: inherit; }
 .search-result-action,
 .detail-action {
   margin-top: 12px;
+}
+
+.media-intel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.media-card,
+.widget-card {
+  padding: 18px;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+  display: grid;
+  gap: 12px;
+}
+
+.media-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.media-card-title {
+  margin: 0;
+  font-family: var(--display-font);
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  color: var(--signal);
+}
+
+.media-preview {
+  min-height: 160px;
+  border-radius: 16px;
+  border: 1px dashed rgba(245, 197, 140, 0.28);
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 18px;
+  color: var(--soft);
+  background:
+    linear-gradient(135deg, rgba(217, 122, 53, 0.08), rgba(129, 203, 218, 0.06)),
+    rgba(255, 255, 255, 0.02);
+}
+
+.media-preview-image {
+  background:
+    linear-gradient(135deg, rgba(217, 122, 53, 0.16), rgba(255, 255, 255, 0.03)),
+    rgba(255, 255, 255, 0.02);
+}
+
+.media-preview-reference {
+  background:
+    radial-gradient(circle at top right, rgba(129, 203, 218, 0.12), transparent 45%),
+    rgba(255, 255, 255, 0.02);
+}
+
+.media-preview-video {
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.12), rgba(255, 255, 255, 0.02)),
+    rgba(255, 255, 255, 0.02);
+}
+
+.tool-grid,
+.compare-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.widget-card-accent {
+  background: linear-gradient(180deg, rgba(217, 122, 53, 0.12), rgba(255, 255, 255, 0.03));
+}
+
+.widget-panel {
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.widget-panel summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 14px 16px;
+  font-weight: 800;
+  color: var(--signal);
+}
+
+.widget-panel summary::-webkit-details-marker {
+  display: none;
+}
+
+.widget-panel-body {
+  padding: 0 16px 16px;
+}
+
+.callout {
+  display: grid;
+  gap: 8px;
+}
+
+.callout-tip {
+  border-color: rgba(129, 203, 218, 0.26);
+  background: rgba(129, 203, 218, 0.08);
+}
+
+.callout-warning {
+  border-color: rgba(217, 122, 53, 0.28);
+  background: rgba(217, 122, 53, 0.1);
+}
+
+.compare-card,
+.mini-flow-step {
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.compare-card strong,
+.mini-flow-step strong {
+  color: var(--signal);
+}
+
+.compare-card p,
+.mini-flow-step p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.mini-flow {
+  display: grid;
+  gap: 10px;
+}
+
+.mini-flow-step {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.mini-flow-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: rgba(217, 122, 53, 0.16);
+  color: var(--accent-soft);
+  font-weight: 800;
 }
 
 .panel {
@@ -2110,7 +2271,7 @@ button { color: inherit; }
 }
 
 @media (max-width: 1120px) {
-  .hero, .update-layout, .curriculum-layout, .quest-layout, .materials-layout, .gear-layout, .intel-grid, .status-grid, .briefing-list, .launchpad-grid, .personal-hub-grid { grid-template-columns: 1fr; }
+  .hero, .update-layout, .curriculum-layout, .quest-layout, .materials-layout, .gear-layout, .intel-grid, .status-grid, .briefing-list, .launchpad-grid, .personal-hub-grid, .tool-grid, .compare-grid { grid-template-columns: 1fr; }
   .curriculum-layout { gap: 16px; }
   .materials-catalog { grid-template-columns: 1fr; }
   .site-tools-row { grid-template-columns: 1fr; }
@@ -2200,15 +2361,19 @@ button { color: inherit; }
   .materials-list-panel,
   .materials-detail-panel,
   .materials-catalog-panel,
-  .material-usage-panel { padding: 16px; }
+  .material-usage-panel,
+  .media-intel-panel,
+  .tools-panel { padding: 16px; }
   .quest-title-row { align-items: flex-start; flex-direction: column; }
   .saved-item,
   .saved-actions,
   .personal-card-head,
   .progress-card-top,
   .gear-card-top,
+  .media-card-top,
   .detail-actions { align-items: flex-start; flex-direction: column; }
   .saved-actions { min-width: 0; width: 100%; }
+  .mini-flow-step { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 480px) {

@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.20.0",
+    date: "2026-04-12",
+    summary: "Added richer visual intel, reusable media widgets, and lightweight interactive tools that make the guide more practical without tanking performance.",
+    changes: [
+      "Added a reusable visual-intel deck with image placeholders, video placeholders, and expandable reference panels for route reading, machine pressure, and gear logic.",
+      "Added a beginner loadout builder and a material decision helper so players can solve common prep and stash problems directly in the app.",
+      "Added reusable callout, comparison, and mini-flow patterns across the guide so the content teaches faster and reads less like a wall of raid homework."
+    ]
+  },
+  {
     version: "v1.19.0",
     date: "2026-04-12",
     summary: "Added personalized progress, saved items, playstyle preferences, and a smarter return-user dashboard so the field guide behaves more like an app.",
@@ -431,6 +441,87 @@ const PLAYSTYLE_OPTIONS = [
     goals: ["materials", "gear"]
   }
 ];
+
+const VISUAL_INTEL_ITEMS = [
+  {
+    id: "route-board",
+    label: "Route reference",
+    title: "Topside Route Reading",
+    copy: "A visual reminder of how to read a run: low-exposure entry, priority stops, bailout path, and extract fallback. Replace this placeholder with a real annotated route screenshot when available.",
+    badge: "Placeholder image",
+    type: "image",
+    tags: ["routes", "new raider", "maps"],
+    details: [
+      "Start with one value target, not a fantasy tour of the whole map.",
+      "Mark a safe exit line before you commit to deeper loot spaces.",
+      "If pressure spikes early, downgrade the run instead of stubbornly donating gear."
+    ]
+  },
+  {
+    id: "arc-pressure-board",
+    label: "Threat visual",
+    title: "ARC Pressure Ladder",
+    copy: "A compact threat reference for the machines that most often cause new Raiders to panic. This should eventually be replaced by a clean annotated machine board.",
+    badge: "Reference panel",
+    type: "reference",
+    tags: ["arc", "combat", "priority"],
+    details: [
+      "Suppress mobility threats first so you keep disengage options.",
+      "Heavy ARC punish slow, greedy looting more than bad aim.",
+      "Boss-class fights are a choice. New Raiders should treat them like a contract, not background noise."
+    ]
+  },
+  {
+    id: "gear-video",
+    label: "Video support",
+    title: "Loadout Walkthrough Slot",
+    copy: "Reserved for a short loadout explainer or raid-prep clip. Keep this to one sharp, practical video instead of dumping a whole content creator playlist in the app like a maniac.",
+    badge: "Video placeholder",
+    type: "video",
+    tags: ["gear", "loadouts", "future media"],
+    details: [
+      "Best future use: one 60-90 second beginner loadout explanation.",
+      "Use captions or summary bullets so the guide still works without autoplay.",
+      "If no video is available, keep the placeholder and link to the related written guide instead."
+    ]
+  }
+];
+
+const LOADOUT_BUILDER_OPTIONS = {
+  goal: [
+    { id: "quests", label: "Quest run" },
+    { id: "materials", label: "Material run" },
+    { id: "learning", label: "Learning run" },
+    { id: "pressure", label: "Operation pressure" }
+  ],
+  risk: [
+    { id: "low", label: "Low risk" },
+    { id: "balanced", label: "Balanced" },
+    { id: "high", label: "High risk" }
+  ],
+  team: [
+    { id: "solo", label: "Solo" },
+    { id: "squad", label: "Squad" }
+  ]
+};
+
+const MATERIAL_HELPER_OPTIONS = {
+  pressure: [
+    { id: "stash", label: "Stash is full" },
+    { id: "crafting", label: "Crafting blocked" },
+    { id: "cash", label: "Need cash" }
+  ],
+  rarity: [
+    { id: "basic", label: "Basic material" },
+    { id: "specialized", label: "Specialized material" },
+    { id: "high-tier", label: "High-tier material" }
+  ],
+  objective: [
+    { id: "healing", label: "Need sustain" },
+    { id: "projects", label: "Need project progress" },
+    { id: "future", label: "Stock for later" }
+  ]
+};
 
 const releases = [
   {
@@ -1712,6 +1803,16 @@ const state = {
   savedItems: [],
   checkedPrepItems: [],
   playstylePreference: "new-raider",
+  loadoutBuilder: {
+    goal: "quests",
+    risk: "balanced",
+    team: "solo"
+  },
+  materialHelper: {
+    pressure: "stash",
+    rarity: "basic",
+    objective: "healing"
+  },
   lastVisited: {
     type: "lesson",
     id: lessons.find((lesson) => lesson.trackId === tracks[0].id)?.id ?? null
@@ -1754,6 +1855,9 @@ const heroTaskListElement = document.querySelector("#hero-task-list");
 const personalOverviewElement = document.querySelector("#personal-overview");
 const sectionProgressElement = document.querySelector("#section-progress");
 const savedPanelElement = document.querySelector("#saved-panel");
+const mediaIntelGridElement = document.querySelector("#media-intel-grid");
+const materialHelperElement = document.querySelector("#material-helper");
+const loadoutBuilderElement = document.querySelector("#loadout-builder");
 const machineOverviewElement = document.querySelector("#machine-overview");
 const painPointListElement = document.querySelector("#pain-point-list");
 const briefingListElement = document.querySelector("#briefing-list");
@@ -2077,6 +2181,79 @@ function buildDiscoveryRegistry() {
   return registry;
 }
 
+function renderSelectableChips(options, selectedId, dataKey) {
+  return options.map((option) => `
+    <button class="filter-chip ${option.id === selectedId ? "active" : ""}" type="button" data-tool-key="${dataKey}" data-tool-value="${option.id}">
+      ${option.label}
+    </button>
+  `).join("");
+}
+
+function getLoadoutBuilderRecommendation() {
+  const { goal, risk, team } = state.loadoutBuilder;
+  const role = loadoutBlueprints.find((entry) => {
+    const title = entry.title.toLowerCase();
+    if (goal === "quests" && title.includes("quest")) return true;
+    if (goal === "materials" && title.includes("material")) return true;
+    if (goal === "pressure" && (title.includes("operation") || title.includes("heavy"))) return true;
+    if (goal === "learning" && (title.includes("recovery") || title.includes("quest"))) return true;
+    return false;
+  }) ?? loadoutBlueprints[0];
+
+  const caution = goal === "pressure" || risk === "high"
+    ? "Do not take this unless the reward justifies contact. Pressure runs become charity the moment you forget your exit plan."
+    : team === "solo"
+      ? "Solo players should bias toward reset tools and ammo discipline over ego-peeking every noise on the map."
+      : "Squads should assign one player to tempo and one to bailout calls so the run does not dissolve into three separate bad ideas.";
+
+  const quickUse = quickUseItems.filter((item) => {
+    const title = item.title.toLowerCase();
+    if (goal === "pressure") return title.includes("grenade") || title.includes("surge") || title.includes("heal");
+    if (goal === "materials") return title.includes("heal") || title.includes("smoke") || title.includes("tool");
+    return title.includes("heal") || title.includes("smoke") || title.includes("utility");
+  }).slice(0, 2);
+
+  return { role, caution, quickUse };
+}
+
+function getMaterialHelperDecision() {
+  const { pressure, rarity, objective } = state.materialHelper;
+
+  if (pressure === "crafting" || objective === "projects") {
+    return {
+      action: "Keep it",
+      tone: "Recommended",
+      reason: "If you are blocked by projects or the workshop, liquidating future progress just to feel tidy is clown behavior.",
+      nextStep: "Use the Materials and Quests focuses together so the next raid targets what the blocked craft actually needs."
+    };
+  }
+
+  if (pressure === "cash" && rarity === "basic" && objective !== "future") {
+    return {
+      action: "Sell it",
+      tone: "Safe choice",
+      reason: "Basic materials are replaceable. If you need breathing room or cash, stop hoarding pennies like they are sacred relics.",
+      nextStep: "Keep only the basic stack that supports your next near-term craft or healing sustain."
+    };
+  }
+
+  if (pressure === "stash" && rarity === "high-tier") {
+    return {
+      action: "Keep it",
+      tone: "Essential",
+      reason: "High-tier materials are exactly the kind of thing players regret selling five minutes before an expensive build unlocks.",
+      nextStep: "Trim lower-value basics first, then save this to a project or future craft plan."
+    };
+  }
+
+  return {
+    action: "Recycle it",
+    tone: "Balanced",
+    reason: "If the item is not high-tier and not tied to an immediate build, recycling it into reliable workshop value is the least stupid middle ground.",
+    nextStep: "Use recycle when you want future utility without bloating the stash with random half-important junk."
+  };
+}
+
 function getSelectedTrack() {
   return tracks.find((track) => track.id === state.selectedTrackId);
 }
@@ -2349,6 +2526,10 @@ function renderBriefing() {
       <span class="briefing-index">0${index + 1}</span>
       <h3 class="briefing-title">${step.title}</h3>
       <p class="briefing-copy">${step.copy}</p>
+      <div class="callout callout-tip">
+        <strong>Why it matters</strong>
+        <p class="detail-copy">This step exists to reduce panic decisions. ARC Raiders punishes drift, not just bad aim.</p>
+      </div>
     </article>
   `).join("");
 }
@@ -2817,6 +2998,8 @@ function saveState() {
     savedItems: state.savedItems,
     checkedPrepItems: state.checkedPrepItems,
     playstylePreference: state.playstylePreference,
+    loadoutBuilder: state.loadoutBuilder,
+    materialHelper: state.materialHelper,
     lastVisited: state.lastVisited,
     filters: state.filters
   };
@@ -2843,6 +3026,8 @@ function loadState() {
     state.savedItems = Array.isArray(parsedState.savedItems) ? parsedState.savedItems : [];
     state.checkedPrepItems = Array.isArray(parsedState.checkedPrepItems) ? parsedState.checkedPrepItems : [];
     state.playstylePreference = parsedState.playstylePreference || state.playstylePreference;
+    state.loadoutBuilder = { ...state.loadoutBuilder, ...(parsedState.loadoutBuilder ?? {}) };
+    state.materialHelper = { ...state.materialHelper, ...(parsedState.materialHelper ?? {}) };
     state.lastVisited = parsedState.lastVisited ?? state.lastVisited;
     state.filters = { ...state.filters, ...(parsedState.filters ?? {}) };
   } catch (_error) {
@@ -3237,6 +3422,157 @@ function renderPersonalHub() {
       updateProgressSummary();
       renderHeroDashboard();
       renderPersonalHub();
+      saveState();
+    });
+  }
+}
+
+function renderMediaIntel() {
+  mediaIntelGridElement.innerHTML = VISUAL_INTEL_ITEMS.map((item) => `
+    <article class="media-card">
+      <div class="media-card-top">
+        <div>
+          <p class="detail-kicker">${item.label}</p>
+          <h3 class="media-card-title">${item.title}</h3>
+        </div>
+        <span class="card-badge">${item.badge}</span>
+      </div>
+      <div class="media-preview media-preview-${item.type}">
+        <span>${item.type === "video" ? "Video slot" : item.type === "image" ? "Annotated visual slot" : "Expandable reference"}</span>
+      </div>
+      <p class="detail-copy">${item.copy}</p>
+      <div class="card-tags">${renderTagMarkup(item.tags)}</div>
+      <details class="widget-panel">
+        <summary>Open reference notes</summary>
+        <div class="widget-panel-body">
+          <ul class="detail-list">${item.details.map((detail) => `<li>${detail}</li>`).join("")}</ul>
+        </div>
+      </details>
+    </article>
+  `).join("");
+}
+
+function renderMaterialHelper() {
+  const decision = getMaterialHelperDecision();
+  materialHelperElement.innerHTML = `
+    <div class="tool-grid">
+      <section class="widget-card">
+        <p class="detail-kicker">Pressure</p>
+        <div class="discovery-filters">${renderSelectableChips(MATERIAL_HELPER_OPTIONS.pressure, state.materialHelper.pressure, "material-pressure")}</div>
+        <p class="detail-kicker">Material tier</p>
+        <div class="discovery-filters">${renderSelectableChips(MATERIAL_HELPER_OPTIONS.rarity, state.materialHelper.rarity, "material-rarity")}</div>
+        <p class="detail-kicker">What you need</p>
+        <div class="discovery-filters">${renderSelectableChips(MATERIAL_HELPER_OPTIONS.objective, state.materialHelper.objective, "material-objective")}</div>
+      </section>
+      <section class="widget-card widget-card-accent">
+        <p class="detail-kicker">Decision</p>
+        <h3 class="media-card-title">${decision.action}</h3>
+        <div class="card-tags"><span class="content-tag">${decision.tone}</span></div>
+        <p class="detail-copy">${decision.reason}</p>
+        <div class="callout callout-tip">
+          <strong>Next step</strong>
+          <p class="detail-copy">${decision.nextStep}</p>
+        </div>
+        <details class="widget-panel" open>
+          <summary>Why this helper exists</summary>
+          <div class="widget-panel-body">
+            <div class="compare-grid">
+              <article class="compare-card">
+                <strong>Bad habit</strong>
+                <p>Keeping everything because it might matter someday.</p>
+              </article>
+              <article class="compare-card">
+                <strong>Better habit</strong>
+                <p>Judge materials by current pressure, near-term projects, and what your stash can actually support.</p>
+              </article>
+            </div>
+          </div>
+        </details>
+      </section>
+    </div>
+  `;
+
+  for (const button of materialHelperElement.querySelectorAll("[data-tool-key]")) {
+    button.addEventListener("click", () => {
+      const { toolKey, toolValue } = button.dataset;
+      if (toolKey === "material-pressure") state.materialHelper.pressure = toolValue;
+      if (toolKey === "material-rarity") state.materialHelper.rarity = toolValue;
+      if (toolKey === "material-objective") state.materialHelper.objective = toolValue;
+      renderMaterialHelper();
+      saveState();
+    });
+  }
+}
+
+function renderLoadoutBuilder() {
+  const recommendation = getLoadoutBuilderRecommendation();
+  loadoutBuilderElement.innerHTML = `
+    <div class="tool-grid">
+      <section class="widget-card">
+        <p class="detail-kicker">Raid intent</p>
+        <div class="discovery-filters">${renderSelectableChips(LOADOUT_BUILDER_OPTIONS.goal, state.loadoutBuilder.goal, "loadout-goal")}</div>
+        <p class="detail-kicker">Risk appetite</p>
+        <div class="discovery-filters">${renderSelectableChips(LOADOUT_BUILDER_OPTIONS.risk, state.loadoutBuilder.risk, "loadout-risk")}</div>
+        <p class="detail-kicker">Team mode</p>
+        <div class="discovery-filters">${renderSelectableChips(LOADOUT_BUILDER_OPTIONS.team, state.loadoutBuilder.team, "loadout-team")}</div>
+      </section>
+      <section class="widget-card widget-card-accent">
+        <p class="detail-kicker">Recommended build</p>
+        <h3 class="media-card-title">${recommendation.role.title}</h3>
+        <p class="detail-copy">${recommendation.role.summary}</p>
+        <div class="mini-flow">
+          <article class="mini-flow-step">
+            <span class="mini-flow-index">01</span>
+            <div>
+              <strong>Bring this for</strong>
+              <p>${recommendation.role.bestFor}</p>
+            </div>
+          </article>
+          <article class="mini-flow-step">
+            <span class="mini-flow-index">02</span>
+            <div>
+              <strong>What to do</strong>
+              <p>${recommendation.role.guidance}</p>
+            </div>
+          </article>
+          <article class="mini-flow-step">
+            <span class="mini-flow-index">03</span>
+            <div>
+              <strong>Quick-use support</strong>
+              <p>${recommendation.quickUse.map((item) => item.title).join(" and ") || "Healing and reset tools"}</p>
+            </div>
+          </article>
+        </div>
+        <div class="callout callout-warning">
+          <strong>Common mistake</strong>
+          <p class="detail-copy">${recommendation.caution}</p>
+        </div>
+        <details class="widget-panel">
+          <summary>Compare safe versus greedy setup</summary>
+          <div class="widget-panel-body">
+            <div class="compare-grid">
+              <article class="compare-card">
+                <strong>Safe</strong>
+                <p>One reliable gun, sustain you can afford, utility that creates exits.</p>
+              </article>
+              <article class="compare-card">
+                <strong>Greedy</strong>
+                <p>Overbuilt damage, weak sustain, zero exit planning, then confusion when the run explodes.</p>
+              </article>
+            </div>
+          </div>
+        </details>
+      </section>
+    </div>
+  `;
+
+  for (const button of loadoutBuilderElement.querySelectorAll("[data-tool-key]")) {
+    button.addEventListener("click", () => {
+      const { toolKey, toolValue } = button.dataset;
+      if (toolKey === "loadout-goal") state.loadoutBuilder.goal = toolValue;
+      if (toolKey === "loadout-risk") state.loadoutBuilder.risk = toolValue;
+      if (toolKey === "loadout-team") state.loadoutBuilder.team = toolValue;
+      renderLoadoutBuilder();
       saveState();
     });
   }
@@ -3702,6 +4038,21 @@ function renderGearOverview() {
           <strong class="chip-value">Overbuilding for fights you do not need to take</strong>
         </section>
       </div>
+      <details class="widget-panel">
+        <summary>Open loadout comparison</summary>
+        <div class="widget-panel-body">
+          <div class="compare-grid">
+            <article class="compare-card">
+              <strong>Good beginner loadout</strong>
+              <p>Reliable primary, one sustain layer, one reset tool, and a raid purpose.</p>
+            </article>
+            <article class="compare-card">
+              <strong>Bad beginner loadout</strong>
+              <p>Expensive gun, weak sustain, no escape tool, and a plan held together by pure optimism.</p>
+            </article>
+          </div>
+        </div>
+      </details>
     </article>
   `;
 }
@@ -3864,6 +4215,7 @@ function render() {
   renderReleaseList();
   renderReleaseDetail();
   renderBriefing();
+  renderMediaIntel();
   renderPainPoints();
   renderTracks();
   renderTrackOverview();
@@ -3881,9 +4233,11 @@ function render() {
   renderMaterialsDetail();
   renderMaterialsCatalog();
   renderMaterialUsageGuide();
+  renderMaterialHelper();
   renderGearOverview();
   renderWeaponRoles();
   renderQuickUseItems();
+  renderLoadoutBuilder();
   renderMachines();
   renderPrepList();
 }
