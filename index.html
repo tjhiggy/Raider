@@ -54,6 +54,14 @@
               <strong id="reviewed-count" class="meta-value">0</strong>
             </article>
             <article class="meta-pill">
+              <span class="meta-label">Guide progress</span>
+              <strong id="overall-progress" class="meta-value">0%</strong>
+            </article>
+            <article class="meta-pill">
+              <span class="meta-label">Saved items</span>
+              <strong id="saved-count" class="meta-value">0</strong>
+            </article>
+            <article class="meta-pill">
               <span class="meta-label">Continue from</span>
               <strong id="continue-label" class="meta-value">New Raider</strong>
             </article>
@@ -140,6 +148,18 @@
       </aside>
     </section>
 
+    <section class="panel personal-hub flow-section" data-view="start">
+      <div class="section-heading">
+        <h2>Your Raider Dashboard</h2>
+        <p>Keep your progress, save the stuff that matters, and let the guide point you at the next useful move instead of making you re-learn the whole app every visit.</p>
+      </div>
+      <div class="personal-hub-grid">
+        <section id="personal-overview" class="personal-card" aria-live="polite"></section>
+        <section id="section-progress" class="personal-card" aria-live="polite"></section>
+        <section id="saved-panel" class="personal-card" aria-live="polite"></section>
+      </div>
+    </section>
+
     <section class="launchpad-grid flow-section" data-view="start">
       <a class="panel launchpad-card" href="#curriculum" data-focus-view="learn">
         <span class="status-label">Start here</span>
@@ -186,6 +206,10 @@
           <p>Use this panel for why the release matters, what to do next, and what parts of the guide changed because of it.</p>
         </div>
         <div id="release-detail" class="release-detail" aria-live="polite"></div>
+        <div class="detail-actions">
+          <button id="mark-release-complete" class="hero-button hero-button-secondary detail-action" type="button">Mark update reviewed</button>
+          <button id="save-release" class="hero-button hero-button-secondary detail-action" type="button">Save update</button>
+        </div>
       </aside>
     </section>
 
@@ -241,7 +265,11 @@
           <p>Use this panel as your quick-reference board before queueing up.</p>
         </div>
         <div id="lesson-detail" class="lesson-detail" aria-live="polite"></div>
-        <button id="mark-reviewed" class="hero-button hero-button-secondary detail-action" type="button">Mark lesson reviewed</button>
+        <div class="detail-actions">
+          <button id="mark-reviewed" class="hero-button hero-button-secondary detail-action" type="button">Mark lesson reviewed</button>
+          <button id="mark-lesson-complete" class="hero-button hero-button-secondary detail-action" type="button">Mark lesson complete</button>
+          <button id="save-lesson" class="hero-button hero-button-secondary detail-action" type="button">Save lesson</button>
+        </div>
         <section class="related-block">
           <div class="section-heading section-heading-compact">
             <h2>Related Content</h2>
@@ -277,6 +305,10 @@
           <p>Built from current official public information about ARC Raiders progression systems.</p>
         </div>
         <div id="quest-detail" class="quest-detail" aria-live="polite"></div>
+        <div class="detail-actions">
+          <button id="mark-quest-complete" class="hero-button hero-button-secondary detail-action" type="button">Mark quest guide complete</button>
+          <button id="save-quest" class="hero-button hero-button-secondary detail-action" type="button">Save quest guide</button>
+        </div>
         <section class="related-block">
           <div class="section-heading section-heading-compact">
             <h2>Related Prep</h2>
@@ -311,6 +343,10 @@
           <p>Built from current official public map, workshop, and event information.</p>
         </div>
         <div id="materials-detail" class="materials-detail" aria-live="polite"></div>
+        <div class="detail-actions">
+          <button id="mark-material-complete" class="hero-button hero-button-secondary detail-action" type="button">Mark material guide complete</button>
+          <button id="save-material" class="hero-button hero-button-secondary detail-action" type="button">Save material guide</button>
+        </div>
         <section class="related-block">
           <div class="section-heading section-heading-compact">
             <h2>Connected Guides</h2>

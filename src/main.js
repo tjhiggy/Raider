@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.19.0",
+    date: "2026-04-12",
+    summary: "Added personalized progress, saved items, playstyle preferences, and a smarter return-user dashboard so the field guide behaves more like an app.",
+    changes: [
+      "Added persistent reviewed and completed states, section progress, overall guide progress, and continue-where-you-left-off behavior.",
+      "Added save-for-later support across lessons, quests, materials, loadouts, quick-use gear, and release notes, plus a dedicated saved-items dashboard panel.",
+      "Added a lightweight playstyle preference layer that changes recommended next actions and keeps the top of the app useful for returning Raiders."
+    ]
+  },
+  {
     version: "v1.18.0",
     date: "2026-04-12",
     summary: "Upgraded content discovery with richer metadata, real filters, better search presentation, and related-content links across the guide.",
@@ -381,6 +391,44 @@ const focusViews = [
     id: "updates",
     label: "Updates",
     summary: "Check patch context first when Embark ships new info or a release goes live."
+  }
+];
+
+const PLAYSTYLE_OPTIONS = [
+  {
+    id: "new-raider",
+    label: "New Raider",
+    summary: "Best when you still need cleaner raid habits and less chaos.",
+    badges: ["Beginner", "Safer route"],
+    goals: ["learn", "quests"]
+  },
+  {
+    id: "solo-player",
+    label: "Solo player",
+    summary: "Focuses on survival margin, flexible kits, and cleaner disengages.",
+    badges: ["Solo", "Control"],
+    goals: ["gear", "machines"]
+  },
+  {
+    id: "squad-player",
+    label: "Squad player",
+    summary: "Better for role planning, tempo, and spreading risk across the team.",
+    badges: ["Squad", "Coordination"],
+    goals: ["quests", "updates"]
+  },
+  {
+    id: "quest-focused",
+    label: "Quest-focused",
+    summary: "Prioritizes progression routing so each run pushes account growth.",
+    badges: ["Progression", "Trader"],
+    goals: ["quests", "materials"]
+  },
+  {
+    id: "loot-crafting-focused",
+    label: "Loot/crafting-focused",
+    summary: "Pushes you toward stash value, workshop efficiency, and smarter farming.",
+    badges: ["Workshop", "Loot"],
+    goals: ["materials", "gear"]
   }
 ];
 
@@ -1660,6 +1708,14 @@ const state = {
   selectedQuestId: "trader-quests",
   selectedMaterialId: "basic-scrap",
   reviewedLessons: [],
+  completedItems: [],
+  savedItems: [],
+  checkedPrepItems: [],
+  playstylePreference: "new-raider",
+  lastVisited: {
+    type: "lesson",
+    id: lessons.find((lesson) => lesson.trackId === tracks[0].id)?.id ?? null
+  },
   filters: {
     tracks: "all",
     lessons: "all",
@@ -1677,6 +1733,8 @@ const machineCountElement = document.querySelector("#machine-count");
 const appUpdatedElement = document.querySelector("#app-updated");
 const appVerifiedElement = document.querySelector("#app-verified");
 const reviewedCountElement = document.querySelector("#reviewed-count");
+const overallProgressElement = document.querySelector("#overall-progress");
+const savedCountElement = document.querySelector("#saved-count");
 const continueLabelElement = document.querySelector("#continue-label");
 const globalSearchElement = document.querySelector("#global-search");
 const searchSuggestionsElement = document.querySelector("#search-suggestions");
@@ -1693,6 +1751,9 @@ const embarkFeedElement = document.querySelector("#embark-feed");
 const heroUpdateCardElement = document.querySelector("#hero-update-card");
 const heroPersonalCardElement = document.querySelector("#hero-personal-card");
 const heroTaskListElement = document.querySelector("#hero-task-list");
+const personalOverviewElement = document.querySelector("#personal-overview");
+const sectionProgressElement = document.querySelector("#section-progress");
+const savedPanelElement = document.querySelector("#saved-panel");
 const machineOverviewElement = document.querySelector("#machine-overview");
 const painPointListElement = document.querySelector("#pain-point-list");
 const briefingListElement = document.querySelector("#briefing-list");
@@ -1733,6 +1794,14 @@ const easterEggTriggerElement = document.querySelector("#easter-egg-trigger");
 const easterEggToastElement = document.querySelector("#easter-egg-toast");
 const appVersionButtonElement = document.querySelector("#app-version");
 const markReviewedButtonElement = document.querySelector("#mark-reviewed");
+const markLessonCompleteButtonElement = document.querySelector("#mark-lesson-complete");
+const saveLessonButtonElement = document.querySelector("#save-lesson");
+const markQuestCompleteButtonElement = document.querySelector("#mark-quest-complete");
+const saveQuestButtonElement = document.querySelector("#save-quest");
+const markMaterialCompleteButtonElement = document.querySelector("#mark-material-complete");
+const saveMaterialButtonElement = document.querySelector("#save-material");
+const markReleaseCompleteButtonElement = document.querySelector("#mark-release-complete");
+const saveReleaseButtonElement = document.querySelector("#save-release");
 const shareAppButtonElement = document.querySelector("#share-app");
 const installAppButtonElement = document.querySelector("#install-app");
 const modalBackdropElement = document.querySelector("#modal-backdrop");
@@ -1761,6 +1830,251 @@ function syncCommandBarState() {
   const isCollapsed = commandBarElement.classList.contains("mobile-collapsed");
   toggleCommandBarElement.textContent = isCollapsed ? "Show menu" : "Hide menu";
   toggleCommandBarElement.setAttribute("aria-expanded", isCollapsed ? "false" : "true");
+}
+
+function createItemKey(type, id) {
+  return `${type}:${id}`;
+}
+
+function createLoadoutId(title) {
+  return title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
+function getPlaystyle() {
+  return PLAYSTYLE_OPTIONS.find((option) => option.id === state.playstylePreference) ?? PLAYSTYLE_OPTIONS[0];
+}
+
+function getLastVisitedItem() {
+  if (!state.lastVisited?.type || !state.lastVisited?.id) {
+    return null;
+  }
+
+  return buildDiscoveryRegistry()[createItemKey(state.lastVisited.type, state.lastVisited.id)] ?? null;
+}
+
+function setLastVisited(type, id) {
+  state.lastVisited = { type, id };
+}
+
+function isSavedItem(type, id) {
+  return state.savedItems.includes(createItemKey(type, id));
+}
+
+function toggleSavedItem(type, id) {
+  const itemKey = createItemKey(type, id);
+  state.savedItems = isSavedItem(type, id)
+    ? state.savedItems.filter((entry) => entry !== itemKey)
+    : [itemKey, ...state.savedItems.filter((entry) => entry !== itemKey)];
+}
+
+function isCompletedItem(type, id) {
+  return state.completedItems.includes(createItemKey(type, id));
+}
+
+function toggleCompletedItem(type, id) {
+  const itemKey = createItemKey(type, id);
+  state.completedItems = isCompletedItem(type, id)
+    ? state.completedItems.filter((entry) => entry !== itemKey)
+    : [...state.completedItems, itemKey];
+}
+
+function isPrepChecked(index) {
+  return state.checkedPrepItems.includes(index);
+}
+
+function togglePrepChecked(index) {
+  state.checkedPrepItems = isPrepChecked(index)
+    ? state.checkedPrepItems.filter((entry) => entry !== index)
+    : [...state.checkedPrepItems, index];
+}
+
+function getLessonProgress() {
+  return lessons.reduce((count, lesson) => count + (isCompletedItem("lesson", lesson.id) ? 1 : 0), 0);
+}
+
+function getQuestProgress() {
+  return questSystems.reduce((count, quest) => count + (isCompletedItem("quest", quest.id) ? 1 : 0), 0);
+}
+
+function getMaterialProgress() {
+  return materialFamilies.reduce((count, material) => count + (isCompletedItem("material", material.id) ? 1 : 0), 0);
+}
+
+function getReleaseProgress() {
+  return releases.reduce((count, release) => count + (isCompletedItem("release", release.id) ? 1 : 0), 0);
+}
+
+function getPrepProgress() {
+  return prepChecklist.reduce((count, _item, index) => count + (isPrepChecked(index) ? 1 : 0), 0);
+}
+
+function getProgressSections() {
+  return [
+    { id: "learn", label: "Lessons", completed: getLessonProgress(), total: lessons.length },
+    { id: "quests", label: "Quest Guides", completed: getQuestProgress(), total: questSystems.length },
+    { id: "materials", label: "Material Guides", completed: getMaterialProgress(), total: materialFamilies.length },
+    { id: "updates", label: "Update Reviews", completed: getReleaseProgress(), total: releases.length },
+    { id: "prep", label: "Prep Checklist", completed: getPrepProgress(), total: prepChecklist.length }
+  ];
+}
+
+function getOverallProgressPercent() {
+  const sections = getProgressSections();
+  const totalItems = sections.reduce((sum, section) => sum + section.total, 0);
+  const completedItems = sections.reduce((sum, section) => sum + section.completed, 0);
+  if (!totalItems) {
+    return 0;
+  }
+
+  return Math.round((completedItems / totalItems) * 100);
+}
+
+function getContinueItem() {
+  const lastVisited = getLastVisitedItem();
+  if (lastVisited) {
+    return lastVisited;
+  }
+
+  const nextLesson = lessons.find((lesson) => !isCompletedItem("lesson", lesson.id)) ?? getSelectedLesson();
+  if (!nextLesson) {
+    return null;
+  }
+
+  return {
+    type: "lesson",
+    id: nextLesson.id,
+    title: nextLesson.title,
+    subtitle: nextLesson.summary,
+    view: "learn",
+    action: () => {
+      state.activeView = "learn";
+      state.selectedTrackId = nextLesson.trackId;
+      state.selectedLessonId = nextLesson.id;
+      setLastVisited("lesson", nextLesson.id);
+      render();
+      scrollElementIntoView(document.querySelector("#curriculum"));
+    }
+  };
+}
+
+function buildDiscoveryRegistry() {
+  const registry = {};
+
+  for (const lesson of lessons) {
+    registry[createItemKey("lesson", lesson.id)] = {
+      type: "lesson",
+      id: lesson.id,
+      title: lesson.title,
+      subtitle: lesson.summary,
+      meta: [lesson.time, getLessonMeta(lesson).level],
+      action: () => {
+        state.activeView = "learn";
+        state.selectedTrackId = lesson.trackId;
+        state.selectedLessonId = lesson.id;
+        setLastVisited("lesson", lesson.id);
+        render();
+        scrollElementIntoView(document.querySelector("#curriculum"));
+      }
+    };
+  }
+
+  for (const quest of questSystems) {
+    registry[createItemKey("quest", quest.id)] = {
+      type: "quest",
+      id: quest.id,
+      title: quest.title,
+      subtitle: quest.summary,
+      meta: [quest.category, getQuestMeta(quest).level],
+      action: () => {
+        state.activeView = "quests";
+        state.selectedQuestId = quest.id;
+        setLastVisited("quest", quest.id);
+        renderQuestList();
+        renderQuestDetail();
+        renderFocusNav();
+        syncFlowSections();
+        scrollElementIntoView(document.querySelector("#quest-ops"));
+      }
+    };
+  }
+
+  for (const material of materialFamilies) {
+    registry[createItemKey("material", material.id)] = {
+      type: "material",
+      id: material.id,
+      title: material.title,
+      subtitle: material.summary,
+      meta: [material.badge, getMaterialMeta(material).goal],
+      action: () => {
+        state.activeView = "materials";
+        state.selectedMaterialId = material.id;
+        setLastVisited("material", material.id);
+        renderMaterialsList();
+        renderMaterialsDetail();
+        renderFocusNav();
+        syncFlowSections();
+        scrollElementIntoView(document.querySelector("#materials-intel"));
+      }
+    };
+  }
+
+  for (const release of releases) {
+    registry[createItemKey("release", release.id)] = {
+      type: "release",
+      id: release.id,
+      title: release.title,
+      subtitle: release.summary,
+      meta: [release.status, release.date],
+      action: () => {
+        state.activeView = "updates";
+        state.selectedReleaseId = release.id;
+        setLastVisited("release", release.id);
+        renderReleaseList();
+        renderReleaseDetail();
+        renderFocusNav();
+        syncFlowSections();
+        scrollElementIntoView(updateCenterElement);
+      }
+    };
+  }
+
+  for (const role of loadoutBlueprints) {
+    const roleId = createLoadoutId(role.title);
+    registry[createItemKey("loadout", roleId)] = {
+      type: "loadout",
+      id: roleId,
+      title: role.title,
+      subtitle: role.summary,
+      meta: [role.bestFor, getLoadoutMeta(role).level],
+      action: () => {
+        state.activeView = "gear";
+        setLastVisited("loadout", roleId);
+        renderFocusNav();
+        syncFlowSections();
+        scrollElementIntoView(document.querySelector("#gear-field-guide"));
+      }
+    };
+  }
+
+  for (const item of quickUseItems) {
+    const quickUseId = createLoadoutId(item.title);
+    registry[createItemKey("quickuse", quickUseId)] = {
+      type: "quickuse",
+      id: quickUseId,
+      title: item.title,
+      subtitle: item.summary,
+      meta: [item.bringWhen, getQuickUseMeta(item).priority],
+      action: () => {
+        state.activeView = "gear";
+        setLastVisited("quickuse", quickUseId);
+        renderFocusNav();
+        syncFlowSections();
+        scrollElementIntoView(document.querySelector("#gear-field-guide"));
+      }
+    };
+  }
+
+  return registry;
 }
 
 function getSelectedTrack() {
@@ -2006,6 +2320,12 @@ function renderCounts() {
   if (appVerifiedElement) {
     appVerifiedElement.textContent = `Official posts verified ${OFFICIAL_POSTS_VERIFIED}`;
   }
+  if (overallProgressElement) {
+    overallProgressElement.textContent = `${getOverallProgressPercent()}%`;
+  }
+  if (savedCountElement) {
+    savedCountElement.textContent = String(state.savedItems.length);
+  }
 }
 
 function renderChangelog() {
@@ -2121,7 +2441,7 @@ function renderLessons() {
   lessonListElement.innerHTML = trackLessons.map((lesson) => {
     const meta = getLessonMeta(lesson);
     return `
-    <button class="lesson-card ${lesson.id === state.selectedLessonId ? "active" : ""} ${state.reviewedLessons.includes(lesson.id) ? "reviewed" : ""}" type="button" data-lesson-id="${lesson.id}">
+    <button class="lesson-card ${lesson.id === state.selectedLessonId ? "active" : ""} ${state.reviewedLessons.includes(lesson.id) ? "reviewed" : ""} ${isCompletedItem("lesson", lesson.id) ? "is-complete" : ""}" type="button" data-lesson-id="${lesson.id}">
       <div class="lesson-title-row">
         <h3 class="lesson-title">${lesson.title}</h3>
         <span class="tag">${lesson.time}</span>
@@ -2136,9 +2456,12 @@ function renderLessons() {
   for (const button of lessonListElement.querySelectorAll("[data-lesson-id]")) {
     button.addEventListener("click", () => {
       state.selectedLessonId = button.dataset.lessonId;
+      setLastVisited("lesson", button.dataset.lessonId);
       renderLessons();
       renderLessonDetail();
       updateProgressSummary();
+      renderHeroDashboard();
+      renderPersonalHub();
       saveState();
       if (isMobileLayout()) {
         scrollElementIntoView(detailPanelElement);
@@ -2152,6 +2475,8 @@ function renderLessonDetail() {
   if (!lesson) {
     lessonDetailElement.innerHTML = '<p class="detail-copy">Select a lesson to load the breakdown.</p>';
     markReviewedButtonElement.hidden = true;
+    markLessonCompleteButtonElement.hidden = true;
+    saveLessonButtonElement.hidden = true;
     renderRelatedCards(lessonRelatedElement, [], "Select a lesson to load related content.");
     return;
   }
@@ -2161,6 +2486,14 @@ function renderLessonDetail() {
   markReviewedButtonElement.textContent = state.reviewedLessons.includes(lesson.id)
     ? "Reviewed - tap to undo"
     : "Mark lesson reviewed";
+  markLessonCompleteButtonElement.hidden = false;
+  markLessonCompleteButtonElement.textContent = isCompletedItem("lesson", lesson.id)
+    ? "Completed - tap to undo"
+    : "Mark lesson complete";
+  saveLessonButtonElement.hidden = false;
+  saveLessonButtonElement.textContent = isSavedItem("lesson", lesson.id)
+    ? "Saved - tap to remove"
+    : "Save lesson";
 
   lessonDetailElement.innerHTML = `
     <section class="detail-block">
@@ -2173,6 +2506,7 @@ function renderLessonDetail() {
         <article class="meta-pill"><span class="chip-label">Track</span><strong class="chip-value">${getSelectedTrack()?.title ?? "Guide"}</strong></article>
         <article class="meta-pill"><span class="chip-label">Lesson Time</span><strong class="chip-value">${lesson.time}</strong></article>
         <article class="meta-pill"><span class="chip-label">Level</span><strong class="chip-value">${meta.level}</strong></article>
+        <article class="meta-pill"><span class="chip-label">State</span><strong class="chip-value">${isCompletedItem("lesson", lesson.id) ? "Completed" : state.reviewedLessons.includes(lesson.id) ? "Reviewed" : "Fresh"}</strong></article>
       </div>
       <div class="card-tags">${renderTagMarkup(meta.tags)}</div>
     </section>
@@ -2272,15 +2606,27 @@ function renderMachines() {
 }
 
 function renderPrepList() {
-  prepListElement.innerHTML = prepChecklist.map((item) => `
-    <article class="prep-card">
+  prepListElement.innerHTML = prepChecklist.map((item, index) => `
+    <button class="prep-card ${isPrepChecked(index) ? "is-complete" : ""}" type="button" data-prep-index="${index}">
       <span class="prep-marker"></span>
       <div>
         <h3 class="prep-title">Check before launch</h3>
         <p class="prep-copy">${item}</p>
       </div>
-    </article>
+    </button>
   `).join("");
+
+  for (const button of prepListElement.querySelectorAll("[data-prep-index]")) {
+    button.addEventListener("click", () => {
+      togglePrepChecked(Number(button.dataset.prepIndex));
+      renderCounts();
+      updateProgressSummary();
+      renderHeroDashboard();
+      renderPersonalHub();
+      renderPrepList();
+      saveState();
+    });
+  }
 }
 
 function getSelectedQuest() {
@@ -2310,12 +2656,12 @@ function renderQuestList() {
   questListElement.innerHTML = visibleQuests.map((quest) => {
     const meta = getQuestMeta(quest);
     return `
-    <button class="quest-card ${quest.id === state.selectedQuestId ? "active" : ""}" type="button" data-quest-id="${quest.id}">
+    <button class="quest-card ${quest.id === state.selectedQuestId ? "active" : ""} ${isCompletedItem("quest", quest.id) ? "is-complete" : ""} ${isSavedItem("quest", quest.id) ? "is-saved" : ""}" type="button" data-quest-id="${quest.id}">
       <div class="quest-title-row">
         <h3 class="quest-title">${quest.title}</h3>
         <span class="quest-badge">${quest.category}</span>
       </div>
-      ${renderCardMeta(meta)}
+      ${renderCardMeta(meta, [isCompletedItem("quest", quest.id) ? "Completed" : null, isSavedItem("quest", quest.id) ? "Saved" : null])}
       <p class="quest-summary">${quest.summary}</p>
       <div class="card-tags">${renderTagMarkup(meta.tags)}</div>
     </button>
@@ -2325,8 +2671,11 @@ function renderQuestList() {
   for (const button of questListElement.querySelectorAll("[data-quest-id]")) {
     button.addEventListener("click", () => {
       state.selectedQuestId = button.dataset.questId;
+      setLastVisited("quest", button.dataset.questId);
       renderQuestList();
       renderQuestDetail();
+      renderHeroDashboard();
+      renderPersonalHub();
       saveState();
       if (isMobileLayout()) {
         scrollElementIntoView(questDetailPanelElement);
@@ -2356,6 +2705,12 @@ function renderQuestDirectory() {
 function renderQuestDetail() {
   const quest = getSelectedQuest();
   const meta = getQuestMeta(quest);
+  markQuestCompleteButtonElement.textContent = isCompletedItem("quest", quest.id)
+    ? "Completed - tap to undo"
+    : "Mark quest guide complete";
+  saveQuestButtonElement.textContent = isSavedItem("quest", quest.id)
+    ? "Saved - tap to remove"
+    : "Save quest guide";
   questDetailElement.innerHTML = `
     <section class="detail-block">
       <p class="detail-kicker">${quest.category}</p>
@@ -2375,6 +2730,7 @@ function renderQuestDetail() {
         <article class="meta-pill"><span class="chip-label">Level</span><strong class="chip-value">${meta.level}</strong></article>
         <article class="meta-pill"><span class="chip-label">Priority</span><strong class="chip-value">${meta.priority}</strong></article>
         <article class="meta-pill"><span class="chip-label">Mode</span><strong class="chip-value">${meta.mode}</strong></article>
+        <article class="meta-pill"><span class="chip-label">State</span><strong class="chip-value">${isCompletedItem("quest", quest.id) ? "Completed" : "Active"}</strong></article>
       </div>
       <div class="card-tags">${renderTagMarkup(meta.tags)}</div>
     </section>
@@ -2457,6 +2813,11 @@ function saveState() {
     selectedQuestId: state.selectedQuestId,
     selectedMaterialId: state.selectedMaterialId,
     reviewedLessons: state.reviewedLessons,
+    completedItems: state.completedItems,
+    savedItems: state.savedItems,
+    checkedPrepItems: state.checkedPrepItems,
+    playstylePreference: state.playstylePreference,
+    lastVisited: state.lastVisited,
     filters: state.filters
   };
 
@@ -2478,9 +2839,17 @@ function loadState() {
     state.selectedQuestId = parsedState.selectedQuestId || state.selectedQuestId;
     state.selectedMaterialId = parsedState.selectedMaterialId || state.selectedMaterialId;
     state.reviewedLessons = Array.isArray(parsedState.reviewedLessons) ? parsedState.reviewedLessons : [];
+    state.completedItems = Array.isArray(parsedState.completedItems) ? parsedState.completedItems : [];
+    state.savedItems = Array.isArray(parsedState.savedItems) ? parsedState.savedItems : [];
+    state.checkedPrepItems = Array.isArray(parsedState.checkedPrepItems) ? parsedState.checkedPrepItems : [];
+    state.playstylePreference = parsedState.playstylePreference || state.playstylePreference;
+    state.lastVisited = parsedState.lastVisited ?? state.lastVisited;
     state.filters = { ...state.filters, ...(parsedState.filters ?? {}) };
   } catch (_error) {
     state.reviewedLessons = [];
+    state.completedItems = [];
+    state.savedItems = [];
+    state.checkedPrepItems = [];
   }
 }
 
@@ -2503,6 +2872,7 @@ function buildSearchIndex() {
       action: () => {
         state.activeView = "updates";
         state.selectedReleaseId = release.id;
+        setLastVisited("release", release.id);
         renderReleaseList();
         renderReleaseDetail();
         renderFocusNav();
@@ -2521,6 +2891,7 @@ function buildSearchIndex() {
         state.activeView = "learn";
         state.selectedTrackId = lesson.trackId;
         state.selectedLessonId = lesson.id;
+        setLastVisited("lesson", lesson.id);
         render();
         scrollElementIntoView(document.querySelector("#curriculum"));
       }
@@ -2535,6 +2906,7 @@ function buildSearchIndex() {
       action: () => {
         state.activeView = "quests";
         state.selectedQuestId = quest.id;
+        setLastVisited("quest", quest.id);
         renderQuestList();
         renderQuestDetail();
         renderFocusNav();
@@ -2552,6 +2924,7 @@ function buildSearchIndex() {
       action: () => {
         state.activeView = "materials";
         state.selectedMaterialId = material.id;
+        setLastVisited("material", material.id);
         renderMaterialsList();
         renderMaterialsDetail();
         renderFocusNav();
@@ -2582,6 +2955,7 @@ function buildSearchIndex() {
       tags: getLoadoutMeta(role).tags,
       action: () => {
         state.activeView = "gear";
+        setLastVisited("loadout", createLoadoutId(role.title));
         renderFocusNav();
         syncFlowSections();
         scrollElementIntoView(document.querySelector("#gear-field-guide"));
@@ -2596,6 +2970,7 @@ function buildSearchIndex() {
       tags: getQuickUseMeta(item).tags,
       action: () => {
         state.activeView = "gear";
+        setLastVisited("quickuse", createLoadoutId(item.title));
         renderFocusNav();
         syncFlowSections();
         scrollElementIntoView(document.querySelector("#gear-field-guide"));
@@ -2620,8 +2995,14 @@ function buildSearchIndex() {
 
 function updateProgressSummary() {
   reviewedCountElement.textContent = String(state.reviewedLessons.length);
-  const selectedLesson = getSelectedLesson();
-  continueLabelElement.textContent = selectedLesson ? selectedLesson.title : getSelectedTrack()?.title ?? "ARC Guide";
+  const continueItem = getContinueItem();
+  continueLabelElement.textContent = continueItem?.title ?? "New Raider";
+  if (overallProgressElement) {
+    overallProgressElement.textContent = `${getOverallProgressPercent()}%`;
+  }
+  if (savedCountElement) {
+    savedCountElement.textContent = String(state.savedItems.length);
+  }
 }
 
 function getSelectedRelease() {
@@ -2674,9 +3055,12 @@ function renderEmbarkFeed() {
 
 function renderHeroDashboard() {
   const currentRelease = releases[0];
-  const selectedLesson = getSelectedLesson();
+  const continueItem = getContinueItem();
   const reviewedCount = state.reviewedLessons.length;
-  const nextFocus = reviewedCount >= 3 ? "Advanced Ops" : "New Raider";
+  const playstyle = getPlaystyle();
+  const nextFocus = playstyle.goals[0] ?? (reviewedCount >= 3 ? "gear" : "learn");
+  const nextFocusView = focusViews.find((view) => view.id === nextFocus);
+  const lessonProgress = getLessonProgress();
 
   heroUpdateCardElement.innerHTML = `
     <span class="hero-card-label">Latest official update</span>
@@ -2690,29 +3074,30 @@ function renderHeroDashboard() {
 
   heroPersonalCardElement.innerHTML = `
     <span class="hero-card-label">Continue from here</span>
-    <strong>${selectedLesson ? selectedLesson.title : "New Raider"}</strong>
-    <p>${reviewedCount} lesson${reviewedCount === 1 ? "" : "s"} reviewed so far. Your best next focus is <strong>${nextFocus}</strong>.</p>
+    <strong>${continueItem?.title ?? "New Raider"}</strong>
+    <p>${reviewedCount} lesson${reviewedCount === 1 ? "" : "s"} reviewed so far, ${lessonProgress} fully completed, and your current path is tuned for <strong>${playstyle.label}</strong>.</p>
     <div class="hero-stat-row">
-      <span class="hero-mini-pill">${getSelectedTrack()?.title ?? "Guide track"}</span>
-      <span class="hero-mini-pill">${selectedLesson?.time ?? "Quick read"}</span>
+      <span class="hero-mini-pill">${playstyle.label}</span>
+      <span class="hero-mini-pill">${nextFocusView?.label ?? "Next move"}</span>
+      <span class="hero-mini-pill">${getOverallProgressPercent()}% done</span>
     </div>
   `;
 
   const taskItems = [
     {
-      title: "Check the patch first",
-      copy: "Start in Update Center when a release is near so you know what systems changed before following older advice.",
-      badges: ["Essential", "Patch aware"]
+      title: continueItem ? `Continue ${continueItem.title}` : "Start with the first lesson",
+      copy: continueItem?.subtitle ?? "New Raiders should begin with the fundamentals before chasing clever nonsense and dying for free.",
+      badges: ["Essential", "Continue"]
     },
     {
-      title: "Run one focused goal",
-      copy: "Use the quest and materials sections together so each raid has one clear purpose instead of random scavenging.",
-      badges: ["Recommended", "Progression"]
+      title: `Lean into ${playstyle.label}`,
+      copy: playstyle.summary,
+      badges: ["Recommended", ...playstyle.badges]
     },
     {
-      title: "Review one weak spot",
-      copy: "Use the lesson track or machine intel to close the one problem that keeps ending your raids.",
-      badges: ["Beginner", "Skill builder"]
+      title: "Clear one weak spot",
+      copy: "Use saved items and section progress together so you can close one skill gap at a time instead of wandering through the whole guide like a lost goblin.",
+      badges: ["Skill builder", state.savedItems.length ? "Saved items ready" : "Save guides first"]
     }
   ];
 
@@ -2725,23 +3110,159 @@ function renderHeroDashboard() {
   `).join("");
 }
 
+function renderPersonalHub() {
+  const playstyle = getPlaystyle();
+  const continueItem = getContinueItem();
+  const sections = getProgressSections();
+  const registry = buildDiscoveryRegistry();
+  const savedItems = state.savedItems
+    .map((key) => registry[key])
+    .filter(Boolean)
+    .slice(0, 6);
+
+  personalOverviewElement.innerHTML = `
+    <div class="personal-card-head">
+      <div>
+        <p class="eyebrow">Raider profile</p>
+        <h3 class="personal-title">${playstyle.label}</h3>
+      </div>
+      <span class="hero-mini-pill">${getOverallProgressPercent()}% complete</span>
+    </div>
+    <p class="personal-copy">${playstyle.summary}</p>
+    <div class="card-tags">${renderTagMarkup(playstyle.badges)}</div>
+    <div class="playstyle-picker" role="group" aria-label="Choose your ARC Raiders playstyle">
+      ${PLAYSTYLE_OPTIONS.map((option) => `
+        <button class="playstyle-chip ${option.id === playstyle.id ? "active" : ""}" type="button" data-playstyle="${option.id}">
+          ${option.label}
+        </button>
+      `).join("")}
+    </div>
+    <div class="personal-actions">
+      <button class="hero-button hero-button-primary" type="button" data-open-continue>${continueItem ? "Continue where you left off" : "Start the guide"}</button>
+    </div>
+  `;
+
+  sectionProgressElement.innerHTML = `
+    <div class="personal-card-head">
+      <div>
+        <p class="eyebrow">Progress map</p>
+        <h3 class="personal-title">Section progress</h3>
+      </div>
+      <span class="hero-mini-pill">${state.reviewedLessons.length} reviewed</span>
+    </div>
+    <div class="section-progress-grid">
+      ${sections.map((section) => {
+        const percentage = section.total ? Math.round((section.completed / section.total) * 100) : 0;
+        return `
+          <article class="progress-card">
+            <div class="progress-card-top">
+              <strong>${section.label}</strong>
+              <span>${section.completed}/${section.total}</span>
+            </div>
+            <div class="progress-bar" aria-hidden="true"><span style="width:${percentage}%"></span></div>
+            <p>${percentage}% complete</p>
+          </article>
+        `;
+      }).join("")}
+    </div>
+  `;
+
+  savedPanelElement.innerHTML = `
+    <div class="personal-card-head">
+      <div>
+        <p class="eyebrow">Saved for later</p>
+        <h3 class="personal-title">Bookmarks</h3>
+      </div>
+      <span class="hero-mini-pill">${state.savedItems.length} saved</span>
+    </div>
+    ${savedItems.length ? `
+      <div class="saved-list">
+        ${savedItems.map((item) => `
+          <article class="saved-item">
+            <div>
+              <span class="saved-type">${item.type}</span>
+              <strong>${item.title}</strong>
+              <p>${item.subtitle}</p>
+              <div class="card-tags">${(item.meta ?? []).map((meta) => `<span class="content-tag">${meta}</span>`).join("")}</div>
+            </div>
+            <div class="saved-actions">
+              <button class="hero-button hero-button-secondary saved-action" type="button" data-open-saved="${createItemKey(item.type, item.id)}">Open</button>
+              <button class="hero-button hero-button-secondary saved-action" type="button" data-unsave="${createItemKey(item.type, item.id)}">Unsave</button>
+            </div>
+          </article>
+        `).join("")}
+      </div>
+    ` : `
+      <article class="empty-state-card">
+        <strong>No saved items yet</strong>
+        <p>Save lessons, quest guides, materials, loadouts, or update notes so your future self doesn’t have to go treasure hunting through the whole site again.</p>
+      </article>
+    `}
+  `;
+
+  for (const button of personalOverviewElement.querySelectorAll("[data-playstyle]")) {
+    button.addEventListener("click", () => {
+      state.playstylePreference = button.dataset.playstyle;
+      renderCounts();
+      updateProgressSummary();
+      renderHeroDashboard();
+      renderPersonalHub();
+      saveState();
+    });
+  }
+
+  const continueButton = personalOverviewElement.querySelector("[data-open-continue]");
+  continueButton?.addEventListener("click", () => {
+    const item = getContinueItem();
+    if (!item) {
+      return;
+    }
+    item.action();
+    saveState();
+  });
+
+  for (const button of savedPanelElement.querySelectorAll("[data-open-saved]")) {
+    button.addEventListener("click", () => {
+      const item = registry[button.dataset.openSaved];
+      item?.action();
+      saveState();
+    });
+  }
+
+  for (const button of savedPanelElement.querySelectorAll("[data-unsave]")) {
+    button.addEventListener("click", () => {
+      const [type, ...rest] = button.dataset.unsave.split(":");
+      toggleSavedItem(type, rest.join(":"));
+      renderCounts();
+      updateProgressSummary();
+      renderHeroDashboard();
+      renderPersonalHub();
+      saveState();
+    });
+  }
+}
+
 function renderReleaseList() {
   releaseListElement.innerHTML = releases.map((release) => `
-    <button class="release-card ${release.id === state.selectedReleaseId ? "active" : ""}" type="button" data-release-id="${release.id}">
+    <button class="release-card ${release.id === state.selectedReleaseId ? "active" : ""} ${isCompletedItem("release", release.id) ? "is-complete" : ""} ${isSavedItem("release", release.id) ? "is-saved" : ""}" type="button" data-release-id="${release.id}">
       <div class="release-title-row">
         <h3 class="release-title">${release.title}</h3>
         <span class="release-badge">${release.status}</span>
       </div>
       <p class="release-summary">${release.date}</p>
       <p class="release-summary">${release.confirmed.slice(0, 2).join(" • ")}</p>
+      <div class="card-tags">${[isCompletedItem("release", release.id) ? "Reviewed" : null, isSavedItem("release", release.id) ? "Saved" : null].filter(Boolean).map((tag) => `<span class="content-tag">${tag}</span>`).join("")}</div>
     </button>
   `).join("");
 
   for (const button of releaseListElement.querySelectorAll("[data-release-id]")) {
     button.addEventListener("click", () => {
       state.selectedReleaseId = button.dataset.releaseId;
+      setLastVisited("release", button.dataset.releaseId);
       renderReleaseList();
       renderReleaseDetail();
+      renderHeroDashboard();
+      renderPersonalHub();
       saveState();
       if (isMobileLayout()) {
         scrollElementIntoView(document.querySelector(".release-detail-panel"));
@@ -2752,6 +3273,12 @@ function renderReleaseList() {
 
 function renderReleaseDetail() {
   const release = getSelectedRelease();
+  markReleaseCompleteButtonElement.textContent = isCompletedItem("release", release.id)
+    ? "Reviewed - tap to undo"
+    : "Mark update reviewed";
+  saveReleaseButtonElement.textContent = isSavedItem("release", release.id)
+    ? "Saved - tap to remove"
+    : "Save update";
   releaseDetailElement.innerHTML = `
     <section class="detail-block">
       <p class="detail-kicker">${release.status}</p>
@@ -2769,6 +3296,13 @@ function renderReleaseDetail() {
     <section class="detail-block">
       <p class="detail-kicker">What changed in the guide</p>
       <ul class="detail-list">${release.appIdeas.map((item) => `<li>${item}</li>`).join("")}</ul>
+    </section>
+    <section class="detail-block">
+      <div class="detail-chip-row">
+        <article class="meta-pill"><span class="chip-label">Status</span><strong class="chip-value">${release.status}</strong></article>
+        <article class="meta-pill"><span class="chip-label">Date</span><strong class="chip-value">${release.date}</strong></article>
+        <article class="meta-pill"><span class="chip-label">State</span><strong class="chip-value">${isCompletedItem("release", release.id) ? "Reviewed" : "Pending"}</strong></article>
+      </div>
     </section>
     <section class="detail-block">
       <div class="callout">
@@ -2792,7 +3326,88 @@ function toggleReviewedLesson() {
 
   renderLessons();
   renderLessonDetail();
+  renderCounts();
   updateProgressSummary();
+  renderHeroDashboard();
+  renderPersonalHub();
+  saveState();
+}
+
+function toggleLessonComplete() {
+  const lesson = getSelectedLesson();
+  if (!lesson) {
+    return;
+  }
+
+  toggleCompletedItem("lesson", lesson.id);
+  setLastVisited("lesson", lesson.id);
+  renderLessons();
+  renderLessonDetail();
+  renderCounts();
+  updateProgressSummary();
+  renderHeroDashboard();
+  renderPersonalHub();
+  saveState();
+}
+
+function toggleQuestComplete() {
+  const quest = getSelectedQuest();
+  if (!quest) {
+    return;
+  }
+
+  toggleCompletedItem("quest", quest.id);
+  setLastVisited("quest", quest.id);
+  renderQuestList();
+  renderQuestDetail();
+  renderCounts();
+  updateProgressSummary();
+  renderHeroDashboard();
+  renderPersonalHub();
+  saveState();
+}
+
+function toggleMaterialComplete() {
+  const material = getSelectedMaterial();
+  if (!material) {
+    return;
+  }
+
+  toggleCompletedItem("material", material.id);
+  setLastVisited("material", material.id);
+  renderMaterialsList();
+  renderMaterialsDetail();
+  renderCounts();
+  updateProgressSummary();
+  renderHeroDashboard();
+  renderPersonalHub();
+  saveState();
+}
+
+function toggleReleaseComplete() {
+  const release = getSelectedRelease();
+  if (!release) {
+    return;
+  }
+
+  toggleCompletedItem("release", release.id);
+  setLastVisited("release", release.id);
+  renderReleaseList();
+  renderReleaseDetail();
+  renderCounts();
+  updateProgressSummary();
+  renderHeroDashboard();
+  renderPersonalHub();
+  saveState();
+}
+
+function toggleCurrentSave(type, id, refresh) {
+  toggleSavedItem(type, id);
+  renderCounts();
+  updateProgressSummary();
+  refresh();
+  renderHeroDashboard();
+  renderPersonalHub();
   saveState();
 }
 
@@ -2900,12 +3515,12 @@ function renderMaterialsList() {
   materialsListElement.innerHTML = visibleMaterials.map((material) => {
     const meta = getMaterialMeta(material);
     return `
-    <button class="material-card ${material.id === state.selectedMaterialId ? "active" : ""}" type="button" data-material-id="${material.id}">
+    <button class="material-card ${material.id === state.selectedMaterialId ? "active" : ""} ${isCompletedItem("material", material.id) ? "is-complete" : ""} ${isSavedItem("material", material.id) ? "is-saved" : ""}" type="button" data-material-id="${material.id}">
       <div class="quest-title-row">
         <h3 class="material-title">${material.title}</h3>
         <span class="quest-badge">${material.badge}</span>
       </div>
-      ${renderCardMeta({ ...meta, mode: meta.goal })}
+      ${renderCardMeta({ ...meta, mode: meta.goal }, [isCompletedItem("material", material.id) ? "Completed" : null, isSavedItem("material", material.id) ? "Saved" : null])}
       <p class="material-summary">${material.summary}</p>
       <div class="card-tags">${renderTagMarkup(meta.tags)}</div>
     </button>
@@ -2915,8 +3530,11 @@ function renderMaterialsList() {
   for (const button of materialsListElement.querySelectorAll("[data-material-id]")) {
     button.addEventListener("click", () => {
       state.selectedMaterialId = button.dataset.materialId;
+      setLastVisited("material", button.dataset.materialId);
       renderMaterialsList();
       renderMaterialsDetail();
+      renderHeroDashboard();
+      renderPersonalHub();
       saveState();
       if (isMobileLayout()) {
         scrollElementIntoView(materialsDetailPanelElement);
@@ -2928,6 +3546,12 @@ function renderMaterialsList() {
 function renderMaterialsDetail() {
   const material = getSelectedMaterial();
   const meta = getMaterialMeta(material);
+  markMaterialCompleteButtonElement.textContent = isCompletedItem("material", material.id)
+    ? "Completed - tap to undo"
+    : "Mark material guide complete";
+  saveMaterialButtonElement.textContent = isSavedItem("material", material.id)
+    ? "Saved - tap to remove"
+    : "Save material guide";
   materialsDetailElement.innerHTML = `
     <section class="detail-block">
       <p class="detail-kicker">${material.badge}</p>
@@ -2947,6 +3571,7 @@ function renderMaterialsDetail() {
         <article class="meta-pill"><span class="chip-label">Level</span><strong class="chip-value">${meta.level}</strong></article>
         <article class="meta-pill"><span class="chip-label">Priority</span><strong class="chip-value">${meta.priority}</strong></article>
         <article class="meta-pill"><span class="chip-label">Goal</span><strong class="chip-value">${meta.goal}</strong></article>
+        <article class="meta-pill"><span class="chip-label">State</span><strong class="chip-value">${isCompletedItem("material", material.id) ? "Completed" : "Tracked"}</strong></article>
       </div>
       <div class="card-tags">${renderTagMarkup(meta.tags)}</div>
     </section>
@@ -3085,9 +3710,13 @@ function renderWeaponRoles() {
   renderFilterBar(weaponFiltersElement, "weaponRoles");
   weaponRoleListElement.innerHTML = loadoutBlueprints.filter(loadoutMatchesFilter).map((role) => {
     const meta = getLoadoutMeta(role);
+    const roleId = createLoadoutId(role.title);
     return `
     <article class="gear-card">
-      <h3 class="gear-title">${role.title}</h3>
+      <div class="gear-card-top">
+        <h3 class="gear-title">${role.title}</h3>
+        <button class="hero-button hero-button-secondary card-save-button" type="button" data-save-loadout="${roleId}">${isSavedItem("loadout", roleId) ? "Saved" : "Save"}</button>
+      </div>
       ${renderCardMeta(meta, [role.bestFor.includes("Quest") ? "Recommended" : null])}
       <p class="gear-copy">${role.summary}</p>
       <div class="card-tags">${renderTagMarkup(meta.tags)}</div>
@@ -3108,15 +3737,33 @@ function renderWeaponRoles() {
     </article>
   `;
   }).join("");
+
+  for (const button of weaponRoleListElement.querySelectorAll("[data-save-loadout]")) {
+    button.addEventListener("click", () => {
+      const loadoutId = button.dataset.saveLoadout;
+      toggleSavedItem("loadout", loadoutId);
+      setLastVisited("loadout", loadoutId);
+      renderCounts();
+      updateProgressSummary();
+      renderHeroDashboard();
+      renderPersonalHub();
+      renderWeaponRoles();
+      saveState();
+    });
+  }
 }
 
 function renderQuickUseItems() {
   renderFilterBar(quickUseFiltersElement, "quickUse");
   quickUseListElement.innerHTML = quickUseItems.filter(quickUseMatchesFilter).map((item) => {
     const meta = getQuickUseMeta(item);
+    const quickUseId = createLoadoutId(item.title);
     return `
     <article class="quick-use-card">
-      <h3 class="quick-use-title">${item.title}</h3>
+      <div class="gear-card-top">
+        <h3 class="quick-use-title">${item.title}</h3>
+        <button class="hero-button hero-button-secondary card-save-button" type="button" data-save-quickuse="${quickUseId}">${isSavedItem("quickuse", quickUseId) ? "Saved" : "Save"}</button>
+      </div>
       ${renderCardMeta(meta)}
       <p class="quick-use-copy">${item.summary}</p>
       <div class="card-tags">${renderTagMarkup(meta.tags)}</div>
@@ -3133,6 +3780,20 @@ function renderQuickUseItems() {
     </article>
   `;
   }).join("");
+
+  for (const button of quickUseListElement.querySelectorAll("[data-save-quickuse]")) {
+    button.addEventListener("click", () => {
+      const quickUseId = button.dataset.saveQuickuse;
+      toggleSavedItem("quickuse", quickUseId);
+      setLastVisited("quickuse", quickUseId);
+      renderCounts();
+      updateProgressSummary();
+      renderHeroDashboard();
+      renderPersonalHub();
+      renderQuickUseItems();
+      saveState();
+    });
+  }
 }
 
 function syncBackToTopVisibility() {
@@ -3210,6 +3871,7 @@ function render() {
   renderLessonDetail();
   updateProgressSummary();
   renderHeroDashboard();
+  renderPersonalHub();
   renderQuestOverview();
   renderQuestList();
   renderQuestDirectory();
@@ -3232,6 +3894,54 @@ backToTopElement.addEventListener("click", () => {
 
 easterEggTriggerElement.addEventListener("click", revealEasterEgg);
 markReviewedButtonElement.addEventListener("click", toggleReviewedLesson);
+markLessonCompleteButtonElement.addEventListener("click", toggleLessonComplete);
+saveLessonButtonElement.addEventListener("click", () => {
+  const lesson = getSelectedLesson();
+  if (!lesson) {
+    return;
+  }
+  setLastVisited("lesson", lesson.id);
+  toggleCurrentSave("lesson", lesson.id, () => {
+    renderLessons();
+    renderLessonDetail();
+  });
+});
+markQuestCompleteButtonElement.addEventListener("click", toggleQuestComplete);
+saveQuestButtonElement.addEventListener("click", () => {
+  const quest = getSelectedQuest();
+  if (!quest) {
+    return;
+  }
+  setLastVisited("quest", quest.id);
+  toggleCurrentSave("quest", quest.id, () => {
+    renderQuestList();
+    renderQuestDetail();
+  });
+});
+markMaterialCompleteButtonElement.addEventListener("click", toggleMaterialComplete);
+saveMaterialButtonElement.addEventListener("click", () => {
+  const material = getSelectedMaterial();
+  if (!material) {
+    return;
+  }
+  setLastVisited("material", material.id);
+  toggleCurrentSave("material", material.id, () => {
+    renderMaterialsList();
+    renderMaterialsDetail();
+  });
+});
+markReleaseCompleteButtonElement.addEventListener("click", toggleReleaseComplete);
+saveReleaseButtonElement.addEventListener("click", () => {
+  const release = getSelectedRelease();
+  if (!release) {
+    return;
+  }
+  setLastVisited("release", release.id);
+  toggleCurrentSave("release", release.id, () => {
+    renderReleaseList();
+    renderReleaseDetail();
+  });
+});
 globalSearchElement.addEventListener("input", () => {
   renderSearchResults(globalSearchElement.value);
 });

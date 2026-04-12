@@ -870,6 +870,197 @@ button { color: inherit; }
 .intel-grid { display: grid; gap: 18px; }
 .launchpad-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom: 20px; }
 .status-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom: 20px; }
+.personal-hub {
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.personal-hub-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr) minmax(0, 1fr);
+  gap: 14px;
+}
+
+.personal-card {
+  padding: 18px;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+  display: grid;
+  gap: 14px;
+}
+
+.personal-card-head,
+.saved-item,
+.saved-actions,
+.progress-card-top,
+.gear-card-top,
+.detail-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.personal-title {
+  margin: 0;
+  font-family: var(--display-font);
+  font-size: 1.08rem;
+  text-transform: uppercase;
+  color: var(--signal);
+}
+
+.personal-copy,
+.saved-item p,
+.progress-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.playstyle-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.playstyle-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--muted);
+  cursor: pointer;
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.playstyle-chip:hover,
+.playstyle-chip:focus-visible {
+  transform: translateY(-1px);
+  border-color: var(--line-strong);
+}
+
+.playstyle-chip.active {
+  border-color: rgba(217, 122, 53, 0.36);
+  background: rgba(217, 122, 53, 0.12);
+  color: var(--signal);
+}
+
+.personal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.section-progress-grid,
+.saved-list {
+  display: grid;
+  gap: 10px;
+}
+
+.progress-card,
+.saved-item,
+.empty-state-card {
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.progress-card strong,
+.saved-item strong,
+.empty-state-card strong {
+  color: var(--signal);
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  margin-top: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.progress-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+}
+
+.saved-list {
+  align-content: start;
+}
+
+.saved-item {
+  align-items: flex-start;
+}
+
+.saved-type {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: var(--accent-soft);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.saved-actions {
+  align-items: stretch;
+  flex-direction: column;
+  min-width: 110px;
+}
+
+.saved-action,
+.card-save-button {
+  min-height: 38px;
+  padding: 0 14px;
+}
+
+.detail-actions {
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.gear-card-top {
+  align-items: flex-start;
+}
+
+.quest-card.is-complete,
+.material-card.is-complete,
+.release-card.is-complete,
+.lesson-card.is-complete,
+.prep-card.is-complete {
+  border-color: rgba(129, 203, 218, 0.28);
+  box-shadow: inset 0 0 0 1px rgba(129, 203, 218, 0.12);
+}
+
+.quest-card.is-saved,
+.material-card.is-saved,
+.release-card.is-saved {
+  border-color: rgba(217, 122, 53, 0.3);
+}
+
+.lesson-card.reviewed {
+  background: linear-gradient(180deg, rgba(129, 203, 218, 0.08), rgba(255, 255, 255, 0.03));
+}
+
+.prep-card {
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.prep-card.is-complete .prep-marker {
+  background: linear-gradient(180deg, var(--accent-cool), #5ea8b8);
+  box-shadow: 0 0 0 6px rgba(129, 203, 218, 0.1);
+}
 .status-card, .briefing, .overview-panel, .rail-panel, .detail-panel, .intel-panel { padding: var(--space-section); }
 .status-value { margin-top: 10px; font-size: 2rem; color: var(--accent-soft); }
 .briefing { margin-bottom: 18px; }
@@ -1919,7 +2110,7 @@ button { color: inherit; }
 }
 
 @media (max-width: 1120px) {
-  .hero, .update-layout, .curriculum-layout, .quest-layout, .materials-layout, .gear-layout, .intel-grid, .status-grid, .briefing-list, .launchpad-grid { grid-template-columns: 1fr; }
+  .hero, .update-layout, .curriculum-layout, .quest-layout, .materials-layout, .gear-layout, .intel-grid, .status-grid, .briefing-list, .launchpad-grid, .personal-hub-grid { grid-template-columns: 1fr; }
   .curriculum-layout { gap: 16px; }
   .materials-catalog { grid-template-columns: 1fr; }
   .site-tools-row { grid-template-columns: 1fr; }
@@ -1942,6 +2133,7 @@ button { color: inherit; }
   .site-header,
   .search-results-panel { padding: 16px; }
   .hero, .status-card, .briefing, .pain-points-panel, .overview-panel, .rail-panel, .detail-panel, .intel-panel { padding: 16px; }
+  .personal-hub { padding: 16px; }
   .hero h1, .hero h2 { font-size: clamp(1.7rem, 8vw, 2.5rem); max-width: 12ch; }
   .hero-actions { display: grid; grid-template-columns: 1fr; }
   .hero-dashboard-grid { grid-template-columns: 1fr; }
@@ -2010,6 +2202,13 @@ button { color: inherit; }
   .materials-catalog-panel,
   .material-usage-panel { padding: 16px; }
   .quest-title-row { align-items: flex-start; flex-direction: column; }
+  .saved-item,
+  .saved-actions,
+  .personal-card-head,
+  .progress-card-top,
+  .gear-card-top,
+  .detail-actions { align-items: flex-start; flex-direction: column; }
+  .saved-actions { min-width: 0; width: 100%; }
 }
 
 @media (max-width: 480px) {
