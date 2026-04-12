@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.16.3",
+    date: "2026-04-12",
+    summary: "Reverified the guide against official ARC Raiders posts and confirmed the site is still current after the April 8 patch cycle.",
+    changes: [
+      "Rechecked the official news hub, patch notes, and roadmap posts through April 12, 2026.",
+      "Confirmed the current live guide already matches the latest official baseline from Patch Notes 1.23.0 and the April 4 UX update.",
+      "Updated the official verification stamp so returning players can see the guide was checked again today."
+    ]
+  },
+  {
     version: "v1.16.2",
     date: "2026-04-10",
     summary: "Added a visible official-verification stamp so players can see when the guide was last checked against Embark posts.",
@@ -313,7 +323,7 @@ const VERSION_HISTORY = [
 
 const APP_VERSION = VERSION_HISTORY[0].version;
 const APP_UPDATED = VERSION_HISTORY[0].date;
-const OFFICIAL_POSTS_VERIFIED = "2026-04-10";
+const OFFICIAL_POSTS_VERIFIED = "2026-04-12";
 const STORAGE_KEY = "arc-raiders-guide-state";
 
 const focusViews = [
