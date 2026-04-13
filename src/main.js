@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.26.0",
+    date: "2026-04-13",
+    summary: "Added category icons, stronger status and trust cues, a more active updates feed, and clearer homepage CTA hierarchy.",
+    changes: [
+      "Added lightweight category indicators, reusable status tags, and visual tip-warning-trust callouts across major content areas.",
+      "Reworked the updates feed into a more active chronological experience with major-versus-minor styling and an important-change highlight card.",
+      "Tightened homepage CTA language and expanded the trust layer with maintained-by messaging, methodology guidance, and clearer last-verified context."
+    ]
+  },
+  {
     version: "v1.25.0",
     date: "2026-04-13",
     summary: "Moved personalization into a top-of-home returning-user dashboard and only shows it when real saved state exists.",
@@ -882,6 +892,8 @@ const embarkFeed = [
     title: "Patch Notes 1.23.0",
     date: "2026-04-08",
     source: "Official news",
+    kind: "major",
+    changeLabel: "Live baseline",
     summary: "Embark fixed Trigger 'Nades stacking, weapon and item firing issues, Stella Montis and Buried City map problems, and several Close Scrutiny Assessor and Vaporizer issues.",
     url: "https://arcraiders.com/news/patch-notes-1-23-0"
   },
@@ -889,6 +901,8 @@ const embarkFeed = [
     title: "Reducing friction in ARC Raiders",
     date: "2026-04-04",
     source: "Official news",
+    kind: "major",
+    changeLabel: "Workflow shift",
     summary: "Embark added an Acquire Resources button so missing craft materials can be sourced directly from the crafting screen.",
     url: "https://arcraiders.com/news/user-experience-improvements"
   },
@@ -896,6 +910,8 @@ const embarkFeed = [
     title: "Hotfix 1.22.1",
     date: "2026-04-01",
     source: "Official news",
+    kind: "minor",
+    changeLabel: "Hotfix",
     summary: "A short official hotfix note confirms a crash fix went live and said an Xbox patch would follow later.",
     url: "https://arcraiders.com/news/hotfix-1-22-1"
   },
@@ -903,6 +919,8 @@ const embarkFeed = [
     title: "Flashpoint - Patch Notes 1.22.0",
     date: "2026-03-31",
     source: "Official news",
+    kind: "major",
+    changeLabel: "Content drop",
     summary: "The official patch-note entry for Flashpoint is now live on Embark's news hub.",
     url: "https://arcraiders.com/news"
   },
@@ -910,6 +928,8 @@ const embarkFeed = [
     title: "Flashpoint Update - Find the Truth",
     date: "2026-03-30",
     source: "Official news",
+    kind: "major",
+    changeLabel: "Prelaunch briefing",
     summary: "Embark's full Flashpoint overview confirms Close Scrutiny, Vaporizer, Canto, Dolabra, Surge Coil, the High Gain Antenna project, and Scrappy changes.",
     url: "https://arcraiders.com/news/flashpoint-content-update"
   },
@@ -917,6 +937,8 @@ const embarkFeed = [
     title: "Patch Notes 1.21.0",
     date: "2026-03-24",
     source: "Official news",
+    kind: "minor",
+    changeLabel: "Weekly patch",
     summary: "The final weekly patch before Flashpoint, useful as the baseline for what changed this morning.",
     url: "https://arcraiders.com/news/patch-notes-1-21-0"
   },
@@ -924,6 +946,8 @@ const embarkFeed = [
     title: "Patch Notes 1.20.0",
     date: "2026-03-17",
     source: "Official news",
+    kind: "minor",
+    changeLabel: "Weekly patch",
     summary: "Another pre-Flashpoint checkpoint in Embark's March update cadence.",
     url: "https://arcraiders.com/news/patch-notes-1-20-0"
   },
@@ -931,6 +955,8 @@ const embarkFeed = [
     title: "Patch Notes 1.19.0",
     date: "2026-03-10",
     source: "Official news",
+    kind: "minor",
+    changeLabel: "Archive",
     summary: "Older March patch notes that now sit just behind the Flashpoint launch coverage in the official archive.",
     url: "https://arcraiders.com/news/patch-notes-1-19-0"
   },
@@ -938,6 +964,8 @@ const embarkFeed = [
     title: "Trials Season 3: what you need to know",
     date: "2026-03-03",
     source: "Official news",
+    kind: "major",
+    changeLabel: "System update",
     summary: "A rules-and-progress post that matters to players using the guide for repeatable performance and challenge prep.",
     url: "https://arcraiders.com/news/trials-season-3-what-you-need-to-know"
   }
@@ -2590,6 +2618,60 @@ function renderTagMarkup(tags = []) {
   return tags.map((tag) => `<span class="content-tag">${tag}</span>`).join("");
 }
 
+function getCategoryIcon(category) {
+  const lookup = {
+    Learn: ["L", "Learn"],
+    Lesson: ["L", "Learn"],
+    Quest: ["Q", "Quest"],
+    Material: ["M", "Material"],
+    Gear: ["G", "Gear"],
+    "Quick-use": ["U", "Utility"],
+    Updates: ["U", "Update"],
+    Release: ["U", "Update"],
+    "ARC Intel": ["A", "ARC"]
+  };
+  return lookup[category] ?? ["•", "Guide"];
+}
+
+function renderCategoryIcon(category) {
+  const [glyph, label] = getCategoryIcon(category);
+  return `<span class="category-icon" aria-label="${label}">${glyph}</span>`;
+}
+
+function getStatusTags(meta = {}) {
+  const tags = [];
+  if (meta.level === "Beginner") {
+    tags.push("Beginner friendly");
+  }
+  if ((meta.mode ?? "").includes("Solo")) {
+    tags.push("Solo");
+  }
+  if ((meta.mode ?? "").includes("Squad")) {
+    tags.push("Squad");
+  }
+  if ((meta.tags ?? []).includes("high risk") || meta.level === "Advanced" || (meta.goal ?? "").toLowerCase().includes("boss")) {
+    tags.push("High risk");
+  }
+  return [...new Set(tags)].slice(0, 3);
+}
+
+function renderStatusTagMarkup(tags = []) {
+  return tags.filter(Boolean).map((tag) => `<span class="status-tag">${tag}</span>`).join("");
+}
+
+function renderCallout(type, title, body) {
+  const icon = type === "warning" ? "!" : type === "trust" ? "i" : "+";
+  return `
+    <div class="callout callout-${type}">
+      <span class="callout-icon" aria-hidden="true">${icon}</span>
+      <div class="callout-body">
+        <strong>${title}</strong>
+        <p class="detail-copy">${body}</p>
+      </div>
+    </div>
+  `;
+}
+
 function renderDecisionMetaRows(items = []) {
   const visibleItems = items.filter((item) => item?.value);
   if (!visibleItems.length) {
@@ -3174,7 +3256,7 @@ function renderLessonDetail() {
       <ul class="detail-list">${lesson.checks.map((item) => `<li>${item}</li>`).join("")}</ul>
     </section>
     <section class="detail-block">
-      <div class="callout"><strong>Field note:</strong><p class="detail-copy">${lesson.fieldNote}</p></div>
+      ${renderCallout("tip", "Field note", lesson.fieldNote)}
     </section>
   `;
 
@@ -3212,6 +3294,7 @@ function renderMachines() {
       <strong class="hero-card-label">Threat priority</strong>
       <p>When a fight starts getting messy, stop thinking about raw health pools first. Kill or break the units that expand the fight, expose you, or force you out of cover.</p>
     </section>
+    ${renderCallout("warning", "Combat warning", "Machine advice mixes official machine coverage with public field-tested counterplay. Use it as practical raid guidance, not as a secret developer damage spreadsheet.")}
     <div class="machine-priority-grid">
       <article class="machine-priority-card">
         <strong>1. Detection first</strong>
@@ -3237,11 +3320,12 @@ function renderMachines() {
     return `
     <article class="machine-card">
       <div class="machine-top">
-        <h3 class="machine-name">${machine.name}</h3>
+        <h3 class="machine-name">${renderCategoryIcon("ARC Intel")}${machine.name}</h3>
         <span class="machine-threat">${machine.threat}</span>
       </div>
       ${renderCardMeta(meta, [machine.threat], getMachineDecisionItems(machine, meta))}
       <p class="machine-copy">${machine.copy}</p>
+      <div class="card-tags">${renderStatusTagMarkup(getStatusTags(meta))}</div>
       <div class="card-tags">${renderTagMarkup(meta.tags)}</div>
       <div class="machine-tactics-grid">
         <article class="machine-tactic">
@@ -3253,8 +3337,8 @@ function renderMachines() {
           <strong class="chip-value">${machine.loadout}</strong>
         </article>
       </div>
-      <div class="callout"><strong>Response:</strong><p class="detail-copy">${machine.response}</p></div>
-      <div class="callout"><strong>How to kill it:</strong><p class="detail-copy">${machine.tactic}</p></div>
+      ${renderCallout("tip", "Response", machine.response)}
+      ${renderCallout("warning", "How to kill it", machine.tactic)}
     </article>
   `;
   }).join("");
@@ -3295,6 +3379,7 @@ function renderQuestOverview() {
       <strong class="meta-value">${questSystems.length} live quest categories</strong>
     </article>
     <p class="quest-overview-copy">ARC Raiders' official public material currently gives enough information to guide players through Trader quests, Feats, weekly Trials, larger Projects, and Expeditions. This section focuses on how to complete those systems reliably rather than pretending there is a public, fixed list of every named in-game task.</p>
+    ${renderCallout("trust", "Last verified", `Quest system guidance is aligned with official public ARC Raiders progression posts verified through ${OFFICIAL_POSTS_VERIFIED}.`)}
     <div class="source-note">
       <strong>Source scope:</strong>
       <p class="quest-note">This guide is grounded in the current official public overview of quests, Traders, Feats, Trials, Projects, and Expedition-related posts from ARC Raiders.</p>
@@ -3313,11 +3398,12 @@ function renderQuestList() {
     return `
     <button class="quest-card ${quest.id === state.selectedQuestId ? "active" : ""} ${isCompletedItem("quest", quest.id) ? "is-complete" : ""} ${isSavedItem("quest", quest.id) ? "is-saved" : ""}" type="button" data-quest-id="${quest.id}">
       <div class="quest-title-row">
-        <h3 class="quest-title">${quest.title}</h3>
+        <h3 class="quest-title">${renderCategoryIcon("Quest")}${quest.title}</h3>
         <span class="quest-badge">${quest.category}</span>
       </div>
       ${renderCardMeta(meta, [isCompletedItem("quest", quest.id) ? "Completed" : null, isSavedItem("quest", quest.id) ? "Saved" : null], getQuestDecisionItems(quest, meta))}
       <p class="quest-summary">${quest.summary}</p>
+      <div class="card-tags">${renderStatusTagMarkup(getStatusTags(meta))}</div>
       <div class="card-tags">${renderTagMarkup(meta.tags)}</div>
     </button>
   `;
@@ -3390,10 +3476,7 @@ function renderQuestDetail() {
       <div class="card-tags">${renderTagMarkup(meta.tags)}</div>
     </section>
     <section class="detail-block">
-      <div class="callout">
-        <strong>Field note:</strong>
-        <p class="detail-copy">${quest.fieldNote}</p>
-      </div>
+      ${renderCallout("tip", "Field note", quest.fieldNote)}
     </section>
   `;
 
@@ -3677,7 +3760,7 @@ function renderUpdateSpotlight() {
       <div class="spotlight-heading">
         <div>
           <p class="eyebrow">Latest official watch</p>
-          <h3 class="spotlight-title">${release.title}</h3>
+          <h3 class="spotlight-title">${renderCategoryIcon("Updates")}${release.title}</h3>
         </div>
         <span class="spotlight-date">${release.date}</span>
       </div>
@@ -3690,6 +3773,9 @@ function renderUpdateSpotlight() {
       <ul class="spotlight-list">
         ${release.confirmed.map((item) => `<li>${item}</li>`).join("")}
       </ul>
+      <div class="spotlight-actions">
+        <a class="hero-button hero-button-primary" href="#update-center" data-focus-view="updates">Review Live Patch Impact</a>
+      </div>
     </section>
     <div class="source-note">
       <strong>Design direction:</strong>
@@ -3729,7 +3815,7 @@ function renderStartHereFlow() {
     </article>
   `).join("");
 
-  startHereCtaElement.textContent = completedCount ? `Continue: ${nextStep.title}` : "Start onboarding";
+  startHereCtaElement.textContent = completedCount ? `Continue: ${nextStep.title}` : "Start New Raider Path";
   startHereCtaElement.dataset.startStep = nextStep.id;
 
   for (const button of startHereStepsElement.querySelectorAll("[data-start-step]")) {
@@ -3742,26 +3828,46 @@ function renderStartHereFlow() {
 }
 
 function renderEmbarkFeed() {
+  const importantItem = embarkFeed.find((item) => item.kind === "major") ?? embarkFeed[0];
   embarkFeedElement.innerHTML = `
-    ${embarkFeed.map((item) => `
-      <article class="embark-feed-card">
-        <span class="embark-feed-date">${item.date}</span>
-        <h3 class="embark-feed-title">${item.title}</h3>
-        <p class="embark-feed-copy">${item.summary}</p>
-        <div class="card-tags">
-          <span class="content-tag">Official post</span>
-          <span class="content-tag">Verified ${OFFICIAL_POSTS_VERIFIED}</span>
-        </div>
-        <div class="embark-feed-meta">
-          <span class="embark-feed-source">${item.source}</span>
-          <a class="hero-button hero-button-secondary embark-feed-link" href="${item.url}" target="_blank" rel="noreferrer">Open post</a>
-        </div>
-      </article>
-    `).join("")}
+    <article class="embark-feed-card embark-feed-highlight">
+      <span class="embark-feed-date">Important change</span>
+      <h3 class="embark-feed-title">${renderCategoryIcon("Updates")}${importantItem.title}</h3>
+      <p class="embark-feed-copy">${importantItem.summary}</p>
+      <div class="card-tags">
+        <span class="content-tag">Major update</span>
+        <span class="content-tag">Verified ${OFFICIAL_POSTS_VERIFIED}</span>
+      </div>
+      <div class="embark-feed-meta">
+        <span class="embark-feed-source">${importantItem.source}</span>
+        <a class="hero-button hero-button-primary embark-feed-link" href="${importantItem.url}" target="_blank" rel="noreferrer">Read Important Change</a>
+      </div>
+    </article>
+    <div class="feed-timeline">
+      ${embarkFeed.map((item) => `
+        <article class="embark-feed-card embark-feed-card-${item.kind ?? "minor"}">
+          <div class="feed-item-top">
+            <span class="embark-feed-date">${item.date}</span>
+            <span class="feed-impact-badge feed-impact-badge-${item.kind ?? "minor"}">${item.kind === "major" ? "Major" : "Minor"}</span>
+          </div>
+          <h3 class="embark-feed-title">${renderCategoryIcon("Updates")}${item.title}</h3>
+          <p class="embark-feed-copy">${item.summary}</p>
+          <div class="card-tags">
+            <span class="content-tag">Official post</span>
+            <span class="content-tag">${item.changeLabel ?? "Active archive"}</span>
+            <span class="content-tag">Verified ${OFFICIAL_POSTS_VERIFIED}</span>
+          </div>
+          <div class="embark-feed-meta">
+            <span class="embark-feed-source">${item.source}</span>
+            <a class="hero-button hero-button-secondary embark-feed-link" href="${item.url}" target="_blank" rel="noreferrer">Open Update</a>
+          </div>
+        </article>
+      `).join("")}
+    </div>
     <article class="source-note">
       <strong>How this works:</strong>
       <p class="release-note">This module is a curated official-news watch, not a noisy live embed. It is designed to be refreshed from Embark's official news page on a regular cadence while the app keeps the deeper guide content organized for players.</p>
-      <a class="hero-button hero-button-secondary embark-feed-link" href="https://arcraiders.com/en/news" target="_blank" rel="noreferrer">Open official news hub</a>
+      <a class="hero-button hero-button-secondary embark-feed-link" href="https://arcraiders.com/en/news" target="_blank" rel="noreferrer">Browse Official News Archive</a>
     </article>
   `;
 }
@@ -4496,10 +4602,7 @@ function renderMaterialsOverview() {
       <strong class="meta-value">${materialFamilies.length} material families</strong>
     </article>
     <p class="materials-copy">ARC Raiders' public material information is best understood as a routing problem, not a perfect loot-table spreadsheet. Official sources tell us which map types exist, which conditions boost certain loot, and which material families are definitely in circulation. This section translates that into practical material-hunting advice.</p>
-    <div class="callout">
-      <strong>April verification status:</strong>
-      <p class="detail-copy">Official April posts confirm the workshop now includes Acquire Resources support for missing ingredients, but they still do not publish a brand-new material family list or a replaced material catalog. Based on current public information, the catalog below still holds after the April 8, 2026 patch cycle.</p>
-    </div>
+    ${renderCallout("trust", "Last verified", `Official April posts confirm the workshop now includes Acquire Resources support for missing ingredients, but they still do not publish a brand-new material family list or a replaced material catalog. Based on current public information, the catalog below still holds after the April 8, 2026 patch cycle and remains verified through ${OFFICIAL_POSTS_VERIFIED}.`)}
     <div class="source-note">
       <strong>Source scope:</strong>
       <p class="material-note">This guide uses official public details about the Workshop, Acquire Resources flow, maps, special conditions, boosted cache drops, the named basic materials used in the tunnel restoration event, and post-Flashpoint workshop changes.</p>
@@ -4518,11 +4621,12 @@ function renderMaterialsList() {
     return `
     <button class="material-card ${material.id === state.selectedMaterialId ? "active" : ""} ${isCompletedItem("material", material.id) ? "is-complete" : ""} ${isSavedItem("material", material.id) ? "is-saved" : ""}" type="button" data-material-id="${material.id}">
       <div class="quest-title-row">
-        <h3 class="material-title">${material.title}</h3>
+        <h3 class="material-title">${renderCategoryIcon("Material")}${material.title}</h3>
         <span class="quest-badge">${material.badge}</span>
       </div>
       ${renderCardMeta({ ...meta, mode: meta.goal }, [isCompletedItem("material", material.id) ? "Completed" : null, isSavedItem("material", material.id) ? "Saved" : null], getMaterialDecisionItems(material, meta))}
       <p class="material-summary">${material.summary}</p>
+      <div class="card-tags">${renderStatusTagMarkup(getStatusTags(meta))}</div>
       <div class="card-tags">${renderTagMarkup(meta.tags)}</div>
     </button>
   `;
@@ -4577,10 +4681,7 @@ function renderMaterialsDetail() {
       <div class="card-tags">${renderTagMarkup(meta.tags)}</div>
     </section>
     <section class="detail-block">
-      <div class="callout">
-        <strong>Field note:</strong>
-        <p class="detail-copy">${material.fieldNote}</p>
-      </div>
+      ${renderCallout("tip", "Field note", material.fieldNote)}
     </section>
   `;
 
@@ -4686,6 +4787,7 @@ function renderGearOverview() {
       <span class="meta-label">Core principle</span>
       <strong class="meta-value">Build for the actual raid objective</strong>
     </article>
+    ${renderCallout("trust", "Method note", "Gear guidance is role-first and ARC Raiders-specific. It is built around raid intent, public patch context, and field use instead of pretending one universal meta loadout solves everything.")}
     <div class="source-note">
       <strong>What this section should do for a new Raider:</strong>
       <p class="release-note">This is now a loadout-planning section, not a generic weapon overview. Use it to answer: what kind of kit should I bring for questing, farming, operations, recovery, or heavy ARC pressure?</p>
@@ -4730,11 +4832,12 @@ function renderWeaponRoles() {
     return `
     <article class="gear-card">
       <div class="gear-card-top">
-        <h3 class="gear-title">${role.title}</h3>
+        <h3 class="gear-title">${renderCategoryIcon("Gear")}${role.title}</h3>
         <button class="hero-button hero-button-secondary card-save-button" type="button" data-save-loadout="${roleId}">${isSavedItem("loadout", roleId) ? "Saved" : "Save"}</button>
       </div>
       ${renderCardMeta(meta, [role.bestFor.includes("Quest") ? "Recommended" : null], getLoadoutDecisionItems(role, meta))}
       <p class="gear-copy">${role.summary}</p>
+      <div class="card-tags">${renderStatusTagMarkup(getStatusTags(meta))}</div>
       <div class="card-tags">${renderTagMarkup(meta.tags)}</div>
       <div class="gear-meta">
         <section class="gear-rule">
@@ -4777,11 +4880,12 @@ function renderQuickUseItems() {
     return `
     <article class="quick-use-card">
       <div class="gear-card-top">
-        <h3 class="quick-use-title">${item.title}</h3>
+        <h3 class="quick-use-title">${renderCategoryIcon("Quick-use")}${item.title}</h3>
         <button class="hero-button hero-button-secondary card-save-button" type="button" data-save-quickuse="${quickUseId}">${isSavedItem("quickuse", quickUseId) ? "Saved" : "Save"}</button>
       </div>
       ${renderCardMeta(meta, [], getQuickUseDecisionItems(item, meta))}
       <p class="quick-use-copy">${item.summary}</p>
+      <div class="card-tags">${renderStatusTagMarkup(getStatusTags(meta))}</div>
       <div class="card-tags">${renderTagMarkup(meta.tags)}</div>
       <div class="gear-meta">
         <section class="gear-rule">
