@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.21.0",
+    date: "2026-04-12",
+    summary: "Added a fuller trust layer with a modern footer, feedback/report flows, clearer verification context, and a more useful changelog.",
+    changes: [
+      "Upgraded the footer with about, trust, feedback, changelog, methodology, FAQ placeholder, update dates, and community links.",
+      "Added friction-light reporting flows for outdated info, improvement suggestions, and topic requests using the GitHub repo and Discord.",
+      "Added clearer official-source and verification cues across updates, feed cards, search empty states, and release detail panels."
+    ]
+  },
+  {
     version: "v1.20.0",
     date: "2026-04-12",
     summary: "Added richer visual intel, reusable media widgets, and lightweight interactive tools that make the guide more practical without tanking performance.",
@@ -365,6 +375,65 @@ const APP_VERSION = VERSION_HISTORY[0].version;
 const APP_UPDATED = VERSION_HISTORY[0].date;
 const OFFICIAL_POSTS_VERIFIED = "2026-04-12";
 const STORAGE_KEY = "arc-raiders-guide-state";
+const GUIDE_METHODOLOGY = {
+  summary: "This guide prioritizes official ARC Raiders news, patch notes, and roadmap posts first. Community-supported sources are used only where official public information stops short, and those areas are labeled accordingly.",
+  official: [
+    "Official news posts, patch notes, and roadmap entries from ARC Raiders",
+    "Verified release dates and currently published official post summaries",
+    "Publicly described systems such as quests, projects, expeditions, workshop changes, and major update beats"
+  ],
+  community: [
+    "Community-supported quest directories when the live named quest list is not fully published by Embark",
+    "Community-supported material catalogs where official sources describe systems but not every item family exhaustively",
+    "Field guidance patterns for machine tactics and loadout logic where public gameplay knowledge is stronger than official documentation"
+  ],
+  limits: [
+    "The guide does not pretend to have private loot tables, hidden quest databases, or secret patch details.",
+    "Placeholder media stays labeled until real screenshots, clips, or diagrams are added.",
+    "If a topic is awaiting verification, it should say so plainly instead of bluffing certainty."
+  ]
+};
+
+const FEEDBACK_ACTIONS = {
+  outdated: {
+    title: "Report outdated info",
+    summary: "Use this when a patch, roadmap change, or gameplay detail in the guide no longer matches live information.",
+    issueTitle: "Outdated guide info:",
+    prompts: [
+      "What page or section looks outdated?",
+      "What changed in the game or official post?",
+      "If you have it, include the official source or date that conflicts with the guide."
+    ]
+  },
+  improvement: {
+    title: "Suggest a guide improvement",
+    summary: "Use this when the guide is technically correct but still not helping enough. Brutal honesty is welcome. Decorative fluff is not.",
+    issueTitle: "Guide improvement:",
+    prompts: [
+      "What part of the guide is weak or confusing?",
+      "What would make that section more useful in an actual raid-prep scenario?",
+      "If you saw a better version on another guide site, say what pattern worked."
+    ]
+  },
+  topic: {
+    title: "Request a topic",
+    summary: "Use this when there is a missing subject you want covered, expanded, or verified.",
+    issueTitle: "Topic request:",
+    prompts: [
+      "What topic or system is missing?",
+      "Is this for new Raiders, solo play, squad play, progression, or patch-day prep?",
+      "What question are you trying to answer that the site currently does not solve?"
+    ]
+  },
+  methodology: {
+    title: "Methodology and sources",
+    summary: GUIDE_METHODOLOGY.summary
+  },
+  faq: {
+    title: "FAQ and coverage notes",
+    summary: "Short version: official sources are checked first, community-supported sections are labeled, and some game systems still are not fully exposed in official public posts. Reality is rude like that."
+  }
+};
 
 const focusViews = [
   {
@@ -1912,6 +1981,13 @@ const modalBackdropElement = document.querySelector("#modal-backdrop");
 const changelogModalElement = document.querySelector("#changelog-modal");
 const closeChangelogElement = document.querySelector("#close-changelog");
 const changelogListElement = document.querySelector("#changelog-list");
+const feedbackModalElement = document.querySelector("#feedback-modal");
+const closeFeedbackElement = document.querySelector("#close-feedback");
+const feedbackPanelElement = document.querySelector("#feedback-panel");
+const openMethodologyElement = document.querySelector("#open-methodology");
+const openFaqElement = document.querySelector("#open-faq");
+const reportUpdateIssueElement = document.querySelector("#report-update-issue");
+const feedbackTriggerElements = Array.from(document.querySelectorAll("[data-feedback-action]"));
 const flowSectionElements = Array.from(document.querySelectorAll(".flow-section"));
 const focusTriggerElements = Array.from(document.querySelectorAll("[data-focus-view]"));
 
@@ -2493,6 +2569,7 @@ function renderCounts() {
     machineCountElement.textContent = String(machines.length);
   }
   appVersionButtonElement.textContent = APP_VERSION;
+  appVersionButtonElement.setAttribute("aria-label", `Open changelog for ${APP_VERSION}`);
   appUpdatedElement.textContent = `Updated ${APP_UPDATED}`;
   if (appVerifiedElement) {
     appVerifiedElement.textContent = `Official posts verified ${OFFICIAL_POSTS_VERIFIED}`;
@@ -2512,12 +2589,37 @@ function renderChangelog() {
         <strong class="changelog-version">${entry.version}</strong>
         <span class="changelog-date">${entry.date}</span>
       </div>
+      <div class="changelog-meta-row">
+        <span class="content-tag">${getChangelogImpact(entry)}</span>
+        ${getChangelogAreas(entry).map((area) => `<span class="card-badge">${area}</span>`).join("")}
+      </div>
       <p class="changelog-summary">${entry.summary}</p>
       <ul class="changelog-points">
         ${entry.changes.map((change) => `<li>${change}</li>`).join("")}
       </ul>
     </article>
   `).join("");
+}
+
+function getChangelogImpact(entry) {
+  const summary = entry.summary.toLowerCase();
+  if (summary.includes("reverified") || summary.includes("verified") || summary.includes("refresh")) return "Maintenance";
+  if (summary.includes("fixed") || summary.includes("replaced")) return "Accuracy fix";
+  if (summary.includes("redesigned") || summary.includes("ui/ux") || summary.includes("visual")) return "UX update";
+  return "Feature update";
+}
+
+function getChangelogAreas(entry) {
+  const haystack = `${entry.summary} ${entry.changes.join(" ")}`.toLowerCase();
+  return [
+    haystack.includes("lesson") || haystack.includes("track") ? "Learn" : null,
+    haystack.includes("quest") || haystack.includes("project") || haystack.includes("expedition") ? "Quests" : null,
+    haystack.includes("material") || haystack.includes("workshop") ? "Materials" : null,
+    haystack.includes("gear") || haystack.includes("loadout") || haystack.includes("weapon") ? "Gear" : null,
+    haystack.includes("arc") || haystack.includes("machine") ? "ARC Intel" : null,
+    haystack.includes("update") || haystack.includes("patch") || haystack.includes("flashpoint") ? "Updates" : null,
+    haystack.includes("footer") || haystack.includes("verification") || haystack.includes("feedback") ? "Trust" : null
+  ].filter(Boolean).slice(0, 4);
 }
 
 function renderBriefing() {
@@ -3206,6 +3308,11 @@ function renderUpdateSpotlight() {
         <span class="spotlight-date">${release.date}</span>
       </div>
       <p class="update-copy">${release.overview}</p>
+      <div class="card-tags">
+        <span class="content-tag">Official source</span>
+        <span class="content-tag">Recently updated</span>
+        <span class="content-tag">Verified ${OFFICIAL_POSTS_VERIFIED}</span>
+      </div>
       <ul class="spotlight-list">
         ${release.confirmed.map((item) => `<li>${item}</li>`).join("")}
       </ul>
@@ -3213,6 +3320,7 @@ function renderUpdateSpotlight() {
     <div class="source-note">
       <strong>Design direction:</strong>
       <p class="release-note">This app now treats updates as a first-class content type so future Embark drops can be added through release records, affected-system tags, and spotlight panels instead of one-off page rewrites.</p>
+      <p class="release-note">Verification note: release context in this section is grounded in official ARC Raiders posts first, then connected back to the guide where player-facing advice needs to change.</p>
     </div>
   `;
 }
@@ -3224,6 +3332,10 @@ function renderEmbarkFeed() {
         <span class="embark-feed-date">${item.date}</span>
         <h3 class="embark-feed-title">${item.title}</h3>
         <p class="embark-feed-copy">${item.summary}</p>
+        <div class="card-tags">
+          <span class="content-tag">Official post</span>
+          <span class="content-tag">Verified ${OFFICIAL_POSTS_VERIFIED}</span>
+        </div>
         <div class="embark-feed-meta">
           <span class="embark-feed-source">${item.source}</span>
           <a class="hero-button hero-button-secondary embark-feed-link" href="${item.url}" target="_blank" rel="noreferrer">Open post</a>
@@ -3646,6 +3758,12 @@ function renderReleaseDetail() {
         <p class="detail-copy">${release.confirmed.join(" | ")}</p>
       </div>
     </section>
+    <section class="detail-block">
+      <div class="source-note">
+        <strong>Confidence note:</strong>
+        <p class="detail-copy">This release panel is driven from official ARC Raiders posts and patch notes. If a system here looks wrong after a new patch lands, use the report flow so the guide can be corrected instead of rotting politely in public.</p>
+      </div>
+    </section>
   `;
 }
 
@@ -3767,8 +3885,13 @@ function renderSearchResults(query) {
       <article class="search-result search-result-empty">
         <h3 class="search-result-title">No matches</h3>
         <p class="search-result-copy">Try a broader term like quest, material, machine, extraction, or trader. You can also jump into one of these common searches.</p>
+        <div class="source-note">
+          <strong>Need coverage that is not here yet?</strong>
+          <p class="search-result-copy">Some topics are still awaiting verification or have not been built out yet. If you want a missing subject covered, use the topic request flow instead of quietly suffering through it.</p>
+        </div>
         <div class="search-empty-actions">
           ${SEARCH_SUGGESTIONS.slice(0, 4).map((item) => `<button class="filter-chip" type="button" data-search-suggestion="${item.query}">${item.label}</button>`).join("")}
+          <button class="hero-button hero-button-secondary" type="button" data-empty-feedback="topic">Request a topic</button>
         </div>
       </article>
     `;
@@ -3778,6 +3901,8 @@ function renderSearchResults(query) {
         renderSearchResults(button.dataset.searchSuggestion);
       });
     }
+    const feedbackButton = searchResultsElement.querySelector("[data-empty-feedback]");
+    feedbackButton?.addEventListener("click", () => openFeedback(feedbackButton.dataset.emptyFeedback));
     return;
   }
 
@@ -4155,12 +4280,112 @@ function openChangelog() {
   renderChangelog();
   modalBackdropElement.hidden = false;
   changelogModalElement.hidden = false;
+  feedbackModalElement.hidden = true;
   document.body.style.overflow = "hidden";
 }
 
 function closeChangelog() {
-  modalBackdropElement.hidden = true;
   changelogModalElement.hidden = true;
+  if (feedbackModalElement.hidden) {
+    modalBackdropElement.hidden = true;
+    document.body.style.overflow = "";
+  }
+}
+
+function renderFeedbackPanel(actionKey) {
+  const action = FEEDBACK_ACTIONS[actionKey] ?? FEEDBACK_ACTIONS.improvement;
+  const issueTitle = encodeURIComponent(action.issueTitle ?? `${action.title}: `);
+  const issueBody = encodeURIComponent((action.prompts ?? []).map((prompt) => `- ${prompt}`).join("\n"));
+
+  if (actionKey === "methodology") {
+    feedbackPanelElement.innerHTML = `
+      <article class="feedback-card">
+        <p class="feedback-copy">${GUIDE_METHODOLOGY.summary}</p>
+        <div class="feedback-grid">
+          <section class="feedback-block">
+            <h3>Official first</h3>
+            <ul class="detail-list">${GUIDE_METHODOLOGY.official.map((item) => `<li>${item}</li>`).join("")}</ul>
+          </section>
+          <section class="feedback-block">
+            <h3>Community-supported where needed</h3>
+            <ul class="detail-list">${GUIDE_METHODOLOGY.community.map((item) => `<li>${item}</li>`).join("")}</ul>
+          </section>
+        </div>
+        <div class="source-note">
+          <strong>Coverage limits:</strong>
+          <ul class="detail-list">${GUIDE_METHODOLOGY.limits.map((item) => `<li>${item}</li>`).join("")}</ul>
+        </div>
+      </article>
+    `;
+    return;
+  }
+
+  if (actionKey === "faq") {
+    feedbackPanelElement.innerHTML = `
+      <article class="feedback-card">
+        <p class="feedback-copy">${FEEDBACK_ACTIONS.faq.summary}</p>
+        <div class="feedback-grid">
+          <section class="feedback-block">
+            <h3>What gets verified fastest?</h3>
+            <p class="feedback-copy">Official patch notes, roadmap posts, release announcements, and UX change posts from Embark.</p>
+          </section>
+          <section class="feedback-block">
+            <h3>What may stay community-supported?</h3>
+            <p class="feedback-copy">Named quest directories, exhaustive material catalogs, and some field-practice combat notes when official public detail is incomplete.</p>
+          </section>
+        </div>
+        <div class="source-note">
+          <strong>Planned but not fully built:</strong>
+          <p class="feedback-copy">Deeper FAQ coverage and more source drilldowns are still planned. The guide is being honest about that instead of pretending the cupboard is full.</p>
+        </div>
+      </article>
+    `;
+    return;
+  }
+
+  feedbackPanelElement.innerHTML = `
+    <article class="feedback-card">
+      <p class="detail-kicker">Feedback path</p>
+      <h3 class="feedback-title">${action.title}</h3>
+      <p class="feedback-copy">${action.summary}</p>
+      <div class="feedback-grid">
+        <section class="feedback-block">
+          <h3>What to include</h3>
+          <ul class="detail-list">${(action.prompts ?? []).map((prompt) => `<li>${prompt}</li>`).join("")}</ul>
+        </section>
+        <section class="feedback-block">
+          <h3>Send it through</h3>
+          <div class="footer-link-stack">
+            <a class="hero-button hero-button-primary" href="https://github.com/tjhiggy/Raider/issues/new?title=${issueTitle}&body=${issueBody}" target="_blank" rel="noreferrer">Open GitHub issue</a>
+            <a class="hero-button hero-button-secondary" href="https://discord.gg/4JZ9f39h" target="_blank" rel="noreferrer">Ask in Discord</a>
+          </div>
+          <p class="feedback-copy">GitHub issues are best for trackable fixes. Discord is better when you want a quick gut-check before filing a formal problem.</p>
+        </section>
+      </div>
+    </article>
+  `;
+}
+
+function openFeedback(actionKey = "improvement") {
+  renderFeedbackPanel(actionKey);
+  modalBackdropElement.hidden = false;
+  feedbackModalElement.hidden = false;
+  changelogModalElement.hidden = true;
+  document.body.style.overflow = "hidden";
+}
+
+function closeFeedback() {
+  feedbackModalElement.hidden = true;
+  if (changelogModalElement.hidden) {
+    modalBackdropElement.hidden = true;
+    document.body.style.overflow = "";
+  }
+}
+
+function closeAllModals() {
+  changelogModalElement.hidden = true;
+  feedbackModalElement.hidden = true;
+  modalBackdropElement.hidden = true;
   document.body.style.overflow = "";
 }
 
@@ -4301,7 +4526,14 @@ globalSearchElement.addEventListener("input", () => {
 });
 appVersionButtonElement.addEventListener("click", openChangelog);
 closeChangelogElement.addEventListener("click", closeChangelog);
-modalBackdropElement.addEventListener("click", closeChangelog);
+closeFeedbackElement.addEventListener("click", closeFeedback);
+modalBackdropElement.addEventListener("click", closeAllModals);
+openMethodologyElement.addEventListener("click", () => openFeedback("methodology"));
+openFaqElement.addEventListener("click", () => openFeedback("faq"));
+reportUpdateIssueElement.addEventListener("click", () => openFeedback("outdated"));
+for (const trigger of feedbackTriggerElements) {
+  trigger.addEventListener("click", () => openFeedback(trigger.dataset.feedbackAction));
+}
 shareAppButtonElement.addEventListener("click", () => {
   shareApp().catch(() => undefined);
 });
@@ -4350,8 +4582,8 @@ installAppButtonElement.addEventListener("click", async () => {
 });
 
 window.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && !changelogModalElement.hidden) {
-    closeChangelog();
+  if (event.key === "Escape" && (!changelogModalElement.hidden || !feedbackModalElement.hidden)) {
+    closeAllModals();
   }
 });
 

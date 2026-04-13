@@ -209,6 +209,7 @@
         <div class="detail-actions">
           <button id="mark-release-complete" class="hero-button hero-button-secondary detail-action" type="button">Mark update reviewed</button>
           <button id="save-release" class="hero-button hero-button-secondary detail-action" type="button">Save update</button>
+          <button id="report-update-issue" class="hero-button hero-button-secondary detail-action" type="button">Report outdated info</button>
         </div>
       </aside>
     </section>
@@ -445,13 +446,42 @@
       </section>
     </section>
 
-    <footer class="app-footer">
-      <span class="footer-item">ARC Raiders Field Guide</span>
-      <button id="app-version" class="footer-item footer-button" type="button" aria-haspopup="dialog" aria-controls="changelog-modal">v1.0.0</button>
-      <span id="app-updated" class="footer-item">Updated 2026-03-30</span>
-      <span id="app-verified" class="footer-item">Official posts verified 2026-03-30</span>
-      <a class="footer-item footer-link" href="https://discord.gg/4JZ9f39h" target="_blank" rel="noreferrer">Join The MuthaShip</a>
-      <span class="footer-item">Optimized for desktop and mobile browsers</span>
+    <footer class="app-footer panel">
+      <section class="footer-column">
+        <p class="eyebrow">About</p>
+        <h2 class="footer-title">ARC Raiders Field Guide</h2>
+        <p class="footer-copy">A practical companion guide focused on raid decision-making, patch context, progression support, and ARC Raiders-specific learning instead of generic shooter filler.</p>
+        <div class="footer-tag-row">
+          <span id="app-updated" class="footer-item">Updated 2026-03-30</span>
+          <span id="app-verified" class="footer-item">Official posts verified 2026-03-30</span>
+        </div>
+      </section>
+      <section class="footer-column">
+        <p class="eyebrow">Trust</p>
+        <div class="footer-link-stack">
+          <button id="app-version" class="footer-link-button" type="button" aria-haspopup="dialog" aria-controls="changelog-modal">Open changelog</button>
+          <button id="open-methodology" class="footer-link-button" type="button" aria-haspopup="dialog" aria-controls="feedback-modal">Methodology and sources</button>
+          <button id="open-faq" class="footer-link-button" type="button" aria-haspopup="dialog" aria-controls="feedback-modal">FAQ and coverage notes</button>
+        </div>
+        <p class="footer-note">Official news, roadmap, and patch posts are prioritized first. Community-supported coverage is labeled when official sources stop short.</p>
+      </section>
+      <section class="footer-column">
+        <p class="eyebrow">Feedback</p>
+        <div class="footer-link-stack">
+          <button class="footer-link-button" type="button" data-feedback-action="outdated">Report outdated info</button>
+          <button class="footer-link-button" type="button" data-feedback-action="improvement">Suggest a guide improvement</button>
+          <button class="footer-link-button" type="button" data-feedback-action="topic">Request a topic</button>
+          <a class="footer-link-button footer-link" href="https://github.com/tjhiggy/Raider/issues/new" target="_blank" rel="noreferrer">Open GitHub issue</a>
+        </div>
+      </section>
+      <section class="footer-column">
+        <p class="eyebrow">Community</p>
+        <div class="footer-link-stack">
+          <a class="footer-link-button footer-link" href="https://discord.gg/4JZ9f39h" target="_blank" rel="noreferrer">Join The MuthaShip</a>
+          <a class="footer-link-button footer-link" href="https://arcraiders.com/en/news" target="_blank" rel="noreferrer">Official news hub</a>
+        </div>
+        <p class="footer-note">Site maintained for desktop and mobile browsers. Feedback is intentionally friction-light because stale guide info is worse than no guide info. Shocking, I know.</p>
+      </section>
     </footer>
   </main>
 
@@ -468,6 +498,18 @@
         <button id="close-changelog" class="modal-close" type="button" aria-label="Close changelog">Close</button>
       </div>
       <div id="changelog-list" class="changelog-list" aria-live="polite"></div>
+    </div>
+  </section>
+  <section id="feedback-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="feedback-title" hidden>
+    <div class="modal-panel">
+      <div class="modal-head">
+        <div>
+          <p class="eyebrow">Guide Feedback</p>
+          <h2 id="feedback-title">Help keep the guide current</h2>
+        </div>
+        <button id="close-feedback" class="modal-close" type="button" aria-label="Close feedback">Close</button>
+      </div>
+      <div id="feedback-panel" class="feedback-panel" aria-live="polite"></div>
     </div>
   </section>
 
