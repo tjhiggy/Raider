@@ -1177,6 +1177,99 @@ button { color: inherit; }
 .intel-grid { display: grid; gap: 18px; }
 .launchpad-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom: 20px; }
 .status-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom: 20px; }
+.live-signal-panel {
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.live-signal-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 320px;
+  gap: 16px;
+}
+
+.live-signal-column,
+.signal-side-panel {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+.signal-list,
+.signal-side-list {
+  display: grid;
+  gap: 10px;
+}
+
+.signal-card,
+.signal-side-card,
+.signal-side-item {
+  width: 100%;
+  text-align: left;
+  color: inherit;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.signal-card,
+.signal-side-item {
+  cursor: pointer;
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+}
+
+.signal-card:hover,
+.signal-card:focus-visible,
+.signal-side-item:hover,
+.signal-side-item:focus-visible {
+  transform: translateY(-2px);
+  border-color: rgba(214, 117, 48, 0.42);
+  box-shadow: 0 12px 28px rgba(214, 117, 48, 0.1);
+  background: linear-gradient(180deg, rgba(214, 117, 48, 0.1), rgba(255, 255, 255, 0.03));
+}
+
+.signal-card-top,
+.signal-side-kicker {
+  color: var(--soft);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.signal-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.signal-title {
+  display: block;
+  margin-top: 10px;
+  color: var(--signal);
+  font-size: 1rem;
+}
+
+.signal-copy,
+.signal-side-card p,
+.signal-side-item p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.signal-side-card strong,
+.signal-side-item strong {
+  color: var(--signal);
+}
+
+.signal-side-item {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+}
 .personal-hub {
   padding: 20px;
   margin-bottom: 20px;
@@ -2528,7 +2621,7 @@ button { color: inherit; }
 }
 
 @media (max-width: 1120px) {
-  .hero, .update-layout, .curriculum-layout, .quest-layout, .materials-layout, .gear-layout, .intel-grid, .status-grid, .briefing-list, .launchpad-grid, .personal-hub-grid, .tool-grid, .compare-grid, .feedback-grid, .app-footer, .start-here-steps { grid-template-columns: 1fr; }
+  .hero, .update-layout, .curriculum-layout, .quest-layout, .materials-layout, .gear-layout, .intel-grid, .status-grid, .briefing-list, .launchpad-grid, .personal-hub-grid, .tool-grid, .compare-grid, .feedback-grid, .app-footer, .start-here-steps, .live-signal-grid { grid-template-columns: 1fr; }
   .curriculum-layout { gap: 16px; }
   .materials-catalog { grid-template-columns: 1fr; }
   .site-tools-row { grid-template-columns: 1fr; }

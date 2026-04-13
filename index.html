@@ -164,6 +164,30 @@
       </aside>
     </section>
 
+    <section class="panel live-signal-panel flow-section" data-view="start">
+      <div class="section-heading">
+        <h2>Live Signal</h2>
+        <p>Spot what changed, what players keep opening, and what matters since your last visit without digging through the whole guide like a sleep-deprived loot goblin.</p>
+      </div>
+      <div class="live-signal-grid">
+        <section class="live-signal-column">
+          <div class="section-heading section-heading-compact">
+            <h3>Recently Updated</h3>
+            <p>Fresh guide content and newly touched areas.</p>
+          </div>
+          <div id="recently-updated-list" class="signal-list" aria-live="polite"></div>
+        </section>
+        <section class="live-signal-column">
+          <div class="section-heading section-heading-compact">
+            <h3>Trending Right Now</h3>
+            <p>High-interest topics ranked with lightweight app logic.</p>
+          </div>
+          <div id="trending-content-list" class="signal-list" aria-live="polite"></div>
+        </section>
+        <aside id="since-last-visit-panel" class="signal-side-panel" aria-live="polite"></aside>
+      </div>
+    </section>
+
     <section class="panel personal-hub flow-section" data-view="start">
       <div class="section-heading">
         <h2>Your Raider Dashboard</h2>

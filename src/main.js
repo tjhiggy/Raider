@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.24.0",
+    date: "2026-04-13",
+    summary: "Added live-signal homepage modules for recently updated content, trending topics, updated-today cues, and since-your-last-visit context.",
+    changes: [
+      "Added a new Live Signal section on the homepage with recently updated and trending content cards tied to real guide entries.",
+      "Added Updated today badges and lightweight ranking logic so the homepage feels more alive and worth revisiting.",
+      "Added a since-your-last-visit panel that uses saved local progress state to surface what changed after a user's previous recorded visit."
+    ]
+  },
+  {
     version: "v1.23.0",
     date: "2026-04-13",
     summary: "Upgraded primary content cards with cleaner decision metadata so Raiders can scan purpose, time, outcome, and difficulty faster.",
@@ -395,6 +405,19 @@ const APP_VERSION = VERSION_HISTORY[0].version;
 const APP_UPDATED = VERSION_HISTORY[0].date;
 const OFFICIAL_POSTS_VERIFIED = "2026-04-12";
 const STORAGE_KEY = "arc-raiders-guide-state";
+const CONTENT_SIGNAL_OVERRIDES = {
+  "lesson:read-topside-correctly": { updated: "2026-04-13", trend: 96, benefit: "Fix raid flow confusion fast", reason: "Start Here anchor" },
+  "lesson:understand-raid-phases": { updated: "2026-04-13", trend: 92, benefit: "Stop random raid pacing mistakes", reason: "Core onboarding" },
+  "quest:trader-quests": { updated: "2026-04-12", trend: 95, benefit: "Turn raids into progression", reason: "High new-player demand" },
+  "quest:expeditions": { updated: "2026-04-12", trend: 82, benefit: "Plan long-cycle progression better", reason: "Advanced prep" },
+  "material:basic-scrap": { updated: "2026-04-12", trend: 84, benefit: "Unblock early crafts and stash decisions", reason: "Common workshop blocker" },
+  "material:advanced-components": { updated: "2026-04-12", trend: 79, benefit: "Protect high-value crafting runs", reason: "High-tier routing" },
+  "loadout:questing-loadout-blueprint": { updated: "2026-04-12", trend: 88, benefit: "Bring the right kit for objective runs", reason: "Popular gear entry" },
+  "quickuse:movement-or-escape-utility": { updated: "2026-04-12", trend: 77, benefit: "Extract cleaner under pressure", reason: "Strong beginner value" },
+  "release:patch-notes-1-23-0-2026-04-08": { updated: "2026-04-08", trend: 93, benefit: "Know what advice changed", reason: "Latest official patch" },
+  "release:flashpoint-content-update-2026-03-31": { updated: "2026-04-08", trend: 86, benefit: "Understand Flashpoint systems", reason: "Still driving live interest" },
+  "release:reducing-friction-in-arc-raiders-2026-04-04": { updated: "2026-04-08", trend: 80, benefit: "See UX changes that affect guide flow", reason: "Fresh support post" }
+};
 const GUIDE_METHODOLOGY = {
   summary: "This guide prioritizes official ARC Raiders news, patch notes, and roadmap posts first. Community-supported sources are used only where official public information stops short, and those areas are labeled accordingly.",
   official: [
@@ -2000,6 +2023,9 @@ const embarkFeedElement = document.querySelector("#embark-feed");
 const heroUpdateCardElement = document.querySelector("#hero-update-card");
 const heroPersonalCardElement = document.querySelector("#hero-personal-card");
 const heroTaskListElement = document.querySelector("#hero-task-list");
+const recentlyUpdatedListElement = document.querySelector("#recently-updated-list");
+const trendingContentListElement = document.querySelector("#trending-content-list");
+const sinceLastVisitPanelElement = document.querySelector("#since-last-visit-panel");
 const personalOverviewElement = document.querySelector("#personal-overview");
 const sectionProgressElement = document.querySelector("#section-progress");
 const savedPanelElement = document.querySelector("#saved-panel");
@@ -2072,6 +2098,7 @@ const focusTriggerElements = Array.from(document.querySelectorAll("[data-focus-v
 
 let deferredInstallPrompt = null;
 let easterEggTimeoutId = null;
+let previousSeenUpdated = null;
 
 function syncCommandBarState() {
   if (!commandBarElement || !toggleCommandBarElement) {
@@ -2214,6 +2241,131 @@ function getContinueItem() {
       scrollElementIntoView(document.querySelector("#curriculum"));
     }
   };
+}
+
+function hasUserProgressData() {
+  return Boolean(
+    state.reviewedLessons.length ||
+    state.completedItems.length ||
+    state.savedItems.length ||
+    state.checkedPrepItems.length
+  );
+}
+
+function getSinceLastVisitEntries() {
+  if (!previousSeenUpdated || !hasUserProgressData()) {
+    return [];
+  }
+
+  const registry = buildDiscoveryRegistry();
+  return Object.entries(CONTENT_SIGNAL_OVERRIDES)
+    .filter(([, signal]) => signal.updated > previousSeenUpdated)
+    .map(([key, signal]) => {
+      const entry = registry[key];
+      if (!entry) {
+        return null;
+      }
+
+      return {
+        key,
+        title: entry.title,
+        subtitle: entry.subtitle,
+        action: entry.action,
+        type: entry.type,
+        updated: signal.updated,
+        benefit: signal.benefit,
+        reason: signal.reason
+      };
+    })
+    .filter(Boolean)
+    .slice(0, 4);
+}
+
+function getLiveSignalEntries() {
+  const registry = buildDiscoveryRegistry();
+  const playstyle = getPlaystyle();
+  const continueItem = getContinueItem();
+
+  return Object.entries(CONTENT_SIGNAL_OVERRIDES).map(([key, signal]) => {
+    const entry = registry[key];
+    if (!entry) {
+      return null;
+    }
+
+    const metaText = (entry.meta ?? []).join(" ").toLowerCase();
+    const titleText = `${entry.title} ${entry.subtitle ?? ""}`.toLowerCase();
+    let trendScore = signal.trend;
+
+    if (continueItem && createItemKey(continueItem.type, continueItem.id) === key) {
+      trendScore += 8;
+    }
+    if (state.savedItems.includes(key)) {
+      trendScore += 6;
+    }
+    if (playstyle.id === "quest-focused" && (titleText.includes("quest") || metaText.includes("quest"))) {
+      trendScore += 6;
+    }
+    if (playstyle.id === "loot-crafting-focused" && (titleText.includes("material") || metaText.includes("craft") || metaText.includes("workshop"))) {
+      trendScore += 6;
+    }
+    if (playstyle.id === "solo-player" && metaText.includes("solo")) {
+      trendScore += 5;
+    }
+    if (playstyle.id === "squad-player" && metaText.includes("squad")) {
+      trendScore += 5;
+    }
+
+    return {
+      key,
+      ...entry,
+      ...signal,
+      trendScore,
+      isUpdatedToday: signal.updated === APP_UPDATED
+    };
+  }).filter(Boolean);
+}
+
+function renderSignalCards(element, items, emptyCopy, variant = "updated") {
+  if (!element) {
+    return;
+  }
+
+  if (!items.length) {
+    element.innerHTML = `
+      <article class="signal-card signal-card-empty">
+        <strong>Nothing new yet</strong>
+        <p>${emptyCopy}</p>
+      </article>
+    `;
+    return;
+  }
+
+  element.innerHTML = items.map((item) => `
+    <button class="signal-card" type="button" data-signal-key="${item.key}">
+      <div class="signal-card-top">
+        <span class="signal-type">${item.type}</span>
+        <span class="signal-date">${item.updated ?? item.date ?? APP_UPDATED}</span>
+      </div>
+      <strong class="signal-title">${item.title}</strong>
+      <p class="signal-copy">${item.benefit ?? item.subtitle}</p>
+      <div class="card-tags">
+        ${item.isUpdatedToday ? '<span class="content-tag">Updated today</span>' : ""}
+        <span class="content-tag">${variant === "trending" ? `Trend ${item.trendScore}` : "Recently updated"}</span>
+        ${item.reason ? `<span class="content-tag">${item.reason}</span>` : ""}
+      </div>
+    </button>
+  `).join("");
+
+  for (const button of element.querySelectorAll("[data-signal-key]")) {
+    button.addEventListener("click", () => {
+      const match = items.find((item) => item.key === button.dataset.signalKey);
+      if (!match) {
+        return;
+      }
+      match.action?.();
+      saveState();
+    });
+  }
 }
 
 function buildDiscoveryRegistry() {
@@ -3311,7 +3463,8 @@ function saveState() {
     loadoutBuilder: state.loadoutBuilder,
     materialHelper: state.materialHelper,
     lastVisited: state.lastVisited,
-    filters: state.filters
+    filters: state.filters,
+    lastSeenUpdated: APP_UPDATED
   };
 
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(persistableState));
@@ -3340,6 +3493,7 @@ function loadState() {
     state.materialHelper = { ...state.materialHelper, ...(parsedState.materialHelper ?? {}) };
     state.lastVisited = parsedState.lastVisited ?? state.lastVisited;
     state.filters = { ...state.filters, ...(parsedState.filters ?? {}) };
+    previousSeenUpdated = parsedState.lastSeenUpdated ?? null;
   } catch (_error) {
     state.reviewedLessons = [];
     state.completedItems = [];
@@ -3598,6 +3752,78 @@ function renderEmbarkFeed() {
       <a class="hero-button hero-button-secondary embark-feed-link" href="https://arcraiders.com/en/news" target="_blank" rel="noreferrer">Open official news hub</a>
     </article>
   `;
+}
+
+function renderLiveSignals() {
+  const signals = getLiveSignalEntries();
+  const recentlyUpdated = [...signals]
+    .sort((a, b) => b.updated.localeCompare(a.updated) || b.trendScore - a.trendScore)
+    .slice(0, 4);
+  const trending = [...signals]
+    .sort((a, b) => b.trendScore - a.trendScore || b.updated.localeCompare(a.updated))
+    .slice(0, 4);
+  const sinceLastVisit = getSinceLastVisitEntries();
+
+  renderSignalCards(recentlyUpdatedListElement, recentlyUpdated, "New guide updates will show here once fresh content lands.", "updated");
+  renderSignalCards(trendingContentListElement, trending, "Trending guidance will appear here when there is enough content to rank.", "trending");
+
+  if (!sinceLastVisitPanelElement) {
+    return;
+  }
+
+  if (!hasUserProgressData()) {
+    sinceLastVisitPanelElement.innerHTML = `
+      <article class="signal-side-card signal-side-empty">
+        <span class="hero-card-label">Since your last visit</span>
+        <strong>This gets smarter after you actually use the guide.</strong>
+        <p>Review, complete, or save a few things and this panel starts surfacing what changed since you were last here.</p>
+      </article>
+    `;
+    return;
+  }
+
+  if (!sinceLastVisit.length) {
+    sinceLastVisitPanelElement.innerHTML = `
+      <article class="signal-side-card">
+        <span class="hero-card-label">Since your last visit</span>
+        <strong>No newer tracked updates yet.</strong>
+        <p>Your progress is saved, your path is intact, and nothing newer than ${previousSeenUpdated ?? APP_UPDATED} has landed in the live-signal pool.</p>
+        <div class="card-tags">
+          <span class="content-tag">Up to date</span>
+          <span class="content-tag">Progress preserved</span>
+        </div>
+      </article>
+    `;
+    return;
+  }
+
+  sinceLastVisitPanelElement.innerHTML = `
+    <article class="signal-side-card">
+      <span class="hero-card-label">Since your last visit</span>
+      <strong>${sinceLastVisit.length} fresh signal${sinceLastVisit.length === 1 ? "" : "s"} worth checking</strong>
+      <p>These changes landed after your previous recorded visit and are the fastest way to avoid stale guidance.</p>
+      <div class="signal-side-list">
+        ${sinceLastVisit.map((item) => `
+          <button class="signal-side-item" type="button" data-signal-key="${item.key}">
+            <span class="signal-side-kicker">${item.updated}</span>
+            <strong>${item.title}</strong>
+            <p>${item.benefit}</p>
+          </button>
+        `).join("")}
+      </div>
+    </article>
+  `;
+
+  for (const button of sinceLastVisitPanelElement.querySelectorAll("[data-signal-key]")) {
+    button.addEventListener("click", () => {
+      const match = sinceLastVisit.find((item) => item.key === button.dataset.signalKey);
+      if (!match) {
+        return;
+      }
+      match.action?.();
+      saveState();
+    });
+  }
 }
 
 function renderHeroDashboard() {
@@ -4687,6 +4913,7 @@ function render() {
   syncFlowSections();
   renderUpdateSpotlight();
   renderEmbarkFeed();
+  renderLiveSignals();
   renderReleaseList();
   renderReleaseDetail();
   renderStartHereFlow();
@@ -4858,6 +5085,7 @@ if (window.matchMedia("(max-width: 760px)").matches) {
   commandBarElement.classList.add("mobile-collapsed");
 }
 render();
+saveState();
 syncBackToTopVisibility();
 syncCommandBarState();
 renderSearchResults("");
