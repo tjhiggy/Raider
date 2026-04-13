@@ -298,6 +298,122 @@ button { color: inherit; }
   margin-bottom: 18px;
 }
 
+.start-here-flow {
+  position: relative;
+  padding: 24px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top left, rgba(217, 122, 53, 0.16), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(129, 203, 218, 0.12), transparent 30%),
+    linear-gradient(180deg, rgba(22, 18, 16, 0.96), rgba(15, 18, 22, 0.96));
+}
+
+.start-here-flow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 88px 88px;
+  opacity: 0.14;
+  pointer-events: none;
+}
+
+.start-here-head,
+.start-here-summary,
+.start-here-actions,
+.start-step-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.start-here-head {
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+
+.start-here-copy {
+  max-width: 62ch;
+  margin: 8px 0 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.start-here-summary {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  min-width: 240px;
+}
+
+.start-here-summary strong {
+  color: var(--signal);
+  font-family: var(--display-font);
+  text-transform: uppercase;
+  font-size: 1rem;
+}
+
+.start-here-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.start-step {
+  position: relative;
+  padding: 18px;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.035);
+  display: grid;
+  gap: 12px;
+}
+
+.start-step-active {
+  border-color: rgba(217, 122, 53, 0.38);
+  background: linear-gradient(180deg, rgba(217, 122, 53, 0.14), rgba(255, 255, 255, 0.03));
+}
+
+.start-step-complete {
+  border-color: rgba(129, 203, 218, 0.3);
+  background: linear-gradient(180deg, rgba(129, 203, 218, 0.1), rgba(255, 255, 255, 0.03));
+}
+
+.start-step-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  background: rgba(217, 122, 53, 0.14);
+  color: var(--accent-soft);
+  font-weight: 900;
+}
+
+.start-step-title {
+  margin: 0;
+  font-family: var(--display-font);
+  font-size: 1rem;
+  text-transform: uppercase;
+  color: var(--signal);
+}
+
+.start-step-copy {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.start-here-actions {
+  margin-top: 18px;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
 .media-intel-panel,
 .tools-panel {
   padding: 20px;
@@ -2367,7 +2483,7 @@ button { color: inherit; }
 }
 
 @media (max-width: 1120px) {
-  .hero, .update-layout, .curriculum-layout, .quest-layout, .materials-layout, .gear-layout, .intel-grid, .status-grid, .briefing-list, .launchpad-grid, .personal-hub-grid, .tool-grid, .compare-grid, .feedback-grid, .app-footer { grid-template-columns: 1fr; }
+  .hero, .update-layout, .curriculum-layout, .quest-layout, .materials-layout, .gear-layout, .intel-grid, .status-grid, .briefing-list, .launchpad-grid, .personal-hub-grid, .tool-grid, .compare-grid, .feedback-grid, .app-footer, .start-here-steps { grid-template-columns: 1fr; }
   .curriculum-layout { gap: 16px; }
   .materials-catalog { grid-template-columns: 1fr; }
   .site-tools-row { grid-template-columns: 1fr; }
@@ -2389,7 +2505,7 @@ button { color: inherit; }
   .app-shell { width: min(100%, calc(100% - 16px)); padding-top: 12px; }
   .site-header,
   .search-results-panel { padding: 16px; }
-  .hero, .status-card, .briefing, .pain-points-panel, .overview-panel, .rail-panel, .detail-panel, .intel-panel { padding: 16px; }
+  .hero, .status-card, .briefing, .pain-points-panel, .overview-panel, .rail-panel, .detail-panel, .intel-panel, .start-here-flow { padding: 16px; }
   .personal-hub { padding: 16px; }
   .hero h1, .hero h2 { font-size: clamp(1.7rem, 8vw, 2.5rem); max-width: 12ch; }
   .hero-actions { display: grid; grid-template-columns: 1fr; }
@@ -2467,6 +2583,9 @@ button { color: inherit; }
   .progress-card-top,
   .gear-card-top,
   .media-card-top,
+  .start-here-head,
+  .start-here-summary,
+  .start-step-top,
   .detail-actions { align-items: flex-start; flex-direction: column; }
   .saved-actions { min-width: 0; width: 100%; }
   .mini-flow-step { grid-template-columns: 1fr; }

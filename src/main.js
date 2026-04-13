@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.22.0",
+    date: "2026-04-13",
+    summary: "Added a visually dominant Start Here onboarding flow at the top of the homepage so new Raiders get one guided path instead of a pile of choices.",
+    changes: [
+      "Added a four-step onboarding section above the hero with a clear next-step CTA tied to existing guide sections.",
+      "Connected onboarding progress to the current progress-tracking system so completed and reviewed activity changes the flow state automatically.",
+      "Reduced first-visit decision paralysis by turning the top of the homepage into a guided sequence instead of making new users guess where to start."
+    ]
+  },
+  {
     version: "v1.21.0",
     date: "2026-04-12",
     summary: "Added a fuller trust layer with a modern footer, feedback/report flows, clearer verification context, and a more useful changelog.",
@@ -470,6 +480,62 @@ const focusViews = [
     id: "updates",
     label: "Updates",
     summary: "Check patch context first when Embark ships new info or a release goes live."
+  }
+];
+
+const START_HERE_STEPS = [
+  {
+    id: "raid-basics",
+    title: "Learn the raid loop",
+    copy: "Start with the lesson track so the extraction flow, raid phases, and early decision-making actually make sense.",
+    cta: "Open basics",
+    status: () => (state.reviewedLessons.length || getLessonProgress()) ? "complete" : "active",
+    action: () => {
+      const firstLesson = lessons[0];
+      state.activeView = "learn";
+      state.selectedTrackId = firstLesson.trackId;
+      state.selectedLessonId = firstLesson.id;
+      setLastVisited("lesson", firstLesson.id);
+      render();
+      scrollElementIntoView(document.querySelector("#curriculum"));
+    }
+  },
+  {
+    id: "pick-goal",
+    title: "Pick a raid goal",
+    copy: "Use Quests or Materials to stop running aimless raids. New Raiders improve faster when each drop has one purpose.",
+    cta: "Open goals",
+    status: () => (getQuestProgress() || getMaterialProgress()) ? "complete" : "active",
+    action: () => {
+      state.activeView = "quests";
+      setLastVisited("quest", state.selectedQuestId);
+      render();
+      scrollElementIntoView(document.querySelector("#quest-ops"));
+    }
+  },
+  {
+    id: "build-kit",
+    title: "Build a safe loadout",
+    copy: "Use the loadout builder and gear section to bring the right kind of kit instead of overbuilding and donating equipment to the Rust Belt.",
+    cta: "Open loadout builder",
+    status: () => state.savedItems.some((item) => item.startsWith("loadout:") || item.startsWith("quickuse:")) ? "complete" : "active",
+    action: () => {
+      state.activeView = "gear";
+      render();
+      scrollElementIntoView(document.querySelector("#loadout-builder"));
+    }
+  },
+  {
+    id: "check-threats",
+    title: "Check threats and prep",
+    copy: "Read the current patch context, then use ARC intel and the prep checklist before you drop. That alone saves new players from a lot of dumb deaths.",
+    cta: "Open prep",
+    status: () => (getReleaseProgress() || getPrepProgress()) ? "complete" : "active",
+    action: () => {
+      state.activeView = "machines";
+      render();
+      scrollElementIntoView(document.querySelector("#machine-intel"));
+    }
   }
 ];
 
@@ -1906,6 +1972,9 @@ const reviewedCountElement = document.querySelector("#reviewed-count");
 const overallProgressElement = document.querySelector("#overall-progress");
 const savedCountElement = document.querySelector("#saved-count");
 const continueLabelElement = document.querySelector("#continue-label");
+const startHereSummaryElement = document.querySelector("#start-here-summary");
+const startHereStepsElement = document.querySelector("#start-here-steps");
+const startHereCtaElement = document.querySelector("#start-here-cta");
 const globalSearchElement = document.querySelector("#global-search");
 const searchSuggestionsElement = document.querySelector("#search-suggestions");
 const commandBarElement = document.querySelector(".command-bar");
@@ -3325,6 +3394,48 @@ function renderUpdateSpotlight() {
   `;
 }
 
+function renderStartHereFlow() {
+  const steps = START_HERE_STEPS.map((step, index) => ({
+    ...step,
+    index: index + 1,
+    state: step.status()
+  }));
+  const completedCount = steps.filter((step) => step.state === "complete").length;
+  const nextStep = steps.find((step) => step.state !== "complete") ?? steps[steps.length - 1];
+  const progressPercent = Math.round((completedCount / steps.length) * 100);
+
+  startHereSummaryElement.innerHTML = `
+    <span class="hero-mini-pill">${completedCount}/${steps.length} steps done</span>
+    <span class="hero-mini-pill">${progressPercent}% ready</span>
+    <strong>${nextStep.state === "complete" ? "Onboarding complete" : `Next: ${nextStep.title}`}</strong>
+  `;
+
+  startHereStepsElement.innerHTML = steps.map((step) => `
+    <article class="start-step start-step-${step.state}">
+      <div class="start-step-top">
+        <span class="start-step-index">0${step.index}</span>
+        <span class="content-tag">${step.state === "complete" ? "Complete" : step.id === nextStep.id ? "Start here" : "Upcoming"}</span>
+      </div>
+      <h3 class="start-step-title">${step.title}</h3>
+      <p class="start-step-copy">${step.copy}</p>
+      <button class="hero-button hero-button-secondary start-step-action" type="button" data-start-step="${step.id}">
+        ${step.state === "complete" ? "Review step" : step.cta}
+      </button>
+    </article>
+  `).join("");
+
+  startHereCtaElement.textContent = completedCount ? `Continue: ${nextStep.title}` : "Start onboarding";
+  startHereCtaElement.dataset.startStep = nextStep.id;
+
+  for (const button of startHereStepsElement.querySelectorAll("[data-start-step]")) {
+    button.addEventListener("click", () => {
+      const step = START_HERE_STEPS.find((entry) => entry.id === button.dataset.startStep);
+      step?.action();
+      saveState();
+    });
+  }
+}
+
 function renderEmbarkFeed() {
   embarkFeedElement.innerHTML = `
     ${embarkFeed.map((item) => `
@@ -4439,6 +4550,7 @@ function render() {
   renderEmbarkFeed();
   renderReleaseList();
   renderReleaseDetail();
+  renderStartHereFlow();
   renderBriefing();
   renderMediaIntel();
   renderPainPoints();
@@ -4536,6 +4648,11 @@ for (const trigger of feedbackTriggerElements) {
 }
 shareAppButtonElement.addEventListener("click", () => {
   shareApp().catch(() => undefined);
+});
+startHereCtaElement.addEventListener("click", () => {
+  const step = START_HERE_STEPS.find((entry) => entry.id === startHereCtaElement.dataset.startStep) ?? START_HERE_STEPS[0];
+  step.action();
+  saveState();
 });
 
 for (const trigger of focusTriggerElements) {
