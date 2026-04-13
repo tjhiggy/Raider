@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.25.0",
+    date: "2026-04-13",
+    summary: "Moved personalization into a top-of-home returning-user dashboard and only shows it when real saved state exists.",
+    changes: [
+      "Added a personalized dashboard near the top of the homepage with continue, recommended next step, progress summary, and saved items.",
+      "Hidden the dashboard entirely for users without stored state so first-time visitors are not hit with empty pseudo-personalization.",
+      "Reworked the dashboard layout so returning Raiders immediately feel the guide is adapting to their progress instead of making them start over."
+    ]
+  },
+  {
     version: "v1.24.0",
     date: "2026-04-13",
     summary: "Added live-signal homepage modules for recently updated content, trending topics, updated-today cues, and since-your-last-visit context.",
@@ -2026,7 +2036,9 @@ const heroTaskListElement = document.querySelector("#hero-task-list");
 const recentlyUpdatedListElement = document.querySelector("#recently-updated-list");
 const trendingContentListElement = document.querySelector("#trending-content-list");
 const sinceLastVisitPanelElement = document.querySelector("#since-last-visit-panel");
+const personalHubElement = document.querySelector("#personal-hub");
 const personalOverviewElement = document.querySelector("#personal-overview");
+const personalNextElement = document.querySelector("#personal-next");
 const sectionProgressElement = document.querySelector("#section-progress");
 const savedPanelElement = document.querySelector("#saved-panel");
 const mediaIntelGridElement = document.querySelector("#media-intel-grid");
@@ -3884,10 +3896,27 @@ function renderHeroDashboard() {
 }
 
 function renderPersonalHub() {
+  if (!personalHubElement || !personalOverviewElement || !personalNextElement || !sectionProgressElement || !savedPanelElement) {
+    return;
+  }
+
+  if (!hasUserProgressData()) {
+    personalHubElement.hidden = true;
+    personalOverviewElement.innerHTML = "";
+    personalNextElement.innerHTML = "";
+    sectionProgressElement.innerHTML = "";
+    savedPanelElement.innerHTML = "";
+    return;
+  }
+
+  personalHubElement.hidden = false;
   const playstyle = getPlaystyle();
   const continueItem = getContinueItem();
   const sections = getProgressSections();
   const registry = buildDiscoveryRegistry();
+  const nextSection = sections
+    .filter((section) => section.total > 0)
+    .sort((a, b) => (a.completed / a.total) - (b.completed / b.total))[0];
   const savedItems = state.savedItems
     .map((key) => registry[key])
     .filter(Boolean)
@@ -3912,6 +3941,31 @@ function renderPersonalHub() {
     </div>
     <div class="personal-actions">
       <button class="hero-button hero-button-primary" type="button" data-open-continue>${continueItem ? "Continue where you left off" : "Start the guide"}</button>
+    </div>
+  `;
+
+  personalNextElement.innerHTML = `
+    <div class="personal-card-head">
+      <div>
+        <p class="eyebrow">Recommended next step</p>
+        <h3 class="personal-title">${continueItem?.title ?? "Keep moving"}</h3>
+      </div>
+      <span class="hero-mini-pill">${continueItem?.type ?? "guide"}</span>
+    </div>
+    <p class="personal-copy">${continueItem?.subtitle ?? "The fastest way forward is still the next unfinished lesson or guide."}</p>
+    <div class="card-tags">
+      ${renderTagMarkup([
+        playstyle.label,
+        nextSection ? `Next focus: ${nextSection.label}` : "Next focus: Lessons",
+        state.savedItems.length ? "Saved items ready" : "Save a few guides"
+      ])}
+    </div>
+    <article class="empty-state-card">
+      <strong>Why this is next</strong>
+      <p>${nextSection ? `${nextSection.label} is your weakest current section at ${Math.round((nextSection.completed / nextSection.total) * 100)}% complete, so this is the cleanest gain.` : "You are still early enough that the best play is continuing the core learning path."}</p>
+    </article>
+    <div class="personal-actions">
+      <button class="hero-button hero-button-primary" type="button" data-open-next-step>Open recommended step</button>
     </div>
   `;
 
@@ -3986,6 +4040,16 @@ function renderPersonalHub() {
 
   const continueButton = personalOverviewElement.querySelector("[data-open-continue]");
   continueButton?.addEventListener("click", () => {
+    const item = getContinueItem();
+    if (!item) {
+      return;
+    }
+    item.action();
+    saveState();
+  });
+
+  const nextButton = personalNextElement.querySelector("[data-open-next-step]");
+  nextButton?.addEventListener("click", () => {
     const item = getContinueItem();
     if (!item) {
       return;
