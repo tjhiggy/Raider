@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.23.0",
+    date: "2026-04-13",
+    summary: "Upgraded primary content cards with cleaner decision metadata so Raiders can scan purpose, time, outcome, and difficulty faster.",
+    changes: [
+      "Enhanced major guide cards across Learn, Quests, Materials, Gear, ARC Intel, and homepage discovery with consistent Best for, Time, Outcome, and Difficulty metadata.",
+      "Upgraded the shared card metadata renderer so content stays scannable without bloating card layouts into a sad little dashboard spreadsheet.",
+      "Aligned homepage action cards with the same decision-driving pattern so the top of the app feels like one coherent discovery system."
+    ]
+  },
+  {
     version: "v1.22.0",
     date: "2026-04-13",
     summary: "Added a visually dominant Start Here onboarding flow at the top of the homepage so new Raiders get one guided path instead of a pile of choices.",
@@ -2416,14 +2426,142 @@ function renderTagMarkup(tags = []) {
   return tags.map((tag) => `<span class="content-tag">${tag}</span>`).join("");
 }
 
-function renderCardMeta(meta, extras = []) {
-  const badges = [meta.level, meta.priority, ...extras].filter(Boolean);
+function renderDecisionMetaRows(items = []) {
+  const visibleItems = items.filter((item) => item?.value);
+  if (!visibleItems.length) {
+    return "";
+  }
+
+  return `
+    <div class="decision-meta-grid">
+      ${visibleItems.map((item) => `
+        <article class="decision-meta-item">
+          <span class="decision-meta-label">${item.label}</span>
+          <strong class="decision-meta-value">${item.value}</strong>
+        </article>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderCardMeta(meta, extras = [], decisionItems = []) {
+  const badges = [meta.priority, ...extras].filter(Boolean);
   return `
     <div class="card-meta-row">
       <div class="card-badges">${badges.map((badge) => `<span class="card-badge">${badge}</span>`).join("")}</div>
       <span class="card-meta-mode">${meta.mode ?? meta.goal ?? ""}</span>
     </div>
+    ${renderDecisionMetaRows(decisionItems)}
   `;
+}
+
+function getTrackDecisionItems(track, meta) {
+  return [
+    { label: "Best for", value: track.bestFor },
+    { label: "Time", value: `${getLessonsForTrack(track.id).length} lessons` },
+    { label: "Outcome", value: track.focus },
+    { label: "Difficulty", value: meta.level }
+  ];
+}
+
+function getLessonDecisionItems(lesson, meta) {
+  return [
+    { label: "Best for", value: lesson.category },
+    { label: "Time", value: lesson.time },
+    { label: "Outcome", value: meta.goal },
+    { label: "Difficulty", value: meta.level }
+  ];
+}
+
+function getQuestTimeEstimate(quest) {
+  if (quest.id === "weekly-trials") return "1 week loop";
+  if (quest.id === "expeditions") return "Multi-session prep";
+  if (quest.id === "projects") return "Several raids";
+  if (quest.id === "trader-quests") return "1-3 raids";
+  return "1-2 raids";
+}
+
+function getQuestDecisionItems(quest, meta) {
+  return [
+    { label: "Best for", value: quest.category },
+    { label: "Time", value: getQuestTimeEstimate(quest) },
+    { label: "Outcome", value: meta.goal },
+    { label: "Difficulty", value: meta.level }
+  ];
+}
+
+function getMaterialTimeEstimate(material) {
+  if (material.id === "advanced-components") return "2-3 raids";
+  if (material.id === "healing-and-utility") return "1 short route";
+  return "1-2 raids";
+}
+
+function getMaterialDecisionItems(material, meta) {
+  return [
+    { label: "Best for", value: material.badge },
+    { label: "Time", value: getMaterialTimeEstimate(material) },
+    { label: "Outcome", value: meta.goal },
+    { label: "Difficulty", value: meta.level }
+  ];
+}
+
+function getLoadoutDecisionItems(role, meta) {
+  return [
+    { label: "Best for", value: role.bestFor },
+    { label: "Time", value: "2 min setup" },
+    { label: "Outcome", value: meta.goal },
+    { label: "Difficulty", value: meta.level }
+  ];
+}
+
+function getQuickUseDecisionItems(item, meta) {
+  return [
+    { label: "Best for", value: item.bringWhen },
+    { label: "Time", value: "30 sec read" },
+    { label: "Outcome", value: meta.goal },
+    { label: "Difficulty", value: meta.level }
+  ];
+}
+
+function getMachineDecisionItems(machine, meta) {
+  return [
+    { label: "Best for", value: machine.threat },
+    { label: "Time", value: "30 sec read" },
+    { label: "Outcome", value: meta.goal },
+    { label: "Difficulty", value: meta.level }
+  ];
+}
+
+function getPainPointDecisionItems(painPoint) {
+  const decisionMap = {
+    "material-confusion": [
+      { label: "Best for", value: "Crafting blocks and missing items" },
+      { label: "Time", value: "2 min to orient" },
+      { label: "Outcome", value: "Route with purpose" }
+    ],
+    "quest-drift": [
+      { label: "Best for", value: "Directionless raids" },
+      { label: "Time", value: "2 min to reset" },
+      { label: "Outcome", value: "Turn raids into progress" }
+    ],
+    "machine-pressure": [
+      { label: "Best for", value: "Messy ARC fights" },
+      { label: "Time", value: "3 min to sharpen target order" },
+      { label: "Outcome", value: "Survive pressure faster" }
+    ],
+    "new-player-overload": [
+      { label: "Best for", value: "First-time Raiders" },
+      { label: "Time", value: "5 min onboarding" },
+      { label: "Outcome", value: "Know where to start" }
+    ],
+    "patch-confusion": [
+      { label: "Best for", value: "Returning after updates" },
+      { label: "Time", value: "1 min patch check" },
+      { label: "Outcome", value: "Avoid stale advice" }
+    ]
+  };
+
+  return decisionMap[painPoint.id] ?? [];
 }
 
 function renderFilterBar(element, sectionKey) {
@@ -2710,6 +2848,7 @@ function renderPainPoints() {
     <article class="pain-point-card">
       <h3 class="pain-point-title">${painPoint.title}</h3>
       <p class="pain-point-copy">${painPoint.copy}</p>
+      ${renderDecisionMetaRows(getPainPointDecisionItems(painPoint))}
       <button class="hero-button hero-button-secondary pain-point-action" type="button" data-pain-point-id="${painPoint.id}">${painPoint.actionLabel}</button>
     </article>
   `).join("");
@@ -2742,7 +2881,7 @@ function renderTracks() {
         <h3>${track.title}</h3>
         <span class="track-badge">${getLessonsForTrack(track.id).length} lessons</span>
       </div>
-      ${renderCardMeta(meta, [track.bestFor.includes("First-time") ? "Beginner path" : null])}
+      ${renderCardMeta(meta, [track.bestFor.includes("First-time") ? "Beginner path" : null], getTrackDecisionItems(track, meta))}
       <p class="track-summary">${track.subtitle}</p>
       <div class="card-tags">${renderTagMarkup(meta.tags)}</div>
     </button>
@@ -2798,7 +2937,7 @@ function renderLessons() {
         <h3 class="lesson-title">${lesson.title}</h3>
         <span class="tag">${lesson.time}</span>
       </div>
-      ${renderCardMeta(meta, [lesson.category])}
+      ${renderCardMeta(meta, [lesson.category], getLessonDecisionItems(lesson, meta))}
       <p class="lesson-summary">${lesson.summary}</p>
       <div class="card-tags">${renderTagMarkup(meta.tags)}</div>
     </button>
@@ -2937,7 +3076,7 @@ function renderMachines() {
         <h3 class="machine-name">${machine.name}</h3>
         <span class="machine-threat">${machine.threat}</span>
       </div>
-      ${renderCardMeta(meta, [machine.threat])}
+      ${renderCardMeta(meta, [machine.threat], getMachineDecisionItems(machine, meta))}
       <p class="machine-copy">${machine.copy}</p>
       <div class="card-tags">${renderTagMarkup(meta.tags)}</div>
       <div class="machine-tactics-grid">
@@ -3013,7 +3152,7 @@ function renderQuestList() {
         <h3 class="quest-title">${quest.title}</h3>
         <span class="quest-badge">${quest.category}</span>
       </div>
-      ${renderCardMeta(meta, [isCompletedItem("quest", quest.id) ? "Completed" : null, isSavedItem("quest", quest.id) ? "Saved" : null])}
+      ${renderCardMeta(meta, [isCompletedItem("quest", quest.id) ? "Completed" : null, isSavedItem("quest", quest.id) ? "Saved" : null], getQuestDecisionItems(quest, meta))}
       <p class="quest-summary">${quest.summary}</p>
       <div class="card-tags">${renderTagMarkup(meta.tags)}</div>
     </button>
@@ -4092,7 +4231,7 @@ function renderMaterialsList() {
         <h3 class="material-title">${material.title}</h3>
         <span class="quest-badge">${material.badge}</span>
       </div>
-      ${renderCardMeta({ ...meta, mode: meta.goal }, [isCompletedItem("material", material.id) ? "Completed" : null, isSavedItem("material", material.id) ? "Saved" : null])}
+      ${renderCardMeta({ ...meta, mode: meta.goal }, [isCompletedItem("material", material.id) ? "Completed" : null, isSavedItem("material", material.id) ? "Saved" : null], getMaterialDecisionItems(material, meta))}
       <p class="material-summary">${material.summary}</p>
       <div class="card-tags">${renderTagMarkup(meta.tags)}</div>
     </button>
@@ -4304,7 +4443,7 @@ function renderWeaponRoles() {
         <h3 class="gear-title">${role.title}</h3>
         <button class="hero-button hero-button-secondary card-save-button" type="button" data-save-loadout="${roleId}">${isSavedItem("loadout", roleId) ? "Saved" : "Save"}</button>
       </div>
-      ${renderCardMeta(meta, [role.bestFor.includes("Quest") ? "Recommended" : null])}
+      ${renderCardMeta(meta, [role.bestFor.includes("Quest") ? "Recommended" : null], getLoadoutDecisionItems(role, meta))}
       <p class="gear-copy">${role.summary}</p>
       <div class="card-tags">${renderTagMarkup(meta.tags)}</div>
       <div class="gear-meta">
@@ -4351,7 +4490,7 @@ function renderQuickUseItems() {
         <h3 class="quick-use-title">${item.title}</h3>
         <button class="hero-button hero-button-secondary card-save-button" type="button" data-save-quickuse="${quickUseId}">${isSavedItem("quickuse", quickUseId) ? "Saved" : "Save"}</button>
       </div>
-      ${renderCardMeta(meta)}
+      ${renderCardMeta(meta, [], getQuickUseDecisionItems(item, meta))}
       <p class="quick-use-copy">${item.summary}</p>
       <div class="card-tags">${renderTagMarkup(meta.tags)}</div>
       <div class="gear-meta">

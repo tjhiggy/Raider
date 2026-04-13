@@ -994,6 +994,36 @@ button { color: inherit; }
   letter-spacing: 0.06em;
 }
 
+.decision-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.decision-meta-item {
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(245, 197, 140, 0.08);
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.decision-meta-label {
+  color: var(--soft);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.decision-meta-value {
+  color: var(--text);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
 .hero-card p { margin: 10px 0 0; }
 .hero-stage {
   align-content: start;
@@ -1362,6 +1392,11 @@ button { color: inherit; }
   overflow: hidden;
 }
 
+.launchpad-card .decision-meta-grid,
+.pain-point-card .decision-meta-grid {
+  margin-top: 4px;
+}
+
 .launchpad-card:hover,
 .launchpad-card:focus-visible {
   transform: translateY(-3px);
@@ -1543,6 +1578,16 @@ button { color: inherit; }
   border-color: rgba(214, 117, 48, 0.72);
   box-shadow: 0 12px 30px rgba(214, 117, 48, 0.12);
   background: linear-gradient(180deg, rgba(214, 117, 48, 0.12), rgba(255, 255, 255, 0.03));
+}
+
+.track-button .decision-meta-grid,
+.lesson-card .decision-meta-grid,
+.quest-card .decision-meta-grid,
+.material-card .decision-meta-grid,
+.gear-card .decision-meta-grid,
+.quick-use-card .decision-meta-grid,
+.machine-card .decision-meta-grid {
+  margin-bottom: 12px;
 }
 
 .track-button { padding: 16px; }
@@ -2502,6 +2547,7 @@ button { color: inherit; }
 }
 
 @media (max-width: 760px) {
+  .decision-meta-grid { grid-template-columns: 1fr; }
   .app-shell { width: min(100%, calc(100% - 16px)); padding-top: 12px; }
   .site-header,
   .search-results-panel { padding: 16px; }
