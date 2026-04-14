@@ -414,6 +414,212 @@ button { color: inherit; }
   flex-wrap: wrap;
 }
 
+.decision-engine {
+  position: relative;
+  overflow: hidden;
+  padding: 24px;
+  margin-bottom: 20px;
+  background:
+    radial-gradient(circle at 82% 18%, rgba(129, 203, 218, 0.14), transparent 26%),
+    radial-gradient(circle at 12% 76%, rgba(217, 122, 53, 0.14), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.045), transparent 22%),
+    linear-gradient(180deg, rgba(14, 18, 24, 0.96), rgba(20, 16, 15, 0.96));
+}
+
+.decision-engine::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(120deg, transparent 0 62%, rgba(255, 255, 255, 0.04) 62% 64%, transparent 64% 100%);
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.decision-engine-head,
+.decision-engine-actions,
+.decision-engine-question-top,
+.decision-engine-step-actions,
+.decision-engine-recommendation-top,
+.decision-engine-link-head {
+  display: flex;
+  gap: 14px;
+}
+
+.decision-engine-head,
+.decision-engine-link-head {
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.decision-engine-head {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 18px;
+}
+
+.decision-engine-copy,
+.decision-engine-note {
+  max-width: 64ch;
+}
+
+.decision-engine-actions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.decision-engine-layout {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(300px, 0.92fr);
+  gap: 18px;
+}
+
+.decision-engine-panel,
+.decision-engine-result {
+  border-radius: calc(var(--radius-card) + 2px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.035);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(8px);
+}
+
+.decision-engine-panel {
+  padding: 18px;
+}
+
+.decision-engine-result {
+  padding: 18px;
+  display: grid;
+  gap: 16px;
+  align-content: start;
+}
+
+.decision-engine-status {
+  margin-bottom: 14px;
+}
+
+.decision-engine-status-card,
+.decision-engine-question,
+.decision-engine-empty,
+.decision-engine-recommendation,
+.decision-engine-links,
+.decision-engine-why {
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  padding: 16px;
+}
+
+.decision-engine-status-card,
+.decision-engine-empty,
+.decision-engine-recommendation,
+.decision-engine-why {
+  display: grid;
+  gap: 12px;
+}
+
+.decision-engine-progress {
+  display: grid;
+  gap: 8px;
+}
+
+.decision-engine-progress-bar {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  overflow: hidden;
+}
+
+.decision-engine-progress-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  box-shadow: 0 0 16px rgba(214, 117, 48, 0.35);
+}
+
+.decision-engine-flow {
+  display: grid;
+  gap: 14px;
+}
+
+.decision-engine-question-top {
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.decision-engine-question-copy,
+.decision-engine-recommendation-copy,
+.decision-engine-link-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.decision-engine-chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.decision-engine-step-actions {
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.decision-engine-step-note {
+  color: var(--soft);
+  font-size: 0.86rem;
+}
+
+.decision-engine-recommendation-top {
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.decision-engine-badges,
+.decision-engine-answer-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.decision-engine-link-list {
+  display: grid;
+  gap: 10px;
+}
+
+.decision-engine-link-card {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.decision-engine-link-type {
+  color: var(--accent-soft);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.decision-engine-link-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.decision-engine-primary-cta {
+  width: 100%;
+}
+
 .media-intel-panel,
 .tools-panel {
   padding: 20px;
@@ -2740,7 +2946,7 @@ button { color: inherit; }
 }
 
 @media (max-width: 1120px) {
-  .hero, .update-layout, .curriculum-layout, .quest-layout, .materials-layout, .gear-layout, .intel-grid, .status-grid, .briefing-list, .launchpad-grid, .personal-hub-grid, .tool-grid, .compare-grid, .feedback-grid, .app-footer, .start-here-steps, .live-signal-grid { grid-template-columns: 1fr; }
+  .hero, .update-layout, .curriculum-layout, .quest-layout, .materials-layout, .gear-layout, .intel-grid, .status-grid, .briefing-list, .launchpad-grid, .personal-hub-grid, .tool-grid, .compare-grid, .feedback-grid, .app-footer, .start-here-steps, .live-signal-grid, .decision-engine-layout { grid-template-columns: 1fr; }
   .curriculum-layout { gap: 16px; }
   .materials-catalog { grid-template-columns: 1fr; }
   .site-tools-row { grid-template-columns: 1fr; }
@@ -2763,7 +2969,7 @@ button { color: inherit; }
   .app-shell { width: min(100%, calc(100% - 16px)); padding-top: 12px; }
   .site-header,
   .search-results-panel { padding: 16px; }
-  .hero, .status-card, .briefing, .pain-points-panel, .overview-panel, .rail-panel, .detail-panel, .intel-panel, .start-here-flow { padding: 16px; }
+  .hero, .status-card, .briefing, .pain-points-panel, .overview-panel, .rail-panel, .detail-panel, .intel-panel, .start-here-flow, .decision-engine { padding: 16px; }
   .personal-hub { padding: 16px; }
   .hero h1, .hero h2 { font-size: clamp(1.7rem, 8vw, 2.5rem); max-width: 12ch; }
   .hero-actions { display: grid; grid-template-columns: 1fr; }
@@ -2773,6 +2979,14 @@ button { color: inherit; }
   .hero-stage-shell { padding: 14px; }
   .hero-proof { grid-template-columns: 1fr; }
   .hero-signal { width: 150px; height: 150px; }
+  .decision-engine-head,
+  .decision-engine-actions,
+  .decision-engine-question-top,
+  .decision-engine-step-actions,
+  .decision-engine-recommendation-top,
+  .decision-engine-link-head { flex-direction: column; }
+  .decision-engine-actions { justify-content: flex-start; }
+  .decision-engine-primary-cta { width: 100%; }
   .lesson-list, .machine-list, .track-list { grid-template-columns: 1fr; }
   .machine-priority-grid { grid-template-columns: 1fr; }
   .machine-tactics-grid { grid-template-columns: 1fr; }

@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.27.0",
+    date: "2026-04-13",
+    summary: "Added the Raid Decision Engine so Raiders can turn a few practical answers into a clear next-run plan tied to the guide.",
+    changes: [
+      "Added a signature homepage Raid Decision Engine with a fast multi-step planning flow, premium result panel, and one dominant continue CTA.",
+      "Built the engine on config-driven questions, recommendation profiles, and guide-link mapping so the rules can expand without turning the code into spaghetti with a tactical font.",
+      "Added local persistence for the last plan plus Use last plan and Rebuild plan actions so returning players can resume or rework their run prep quickly."
+    ]
+  },
+  {
     version: "v1.26.0",
     date: "2026-04-13",
     summary: "Added category icons, stronger status and trust cues, a more active updates feed, and clearer homepage CTA hierarchy.",
@@ -627,6 +637,321 @@ const PLAYSTYLE_OPTIONS = [
     summary: "Pushes you toward stash value, workshop efficiency, and smarter farming.",
     badges: ["Workshop", "Loot"],
     goals: ["materials", "gear"]
+  }
+];
+
+const RAID_DECISION_QUESTIONS = [
+  {
+    id: "experience",
+    label: "Experience level",
+    prompt: "How settled are you in ARC Raiders right now?",
+    copy: "This keeps the recommendation grounded in actual game familiarity instead of pretending every player wants sweat-lord homework.",
+    options: [
+      { id: "new", label: "New Raider" },
+      { id: "learning", label: "Some reps" },
+      { id: "confident", label: "Confident" }
+    ]
+  },
+  {
+    id: "team",
+    label: "Team",
+    prompt: "Are you dropping solo or with a squad?",
+    copy: "Risk profile and utility priorities shift fast depending on whether backup exists or is just a beautiful lie.",
+    options: [
+      { id: "solo", label: "Solo" },
+      { id: "squad", label: "Squad" }
+    ]
+  },
+  {
+    id: "goal",
+    label: "Current goal",
+    prompt: "What do you want this run to accomplish?",
+    copy: "One clear purpose beats wandering around the map collecting bad decisions.",
+    options: [
+      { id: "learn", label: "Learn safely" },
+      { id: "quests", label: "Push quests" },
+      { id: "materials", label: "Farm materials" },
+      { id: "workshop", label: "Support workshop" },
+      { id: "confidence", label: "Take fights" }
+    ]
+  },
+  {
+    id: "risk",
+    label: "Risk tolerance",
+    prompt: "How spicy should this run be?",
+    copy: "We are aiming for the right amount of pressure, not sending you into a heroic gear donation.",
+    options: [
+      { id: "low", label: "Keep it safe" },
+      { id: "balanced", label: "Balanced" },
+      { id: "high", label: "Push it" }
+    ]
+  },
+  {
+    id: "gear",
+    label: "Gear confidence",
+    prompt: "How good do you feel about what you can bring?",
+    copy: "This helps separate real progression runs from those tragic 'I guess this is fine' loadouts.",
+    options: [
+      { id: "low", label: "I need help" },
+      { id: "medium", label: "Mostly fine" },
+      { id: "high", label: "I know my kit" }
+    ]
+  },
+  {
+    id: "session",
+    label: "Session length",
+    prompt: "How long are you trying to play?",
+    copy: "Short sessions should not pretend to support marathon progression plans.",
+    options: [
+      { id: "short", label: "Quick run" },
+      { id: "medium", label: "Normal session" },
+      { id: "long", label: "Long grind" }
+    ]
+  },
+  {
+    id: "blocker",
+    label: "Current blocker",
+    prompt: "What is actually slowing you down?",
+    copy: "This is the part that routes you into the right guide pages instead of generic 'try harder' nonsense.",
+    options: [
+      { id: "unclear", label: "I do not know what to do" },
+      { id: "survival", label: "I keep dying" },
+      { id: "crafting", label: "Crafting is stuck" },
+      { id: "quests", label: "Quest progress is stalled" },
+      { id: "loadout", label: "I do not know what to bring" },
+      { id: "patch", label: "Patch changes confused me" }
+    ]
+  }
+];
+
+const RAID_DECISION_PROFILES = [
+  {
+    id: "safe-learning-run",
+    label: "Safe learning run",
+    runType: "Low-contact fundamentals run",
+    priority: "Understand raid flow, survive contact, and leave with one clean extraction.",
+    approach: "Favor quieter routes, avoid loud multi-team pressure, and treat every fight like it needs an exit plan before it needs bravado.",
+    loadout: "Cheap flexible kit with forgiving recoil, enough meds to recover mistakes, and no attachment drama you will cry about losing.",
+    utility: "Bring healing, smoke or movement bailout, and one simple reset tool.",
+    warning: "Do not let this turn into an ego run. The goal is information and one successful extract, not an accidental boss-speedrun funeral.",
+    summary: "Best fit when you still need cleaner habits and the right next move matters more than raw loot value.",
+    dominantCta: "Open First Raid Briefing",
+    ctaType: "section",
+    ctaId: "briefing",
+    tags: ["Beginner friendly", "Low risk", "Solo or squad"],
+    matches: {
+      experience: ["new", "learning"],
+      goal: ["learn"],
+      risk: ["low", "balanced"],
+      gear: ["low", "medium"],
+      session: ["short", "medium"],
+      blocker: ["unclear", "survival"],
+      team: ["solo", "squad"]
+    },
+    weights: {
+      goal: 5,
+      blocker: 4,
+      experience: 3,
+      risk: 3,
+      gear: 2,
+      session: 1,
+      team: 1
+    },
+    links: [
+      { type: "section", id: "briefing" },
+      { type: "lesson", id: "read-topside-correctly" },
+      { type: "lesson", id: "understand-raid-phases" },
+      { type: "section", id: "prep" }
+    ]
+  },
+  {
+    id: "quest-progression-run",
+    label: "Quest progression run",
+    runType: "Progress-first objective run",
+    priority: "Stack one trader or system goal and let the rest of the raid serve that purpose.",
+    approach: "Plan one route around the quest requirement, skip vanity fights, and extract the moment the progress condition is secured.",
+    loadout: "Stable questing kit with low fuss sustain, enough ammo for one forced fight, and utility that buys space instead of noise.",
+    utility: "Healing, movement or smoke coverage, and one consistency tool over raw aggression.",
+    warning: "Quest runs die when you improvise into every noise and suddenly forget why you dropped in the first place.",
+    summary: "Best fit when progression is stalled and the right answer is cleaner objective routing, not just more raids.",
+    dominantCta: "Open Quest Board",
+    ctaType: "section",
+    ctaId: "quests",
+    tags: ["Progression", "Recommended", "Solo or squad"],
+    matches: {
+      goal: ["quests"],
+      blocker: ["quests"],
+      risk: ["low", "balanced"],
+      gear: ["medium", "high"],
+      session: ["medium", "long"],
+      team: ["solo", "squad"],
+      experience: ["learning", "confident"]
+    },
+    weights: {
+      goal: 5,
+      blocker: 4,
+      session: 2,
+      gear: 2,
+      risk: 2,
+      experience: 1,
+      team: 1
+    },
+    links: [
+      { type: "quest", id: "trader-quests" },
+      { type: "quest", id: "expeditions" },
+      { type: "section", id: "quests" },
+      { type: "loadout", id: "questing-loadout-blueprint" }
+    ]
+  },
+  {
+    id: "material-farming-run",
+    label: "Material farming run",
+    runType: "Targeted material harvest run",
+    priority: "Resolve one workshop or stash bottleneck and leave before greed starts narrating your decisions.",
+    approach: "Route toward known material families, keep pace tight, and value clean exits over squeezing one more room for imagined upside.",
+    loadout: "Lightweight loot-and-leave kit with efficient sustain and enough range flexibility to disengage or finish light pressure quickly.",
+    utility: "Healing, smoke, and one movement or utility slot that helps extraction over combat flexing.",
+    warning: "Material runs become terrible the second you start behaving like a PvP montage with a backpack full of crafting parts.",
+    summary: "Best fit when crafting, stash pressure, or workshop momentum is the thing actually holding you back.",
+    dominantCta: "Open Material Routes",
+    ctaType: "section",
+    ctaId: "materials",
+    tags: ["Workshop value", "Recommended", "Loot focused"],
+    matches: {
+      goal: ["materials"],
+      blocker: ["crafting"],
+      risk: ["low", "balanced"],
+      gear: ["low", "medium"],
+      session: ["medium", "long"],
+      team: ["solo", "squad"],
+      experience: ["new", "learning", "confident"]
+    },
+    weights: {
+      goal: 5,
+      blocker: 5,
+      session: 2,
+      risk: 2,
+      gear: 2
+    },
+    links: [
+      { type: "section", id: "materials" },
+      { type: "material", id: "basic-scrap" },
+      { type: "section", id: "material-value" },
+      { type: "section", id: "material-helper" }
+    ]
+  },
+  {
+    id: "workshop-support-run",
+    label: "Workshop support run",
+    runType: "Craft-support and stash-cleanup run",
+    priority: "Protect high-value inputs, solve sell-keep-recycle indecision, and come out with clearer workshop momentum.",
+    approach: "Bias toward dependable material routes and post-raid decision quality instead of chasing dramatic fights that do nothing for the workshop.",
+    loadout: "Cheap repeatable kit you would not hesitate to re-queue, with simple sustain and no luxury clutter.",
+    utility: "Bring healing plus one escape tool because losing key materials to stubbornness is not a personality trait worth preserving.",
+    warning: "If you are already workshop-blocked, do not compound the problem by bringing a fragile overbuilt kit into a glorified supply run.",
+    summary: "Best fit when you need to stabilize stash decisions and feed the workshop without making the run heavier than it needs to be.",
+    dominantCta: "Open Workshop Support Intel",
+    ctaType: "section",
+    ctaId: "material-helper",
+    tags: ["Workshop support", "Low fuss", "Repeatable"],
+    matches: {
+      goal: ["workshop", "materials"],
+      blocker: ["crafting", "loadout"],
+      risk: ["low", "balanced"],
+      gear: ["low", "medium"],
+      session: ["short", "medium"],
+      team: ["solo", "squad"]
+    },
+    weights: {
+      goal: 4,
+      blocker: 5,
+      gear: 3,
+      session: 2,
+      risk: 2
+    },
+    links: [
+      { type: "section", id: "material-helper" },
+      { type: "section", id: "material-value" },
+      { type: "section", id: "loadout-builder" },
+      { type: "quickuse", id: "movement-or-escape-utility" }
+    ]
+  },
+  {
+    id: "conservative-extraction-run",
+    label: "Conservative extraction run",
+    runType: "Survival-first confidence rebuild",
+    priority: "Leave with progress and reset your momentum instead of forcing high-pressure fights while tilted.",
+    approach: "Take only favorable fights, stay disciplined on noise, and treat extraction timing as the win condition instead of a side quest.",
+    loadout: "Reliable mid-cost kit you trust under pressure with utility dedicated to bailout, healing, and one controlled damage option.",
+    utility: "Healing, smoke, and one utility piece that helps you disengage before the run turns into a comedy of bad peeks.",
+    warning: "High-pressure lobbies punish indecision. If your confidence is shaky, do not cosplay aggression you do not currently have.",
+    summary: "Best fit when survival or loadout confidence is the blocker and the smart play is getting one clean stable run back on the board.",
+    dominantCta: "Open Safe Loadout Builder",
+    ctaType: "section",
+    ctaId: "loadout-builder",
+    tags: ["Survival", "Recommended", "Solo leaning"],
+    matches: {
+      goal: ["learn", "workshop"],
+      blocker: ["survival", "loadout"],
+      risk: ["low"],
+      gear: ["low", "medium"],
+      session: ["short", "medium"],
+      team: ["solo"],
+      experience: ["new", "learning"]
+    },
+    weights: {
+      blocker: 4,
+      risk: 4,
+      team: 3,
+      gear: 3,
+      goal: 2,
+      experience: 2
+    },
+    links: [
+      { type: "section", id: "loadout-builder" },
+      { type: "loadout", id: "cheap-recovery-loadout" },
+      { type: "quickuse", id: "movement-or-escape-utility" },
+      { type: "section", id: "prep" }
+    ]
+  },
+  {
+    id: "aggressive-confidence-run",
+    label: "Aggressive confidence run",
+    runType: "Pressure and fight-selection run",
+    priority: "Take confident fights with a clear purpose and sharpen your ability to control machine or player pressure.",
+    approach: "Push contested value only when the goal justifies it, lean on tempo, and pick fights where your team setup or kit actually gives you leverage.",
+    loadout: "Assertive combat kit with solid pressure tools, enough sustain to stay in the run, and utility chosen to create openings instead of excuses.",
+    utility: "Bring heals plus offensive utility or control tools that help break pressure without relying on coin-flip heroics.",
+    warning: "This is not a free license to int. Aggressive runs still need exits, patch awareness, and a reason to stay committed.",
+    summary: "Best fit when you know your gear, want more pressure, and need a run plan that turns confidence into useful reps.",
+    dominantCta: "Open ARC Intel",
+    ctaType: "section",
+    ctaId: "machines",
+    tags: ["High risk", "Advanced", "Squad friendly"],
+    matches: {
+      goal: ["confidence"],
+      blocker: ["patch", "loadout"],
+      risk: ["high"],
+      gear: ["high", "medium"],
+      session: ["medium", "long"],
+      team: ["squad", "solo"],
+      experience: ["confident", "learning"]
+    },
+    weights: {
+      goal: 5,
+      risk: 4,
+      gear: 3,
+      experience: 3,
+      session: 2,
+      blocker: 2,
+      team: 1
+    },
+    links: [
+      { type: "section", id: "machines" },
+      { type: "section", id: "updates" },
+      { type: "section", id: "loadout-builder" },
+      { type: "quickuse", id: "grenades-and-burst-utility" }
+    ]
   }
 ];
 
@@ -2019,6 +2344,11 @@ const state = {
     rarity: "basic",
     objective: "healing"
   },
+  decisionEngine: {
+    currentStep: 0,
+    answers: {},
+    lastPlan: null
+  },
   lastVisited: {
     type: "lesson",
     id: lessons.find((lesson) => lesson.trackId === tracks[0].id)?.id ?? null
@@ -2046,6 +2376,12 @@ const continueLabelElement = document.querySelector("#continue-label");
 const startHereSummaryElement = document.querySelector("#start-here-summary");
 const startHereStepsElement = document.querySelector("#start-here-steps");
 const startHereCtaElement = document.querySelector("#start-here-cta");
+const decisionEngineStartElement = document.querySelector("#decision-engine-start");
+const decisionEngineLastPlanElement = document.querySelector("#decision-engine-last-plan");
+const decisionEngineResetElement = document.querySelector("#decision-engine-reset");
+const decisionEngineStatusElement = document.querySelector("#decision-engine-status");
+const decisionEngineFlowElement = document.querySelector("#decision-engine-flow");
+const decisionEngineResultElement = document.querySelector("#decision-engine-result");
 const globalSearchElement = document.querySelector("#global-search");
 const searchSuggestionsElement = document.querySelector("#search-suggestions");
 const commandBarElement = document.querySelector(".command-bar");
@@ -2288,7 +2624,8 @@ function hasUserProgressData() {
     state.reviewedLessons.length ||
     state.completedItems.length ||
     state.savedItems.length ||
-    state.checkedPrepItems.length
+    state.checkedPrepItems.length ||
+    state.decisionEngine.lastPlan
   );
 }
 
@@ -2599,6 +2936,442 @@ function getMaterialHelperDecision() {
     reason: "If the item is not high-tier and not tied to an immediate build, recycling it into reliable workshop value is the least stupid middle ground.",
     nextStep: "Use recycle when you want future utility without bloating the stash with random half-important junk."
   };
+}
+
+function getDecisionEngineAnswer(questionId) {
+  return state.decisionEngine.answers[questionId] ?? null;
+}
+
+function getDecisionEngineProgress() {
+  return RAID_DECISION_QUESTIONS.reduce((count, question) => count + (getDecisionEngineAnswer(question.id) ? 1 : 0), 0);
+}
+
+function getDecisionEngineNextStep() {
+  const firstUnansweredIndex = RAID_DECISION_QUESTIONS.findIndex((question) => !getDecisionEngineAnswer(question.id));
+  if (firstUnansweredIndex === -1) {
+    return RAID_DECISION_QUESTIONS.length;
+  }
+  return Math.min(state.decisionEngine.currentStep, RAID_DECISION_QUESTIONS.length - 1, firstUnansweredIndex);
+}
+
+function getDecisionEngineQuestion() {
+  if (getDecisionEngineProgress() >= RAID_DECISION_QUESTIONS.length) {
+    return null;
+  }
+  return RAID_DECISION_QUESTIONS[getDecisionEngineNextStep()] ?? RAID_DECISION_QUESTIONS[0];
+}
+
+function getDecisionEngineOptionLabel(questionId, optionId) {
+  const question = RAID_DECISION_QUESTIONS.find((entry) => entry.id === questionId);
+  return question?.options.find((option) => option.id === optionId)?.label ?? optionId;
+}
+
+function getDecisionEngineEntry(entry) {
+  if (!entry) {
+    return null;
+  }
+
+  if (entry.type && entry.id && ["lesson", "quest", "material", "release", "loadout", "quickuse"].includes(entry.type)) {
+    return buildDiscoveryRegistry()[createItemKey(entry.type, entry.id)] ?? null;
+  }
+
+  const sectionEntries = {
+    briefing: {
+      type: "section",
+      id: "briefing",
+      title: "First Raid Briefing",
+      subtitle: "Start with the survival habits that stop new Raiders from dying for free.",
+      meta: ["Start Here", "Core habits"],
+      action: () => {
+        state.activeView = "start";
+        render();
+        scrollElementIntoView(document.querySelector(".briefing"));
+      }
+    },
+    prep: {
+      type: "section",
+      id: "prep",
+      title: "Raid Prep Checklist",
+      subtitle: "Run the pre-drop checks before you queue so the raid does not punish obvious prep mistakes.",
+      meta: ["Prep", "Checklist"],
+      action: () => {
+        state.activeView = "machines";
+        render();
+        scrollElementIntoView(document.querySelector("#prep-list"));
+      }
+    },
+    quests: {
+      type: "section",
+      id: "quests",
+      title: "Quest Ops",
+      subtitle: "Use the quest board when the raid needs a progression-first plan.",
+      meta: ["Quests", "Routing"],
+      action: () => {
+        state.activeView = "quests";
+        render();
+        scrollElementIntoView(document.querySelector("#quest-ops"));
+      }
+    },
+    materials: {
+      type: "section",
+      id: "materials",
+      title: "Materials Intel",
+      subtitle: "Route toward the material families that actually unblock crafting and workshop momentum.",
+      meta: ["Materials", "Workshop"],
+      action: () => {
+        state.activeView = "materials";
+        render();
+        scrollElementIntoView(document.querySelector("#materials-intel"));
+      }
+    },
+    "material-value": {
+      type: "section",
+      id: "material-value",
+      title: "Material Value Guide",
+      subtitle: "Use keep-sell-recycle guidance when stash pressure starts making your decisions worse.",
+      meta: ["Materials", "Stash value"],
+      action: () => {
+        state.activeView = "materials";
+        render();
+        scrollElementIntoView(document.querySelector("#material-usage-guide"));
+      }
+    },
+    "material-helper": {
+      type: "section",
+      id: "material-helper",
+      title: "Material Decision Helper",
+      subtitle: "Turn stash pressure and crafting blockers into a cleaner keep-sell-recycle call.",
+      meta: ["Tool", "Workshop"],
+      action: () => {
+        state.activeView = "materials";
+        render();
+        scrollElementIntoView(document.querySelector("#material-helper"));
+      }
+    },
+    "loadout-builder": {
+      type: "section",
+      id: "loadout-builder",
+      title: "Beginner Loadout Builder",
+      subtitle: "Use raid intent, risk, and team setup to build a sane kit instead of guessing.",
+      meta: ["Tool", "Gear"],
+      action: () => {
+        state.activeView = "gear";
+        render();
+        scrollElementIntoView(document.querySelector("#loadout-builder"));
+      }
+    },
+    machines: {
+      type: "section",
+      id: "machines",
+      title: "ARC Machine Intel",
+      subtitle: "Check threat priority, counterplay, and common pressure mistakes before you queue.",
+      meta: ["ARC Intel", "Threat prep"],
+      action: () => {
+        state.activeView = "machines";
+        render();
+        scrollElementIntoView(document.querySelector("#machine-intel"));
+      }
+    },
+    updates: {
+      type: "section",
+      id: "updates",
+      title: "Update Center",
+      subtitle: "Check the live patch context before you trust older route or gear advice.",
+      meta: ["Updates", "Patch context"],
+      action: () => {
+        state.activeView = "updates";
+        render();
+        scrollElementIntoView(document.querySelector("#update-center"));
+      }
+    }
+  };
+
+  return sectionEntries[entry.id] ?? null;
+}
+
+function scoreDecisionProfile(profile, answers) {
+  let score = 0;
+  const matched = [];
+
+  for (const question of RAID_DECISION_QUESTIONS) {
+    const answer = answers[question.id];
+    if (!answer) {
+      continue;
+    }
+
+    if ((profile.matches[question.id] ?? []).includes(answer)) {
+      score += profile.weights[question.id] ?? 1;
+      matched.push({
+        id: question.id,
+        label: question.label,
+        answer: getDecisionEngineOptionLabel(question.id, answer)
+      });
+    }
+  }
+
+  return { score, matched };
+}
+
+function buildDecisionRecommendation(answers) {
+  if (!answers || Object.keys(answers).length < RAID_DECISION_QUESTIONS.length) {
+    return null;
+  }
+
+  const rankedProfiles = RAID_DECISION_PROFILES.map((profile) => {
+    const result = scoreDecisionProfile(profile, answers);
+    return { profile, score: result.score, matched: result.matched };
+  }).sort((a, b) => b.score - a.score);
+
+  const topResult = rankedProfiles[0];
+  if (!topResult) {
+    return null;
+  }
+
+  const links = topResult.profile.links
+    .map((entry) => getDecisionEngineEntry(entry))
+    .filter(Boolean)
+    .slice(0, 4);
+
+  const dominantLink = getDecisionEngineEntry({ type: topResult.profile.ctaType, id: topResult.profile.ctaId }) ?? links[0] ?? null;
+  const why = topResult.matched.slice(0, 4).map((item) => `${item.label}: ${item.answer}`);
+
+  return {
+    profileId: topResult.profile.id,
+    title: topResult.profile.label,
+    runType: topResult.profile.runType,
+    priority: topResult.profile.priority,
+    approach: topResult.profile.approach,
+    loadout: topResult.profile.loadout,
+    utility: topResult.profile.utility,
+    warning: topResult.profile.warning,
+    summary: topResult.profile.summary,
+    tags: topResult.profile.tags,
+    dominantCta: topResult.profile.dominantCta,
+    dominantLink,
+    links,
+    why,
+    answers: { ...answers }
+  };
+}
+
+function getStoredDecisionPlan() {
+  if (!state.decisionEngine.lastPlan?.answers) {
+    return null;
+  }
+
+  const plan = buildDecisionRecommendation(state.decisionEngine.lastPlan.answers);
+  if (!plan) {
+    return null;
+  }
+
+  return {
+    ...plan,
+    createdAt: state.decisionEngine.lastPlan.createdAt ?? APP_UPDATED
+  };
+}
+
+function applyDecisionEngineAnswer(questionId, value) {
+  state.decisionEngine.answers = {
+    ...state.decisionEngine.answers,
+    [questionId]: value
+  };
+
+  const nextIndex = RAID_DECISION_QUESTIONS.findIndex((question) => !state.decisionEngine.answers[question.id]);
+  state.decisionEngine.currentStep = nextIndex === -1
+    ? RAID_DECISION_QUESTIONS.length
+    : Math.max(nextIndex, 0);
+
+  const plan = buildDecisionRecommendation(state.decisionEngine.answers);
+  if (plan) {
+    state.decisionEngine.lastPlan = {
+      profileId: plan.profileId,
+      answers: { ...state.decisionEngine.answers },
+      createdAt: new Date().toISOString().slice(0, 10)
+    };
+  }
+}
+
+function resetDecisionEngine(reuseLastPlan = false) {
+  state.decisionEngine.currentStep = 0;
+  state.decisionEngine.answers = reuseLastPlan && state.decisionEngine.lastPlan?.answers
+    ? { ...state.decisionEngine.lastPlan.answers }
+    : {};
+
+  const nextIndex = RAID_DECISION_QUESTIONS.findIndex((question) => !state.decisionEngine.answers[question.id]);
+  state.decisionEngine.currentStep = nextIndex === -1
+    ? RAID_DECISION_QUESTIONS.length
+    : Math.max(nextIndex, 0);
+}
+
+function openDecisionEngineLink(entry) {
+  const target = getDecisionEngineEntry(entry);
+  if (!target) {
+    return;
+  }
+  target.action?.();
+  saveState();
+}
+
+function renderDecisionEngine() {
+  if (!decisionEngineStatusElement || !decisionEngineFlowElement || !decisionEngineResultElement) {
+    return;
+  }
+
+  const answeredCount = getDecisionEngineProgress();
+  const totalQuestions = RAID_DECISION_QUESTIONS.length;
+  const percent = Math.round((answeredCount / totalQuestions) * 100);
+  const currentQuestion = getDecisionEngineQuestion();
+  const storedPlan = getStoredDecisionPlan();
+  const activePlan = buildDecisionRecommendation(state.decisionEngine.answers) ?? storedPlan;
+  const continueItem = getContinueItem();
+
+  if (decisionEngineLastPlanElement) {
+    decisionEngineLastPlanElement.hidden = !storedPlan;
+  }
+
+  decisionEngineStatusElement.innerHTML = `
+    <article class="decision-engine-status-card">
+      <div class="decision-engine-link-head">
+        <div>
+          <p class="eyebrow">Field console state</p>
+          <strong>${answeredCount ? `${answeredCount} of ${totalQuestions} answers locked` : "Ready to build a run plan"}</strong>
+        </div>
+        <span class="hero-mini-pill">${answeredCount === totalQuestions ? "Result ready" : `Step ${Math.min(answeredCount + 1, totalQuestions)} / ${totalQuestions}`}</span>
+      </div>
+      <div class="decision-engine-progress">
+        <div class="decision-engine-progress-bar" aria-hidden="true"><span style="width:${percent}%"></span></div>
+        <p class="decision-engine-note">${hasUserProgressData() ? `Guide progress ${getOverallProgressPercent()}%, ${state.savedItems.length} saved, and ${continueItem?.title ?? "New Raider path"} is your current continuation.` : "No stored state yet. Build a plan once and this section starts behaving like it remembers you, because it will."}</p>
+      </div>
+    </article>
+  `;
+
+  if (currentQuestion) {
+    decisionEngineFlowElement.innerHTML = `
+      <article class="decision-engine-question">
+        <div class="decision-engine-question-top">
+          <div>
+            <p class="eyebrow">${currentQuestion.label}</p>
+            <h3 class="personal-title">${currentQuestion.prompt}</h3>
+          </div>
+          <span class="hero-mini-pill">${Math.min(getDecisionEngineNextStep() + 1, totalQuestions)} / ${totalQuestions}</span>
+        </div>
+        <p class="decision-engine-question-copy">${currentQuestion.copy}</p>
+        <div class="decision-engine-chip-group" role="group" aria-label="${currentQuestion.label}">
+          ${renderSelectableChips(currentQuestion.options, getDecisionEngineAnswer(currentQuestion.id), currentQuestion.id)}
+        </div>
+        <div class="decision-engine-step-actions">
+          <span class="decision-engine-step-note">${answeredCount ? "Tap any answer to revise the plan as you go." : "Start with the answer that best matches this session, not your fantasy build."}</span>
+          ${state.decisionEngine.currentStep > 0 ? '<button class="hero-button hero-button-secondary" type="button" data-decision-nav="back">Previous</button>' : ""}
+        </div>
+      </article>
+    `;
+  } else {
+    decisionEngineFlowElement.innerHTML = `
+      <article class="decision-engine-empty">
+        <p class="eyebrow">Plan inputs locked</p>
+        <strong>Recommendation ready</strong>
+        <p class="decision-engine-note">You answered all ${totalQuestions} questions. Review the result, jump into the guide pages it points to, or rebuild if your session goal changed.</p>
+        <div class="decision-engine-answer-list">
+          ${RAID_DECISION_QUESTIONS.map((question) => `<span class="content-tag">${question.label}: ${getDecisionEngineOptionLabel(question.id, getDecisionEngineAnswer(question.id))}</span>`).join("")}
+        </div>
+      </article>
+    `;
+  }
+
+  if (!activePlan) {
+    decisionEngineResultElement.innerHTML = `
+      <article class="decision-engine-empty">
+        <p class="eyebrow">No plan yet</p>
+        <strong>Build the next run before you queue</strong>
+        <p class="decision-engine-note">This tool does not know your hidden inventory, secret MMR, or emotional attachment to bad ideas. It gives you the best fit based on the practical answers you provide.</p>
+        ${storedPlan ? `<div class="card-tags"><span class="content-tag">Last plan saved ${storedPlan.createdAt}</span></div>` : ""}
+      </article>
+    `;
+    return;
+  }
+
+  decisionEngineResultElement.innerHTML = `
+    <article class="decision-engine-recommendation">
+      <div class="decision-engine-recommendation-top">
+        <div>
+          <p class="eyebrow">Best fit based on your answers</p>
+          <h3 class="personal-title">${activePlan.title}</h3>
+          <p class="decision-engine-recommendation-copy">${activePlan.summary}</p>
+        </div>
+        <span class="hero-mini-pill">${activePlan.createdAt ? `Saved ${activePlan.createdAt}` : "Live result"}</span>
+      </div>
+      <div class="decision-engine-badges">
+        ${activePlan.tags.map((tag) => `<span class="content-tag">${tag}</span>`).join("")}
+      </div>
+      ${renderDecisionMetaRows([
+        { label: "Run type", value: activePlan.runType },
+        { label: "Priority", value: activePlan.priority },
+        { label: "Loadout", value: activePlan.loadout },
+        { label: "Utility", value: activePlan.utility }
+      ])}
+      ${renderCallout("tip", "Suggested approach", activePlan.approach)}
+      ${renderCallout("warning", "Risk warning", activePlan.warning)}
+      ${activePlan.dominantLink ? `<button class="hero-button hero-button-primary decision-engine-primary-cta" type="button" data-decision-open="${activePlan.dominantLink.type}:${activePlan.dominantLink.id}">${activePlan.dominantCta}</button>` : ""}
+    </article>
+    <article class="decision-engine-links">
+      <div class="decision-engine-link-head">
+        <div>
+          <p class="eyebrow">Recommended next pages</p>
+          <strong>Use the guide pages that fit this run</strong>
+        </div>
+      </div>
+      <div class="decision-engine-link-list">
+        ${activePlan.links.map((item) => `
+          <article class="decision-engine-link-card">
+            <span class="decision-engine-link-type">${item.type}</span>
+            <strong>${item.title}</strong>
+            <p>${item.subtitle}</p>
+            <div class="card-tags">${(item.meta ?? []).map((meta) => `<span class="content-tag">${meta}</span>`).join("")}</div>
+            <div class="decision-engine-link-actions">
+              <button class="hero-button hero-button-secondary" type="button" data-decision-open="${item.type}:${item.id}">Open</button>
+            </div>
+          </article>
+        `).join("")}
+      </div>
+    </article>
+    <article class="decision-engine-why">
+      <p class="eyebrow">Why this recommendation?</p>
+      <strong>Reasoning snapshot</strong>
+      <div class="decision-engine-answer-list">
+        ${activePlan.why.map((item) => `<span class="content-tag">${item}</span>`).join("")}
+      </div>
+      <p class="decision-engine-note">Recommended, not certain. This is a guide fit based on your answers, not a magical read of your stash, lobby, or live inventory.</p>
+    </article>
+  `;
+
+  for (const button of decisionEngineFlowElement.querySelectorAll("[data-tool-key]")) {
+    button.addEventListener("click", () => {
+      applyDecisionEngineAnswer(button.dataset.toolKey, button.dataset.toolValue);
+      renderDecisionEngine();
+      renderHeroDashboard();
+      renderPersonalHub();
+      saveState();
+    });
+  }
+
+  for (const button of decisionEngineFlowElement.querySelectorAll("[data-decision-nav='back']")) {
+    button.addEventListener("click", () => {
+      state.decisionEngine.currentStep = Math.max(0, getDecisionEngineNextStep() - 1);
+      const previousQuestion = RAID_DECISION_QUESTIONS[state.decisionEngine.currentStep];
+      if (previousQuestion) {
+        delete state.decisionEngine.answers[previousQuestion.id];
+      }
+      renderDecisionEngine();
+      saveState();
+    });
+  }
+
+  for (const button of decisionEngineResultElement.querySelectorAll("[data-decision-open]")) {
+    button.addEventListener("click", () => {
+      const [type, id] = button.dataset.decisionOpen.split(":");
+      openDecisionEngineLink({ type, id });
+    });
+  }
 }
 
 function getSelectedTrack() {
@@ -3557,6 +4330,7 @@ function saveState() {
     playstylePreference: state.playstylePreference,
     loadoutBuilder: state.loadoutBuilder,
     materialHelper: state.materialHelper,
+    decisionEngine: state.decisionEngine,
     lastVisited: state.lastVisited,
     filters: state.filters,
     lastSeenUpdated: APP_UPDATED
@@ -3586,6 +4360,11 @@ function loadState() {
     state.playstylePreference = parsedState.playstylePreference || state.playstylePreference;
     state.loadoutBuilder = { ...state.loadoutBuilder, ...(parsedState.loadoutBuilder ?? {}) };
     state.materialHelper = { ...state.materialHelper, ...(parsedState.materialHelper ?? {}) };
+    state.decisionEngine = {
+      ...state.decisionEngine,
+      ...(parsedState.decisionEngine ?? {}),
+      answers: { ...(parsedState.decisionEngine?.answers ?? {}) }
+    };
     state.lastVisited = parsedState.lastVisited ?? state.lastVisited;
     state.filters = { ...state.filters, ...(parsedState.filters ?? {}) };
     previousSeenUpdated = parsedState.lastSeenUpdated ?? null;
@@ -3594,6 +4373,11 @@ function loadState() {
     state.completedItems = [];
     state.savedItems = [];
     state.checkedPrepItems = [];
+    state.decisionEngine = {
+      currentStep: 0,
+      answers: {},
+      lastPlan: null
+    };
   }
 }
 
@@ -3952,6 +4736,7 @@ function renderHeroDashboard() {
   const nextFocus = playstyle.goals[0] ?? (reviewedCount >= 3 ? "gear" : "learn");
   const nextFocusView = focusViews.find((view) => view.id === nextFocus);
   const lessonProgress = getLessonProgress();
+  const storedPlan = getStoredDecisionPlan();
 
   heroUpdateCardElement.innerHTML = `
     <span class="hero-card-label">Latest official update</span>
@@ -3989,6 +4774,11 @@ function renderHeroDashboard() {
       title: "Clear one weak spot",
       copy: "Use saved items and section progress together so you can close one skill gap at a time instead of wandering through the whole guide like a lost goblin.",
       badges: ["Skill builder", state.savedItems.length ? "Saved items ready" : "Save guides first"]
+    },
+    {
+      title: storedPlan ? `Use ${storedPlan.title}` : "Build a run plan",
+      copy: storedPlan?.summary ?? "Use the Raid Decision Engine when you want one practical next-run recommendation instead of winging it and hoping the map pities you.",
+      badges: ["Raid Decision Engine", storedPlan ? "Last plan saved" : "Signature feature"]
     }
   ];
 
@@ -4020,6 +4810,7 @@ function renderPersonalHub() {
   const continueItem = getContinueItem();
   const sections = getProgressSections();
   const registry = buildDiscoveryRegistry();
+  const storedPlan = getStoredDecisionPlan();
   const nextSection = sections
     .filter((section) => section.total > 0)
     .sort((a, b) => (a.completed / a.total) - (b.completed / b.total))[0];
@@ -4063,7 +4854,8 @@ function renderPersonalHub() {
       ${renderTagMarkup([
         playstyle.label,
         nextSection ? `Next focus: ${nextSection.label}` : "Next focus: Lessons",
-        state.savedItems.length ? "Saved items ready" : "Save a few guides"
+        state.savedItems.length ? "Saved items ready" : "Save a few guides",
+        storedPlan ? `Plan: ${storedPlan.title}` : "Plan your next run"
       ])}
     </div>
     <article class="empty-state-card">
@@ -4072,6 +4864,7 @@ function renderPersonalHub() {
     </article>
     <div class="personal-actions">
       <button class="hero-button hero-button-primary" type="button" data-open-next-step>Open recommended step</button>
+      ${storedPlan ? '<button class="hero-button hero-button-secondary" type="button" data-open-last-plan>Use last plan</button>' : ""}
     </div>
   `;
 
@@ -4162,6 +4955,14 @@ function renderPersonalHub() {
     }
     item.action();
     saveState();
+  });
+
+  const lastPlanButton = personalNextElement.querySelector("[data-open-last-plan]");
+  lastPlanButton?.addEventListener("click", () => {
+    resetDecisionEngine(true);
+    renderDecisionEngine();
+    saveState();
+    scrollElementIntoView(document.querySelector("#raid-decision-engine"));
   });
 
   for (const button of savedPanelElement.querySelectorAll("[data-open-saved]")) {
@@ -5085,6 +5886,7 @@ function render() {
   renderReleaseList();
   renderReleaseDetail();
   renderStartHereFlow();
+  renderDecisionEngine();
   renderBriefing();
   renderMediaIntel();
   renderPainPoints();
@@ -5186,6 +5988,25 @@ shareAppButtonElement.addEventListener("click", () => {
 startHereCtaElement.addEventListener("click", () => {
   const step = START_HERE_STEPS.find((entry) => entry.id === startHereCtaElement.dataset.startStep) ?? START_HERE_STEPS[0];
   step.action();
+  saveState();
+});
+decisionEngineStartElement?.addEventListener("click", () => {
+  if (!getDecisionEngineProgress()) {
+    resetDecisionEngine(false);
+  }
+  renderDecisionEngine();
+  saveState();
+  scrollElementIntoView(document.querySelector("#raid-decision-engine"));
+});
+decisionEngineLastPlanElement?.addEventListener("click", () => {
+  resetDecisionEngine(true);
+  renderDecisionEngine();
+  saveState();
+  scrollElementIntoView(document.querySelector("#raid-decision-engine"));
+});
+decisionEngineResetElement?.addEventListener("click", () => {
+  resetDecisionEngine(false);
+  renderDecisionEngine();
   saveState();
 });
 
