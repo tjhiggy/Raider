@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.28.0",
+    date: "2026-04-13",
+    summary: "Operation Overwatch turns the field guide into a mission-control companion system with saved run plans, Pre-Raid Mode, patch impact intelligence, and stronger daily-return loops.",
+    changes: [
+      "Reworked the top of the homepage into an action-first mission-control layer with Today's Focus, Continue Last Plan, Latest Patch Impact, and smart nudges.",
+      "Expanded the Raid Decision Engine into a true Run Plan system with save, edit, duplicate, copy-summary, dashboard surfacing, and Pre-Raid Mode execution support.",
+      "Added patch-impact relationships, stash and progression support, milestone cues, and stronger return-user guidance so the site behaves like a connected companion instead of a stack of helpful but separate sections."
+    ]
+  },
+  {
     version: "v1.27.0",
     date: "2026-04-13",
     summary: "Added the Raid Decision Engine so Raiders can turn a few practical answers into a clear next-run plan tied to the guide.",
@@ -954,6 +964,65 @@ const RAID_DECISION_PROFILES = [
     ]
   }
 ];
+
+const PATCH_IMPACT_MAP = {
+  learn: {
+    tags: ["Affected by latest patch", "Recommended adjustment"],
+    whatChanged: "Close Scrutiny reliability and April UX cleanup changed how much older 'just avoid it' advice still applies.",
+    meaning: "New Raiders should still respect the danger, but the right move is now patch-aware learning instead of blanket avoidance.",
+    action: "Check the latest patch impact before following older operation or route advice."
+  },
+  quests: {
+    tags: ["Recently updated", "Recommended adjustment"],
+    whatChanged: "Recent official fixes improve operation stability and reduce some route friction around live content and system flow.",
+    meaning: "Questing is still dangerous, but the current live build supports cleaner objective planning than earlier Flashpoint rough spots did.",
+    action: "Pair quest routing with current patch context and extract once the quest condition is secured."
+  },
+  materials: {
+    tags: ["Affected by latest patch", "Recommended adjustment"],
+    whatChanged: "Embark added the Acquire Resources workflow and recent guide logic now assumes the workshop path is less opaque than before.",
+    meaning: "Material choices should now be tied more directly to workshop goals, not just hoarding and hope.",
+    action: "Use stash support and the Material Decision Helper before selling premium tech or dumping core utility stock."
+  },
+  gear: {
+    tags: ["Needs reverification", "Recommended adjustment"],
+    whatChanged: "Recent official posts focused more on stability and friction reduction than broad weapon meta resets.",
+    meaning: "Loadout advice should stay purpose-first and patch-aware instead of pretending there was a huge confirmed balance rewrite when there was not.",
+    action: "Adjust the kit to your run goal and patch context, not rumor-tier meta chatter."
+  },
+  machines: {
+    tags: ["Affected by latest patch", "Recommended adjustment"],
+    whatChanged: "The latest patch directly touched Close Scrutiny behavior, including Assessors, Vaporizers, platforms, and ping clarity.",
+    meaning: "Machine intel is still practical, but operation-specific reads should assume cleaner behavior than at Flashpoint launch.",
+    action: "Recheck ARC Intel before running operation-heavy or pressure-heavy plans."
+  },
+  updates: {
+    tags: ["Official source", "Recently updated"],
+    whatChanged: "Update Center is now the current live reference layer instead of a side archive.",
+    meaning: "Players should read the patch as behavior guidance, not just release notes.",
+    action: "Use the latest patch impact board before trusting older advice elsewhere in the app."
+  }
+};
+
+const STASH_SUPPORT_OPTIONS = {
+  pressure: [
+    { id: "light", label: "Light pressure" },
+    { id: "medium", label: "Crowded stash" },
+    { id: "high", label: "I need space now" }
+  ],
+  bottleneck: [
+    { id: "healing", label: "Healing sustain" },
+    { id: "weapons", label: "Weapon pipeline" },
+    { id: "projects", label: "Projects" },
+    { id: "premium-tech", label: "Premium ARC tech" }
+  ],
+  pathway: [
+    { id: "first-extract", label: "First extraction prep" },
+    { id: "quest-push", label: "Quest push" },
+    { id: "workshop", label: "Workshop unlocks" },
+    { id: "long-cycle", label: "Long-cycle progression" }
+  ]
+};
 
 const VISUAL_INTEL_ITEMS = [
   {
@@ -2344,11 +2413,19 @@ const state = {
     rarity: "basic",
     objective: "healing"
   },
+  stashSupport: {
+    pressure: "medium",
+    bottleneck: "healing",
+    pathway: "first-extract"
+  },
   decisionEngine: {
     currentStep: 0,
     answers: {},
-    lastPlan: null
+    lastPlan: null,
+    editingPlanId: null
   },
+  runPlans: [],
+  selectedRunPlanId: null,
   lastVisited: {
     type: "lesson",
     id: lessons.find((lesson) => lesson.trackId === tracks[0].id)?.id ?? null
@@ -2376,12 +2453,18 @@ const continueLabelElement = document.querySelector("#continue-label");
 const startHereSummaryElement = document.querySelector("#start-here-summary");
 const startHereStepsElement = document.querySelector("#start-here-steps");
 const startHereCtaElement = document.querySelector("#start-here-cta");
+const todayFocusCardElement = document.querySelector("#today-focus-card");
+const continuePlanCardElement = document.querySelector("#continue-plan-card");
+const latestPatchImpactCardElement = document.querySelector("#latest-patch-impact-card");
+const missionNudgesCardElement = document.querySelector("#mission-nudges-card");
 const decisionEngineStartElement = document.querySelector("#decision-engine-start");
 const decisionEngineLastPlanElement = document.querySelector("#decision-engine-last-plan");
 const decisionEngineResetElement = document.querySelector("#decision-engine-reset");
 const decisionEngineStatusElement = document.querySelector("#decision-engine-status");
 const decisionEngineFlowElement = document.querySelector("#decision-engine-flow");
 const decisionEngineResultElement = document.querySelector("#decision-engine-result");
+const runPlanListElement = document.querySelector("#run-plan-list");
+const preRaidPanelElement = document.querySelector("#pre-raid-panel");
 const globalSearchElement = document.querySelector("#global-search");
 const searchSuggestionsElement = document.querySelector("#search-suggestions");
 const commandBarElement = document.querySelector(".command-bar");
@@ -2436,6 +2519,7 @@ const materialRelatedElement = document.querySelector("#material-related");
 const materialsDetailPanelElement = document.querySelector(".materials-detail-panel");
 const materialsCatalogElement = document.querySelector("#materials-catalog");
 const materialUsageGuideElement = document.querySelector("#material-usage-guide");
+const stashSupportElement = document.querySelector("#stash-support");
 const gearOverviewElement = document.querySelector("#gear-overview");
 const weaponRoleListElement = document.querySelector("#weapon-role-list");
 const weaponFiltersElement = document.querySelector("#weapon-filters");
@@ -2625,7 +2709,8 @@ function hasUserProgressData() {
     state.completedItems.length ||
     state.savedItems.length ||
     state.checkedPrepItems.length ||
-    state.decisionEngine.lastPlan
+    state.decisionEngine.lastPlan ||
+    state.runPlans.length
   );
 }
 
@@ -3196,11 +3281,287 @@ function resetDecisionEngine(reuseLastPlan = false) {
   state.decisionEngine.answers = reuseLastPlan && state.decisionEngine.lastPlan?.answers
     ? { ...state.decisionEngine.lastPlan.answers }
     : {};
+  state.decisionEngine.editingPlanId = reuseLastPlan && state.decisionEngine.lastPlan?.id
+    ? state.decisionEngine.lastPlan.id
+    : null;
 
   const nextIndex = RAID_DECISION_QUESTIONS.findIndex((question) => !state.decisionEngine.answers[question.id]);
   state.decisionEngine.currentStep = nextIndex === -1
     ? RAID_DECISION_QUESTIONS.length
     : Math.max(nextIndex, 0);
+}
+
+function createRunPlanId() {
+  return `plan-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+}
+
+function getRunPlans() {
+  return [...state.runPlans].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+}
+
+function getRunPlanById(planId) {
+  return state.runPlans.find((plan) => plan.id === planId) ?? null;
+}
+
+function getLatestRunPlan() {
+  return getRunPlans()[0] ?? null;
+}
+
+function buildRunPlanSnapshot(answers, existingPlan = null) {
+  const recommendation = buildDecisionRecommendation(answers);
+  if (!recommendation) {
+    return null;
+  }
+
+  const now = new Date().toISOString().slice(0, 10);
+  return {
+    id: existingPlan?.id ?? createRunPlanId(),
+    name: existingPlan?.name ?? recommendation.title,
+    profileId: recommendation.profileId,
+    answers: { ...answers },
+    createdAt: existingPlan?.createdAt ?? now,
+    updatedAt: now,
+    readyToDrop: existingPlan?.readyToDrop ?? false,
+    summary: recommendation.summary,
+    runType: recommendation.runType,
+    priority: recommendation.priority,
+    approach: recommendation.approach,
+    loadout: recommendation.loadout,
+    utility: recommendation.utility,
+    warning: recommendation.warning,
+    why: [...recommendation.why],
+    tags: [...recommendation.tags]
+  };
+}
+
+function formatRunPlanSummary(plan) {
+  return `${plan.name}: ${plan.runType}. Priority: ${plan.priority} Loadout: ${plan.loadout} Utility: ${plan.utility} Warning: ${plan.warning}`;
+}
+
+async function copyRunPlanSummary(plan) {
+  const targetPlan = plan ?? getRunPlanById(state.selectedRunPlanId) ?? getLatestRunPlan();
+  if (!targetPlan || !navigator.clipboard?.writeText) {
+    return false;
+  }
+
+  await navigator.clipboard.writeText(formatRunPlanSummary(targetPlan));
+  return true;
+}
+
+function saveCurrentRunPlan(mode = "save") {
+  const answers = state.decisionEngine.answers;
+  const recommendation = buildDecisionRecommendation(answers);
+  if (!recommendation) {
+    return null;
+  }
+
+  const activePlan = state.decisionEngine.editingPlanId ? getRunPlanById(state.decisionEngine.editingPlanId) : null;
+  const snapshot = buildRunPlanSnapshot(
+    answers,
+    mode === "update" && activePlan ? activePlan : null
+  );
+
+  if (!snapshot) {
+    return null;
+  }
+
+  if (mode === "duplicate") {
+    snapshot.id = createRunPlanId();
+    snapshot.name = `${snapshot.name} Copy`;
+    snapshot.createdAt = snapshot.updatedAt;
+    snapshot.readyToDrop = false;
+  }
+
+  const existingIndex = state.runPlans.findIndex((plan) => plan.id === snapshot.id);
+  if (existingIndex >= 0) {
+    state.runPlans[existingIndex] = snapshot;
+  } else {
+    state.runPlans = [snapshot, ...state.runPlans];
+  }
+
+  state.selectedRunPlanId = snapshot.id;
+  state.decisionEngine.editingPlanId = snapshot.id;
+  state.decisionEngine.lastPlan = {
+    id: snapshot.id,
+    profileId: snapshot.profileId,
+    answers: { ...snapshot.answers },
+    createdAt: snapshot.updatedAt
+  };
+  return snapshot;
+}
+
+function loadRunPlanIntoEngine(planId, mode = "edit") {
+  const plan = getRunPlanById(planId);
+  if (!plan) {
+    return;
+  }
+
+  state.decisionEngine.answers = { ...plan.answers };
+  state.decisionEngine.currentStep = RAID_DECISION_QUESTIONS.length;
+  state.decisionEngine.editingPlanId = mode === "edit" ? plan.id : null;
+  state.selectedRunPlanId = plan.id;
+  state.decisionEngine.lastPlan = {
+    id: plan.id,
+    profileId: plan.profileId,
+    answers: { ...plan.answers },
+    createdAt: plan.updatedAt
+  };
+}
+
+function toggleRunPlanReady(planId) {
+  state.runPlans = state.runPlans.map((plan) => (
+    plan.id === planId
+      ? { ...plan, readyToDrop: !plan.readyToDrop, updatedAt: new Date().toISOString().slice(0, 10) }
+      : plan
+  ));
+}
+
+function buildPreRaidChecklist(plan) {
+  const teamAnswer = plan.answers.team === "squad" ? "Confirm squad roles and final leave call." : "Confirm your solo exit route and one hard bailout path.";
+  const riskAnswer = plan.answers.risk === "high"
+    ? "Do one last check that the reward actually justifies the contact you are volunteering for."
+    : "Keep the route honest and do not let curiosity inflate the run past its stated purpose.";
+  return [
+    "Lock the mission focus before queueing. No improvising into three unrelated goals.",
+    "Bring healing plus one reset or control tool.",
+    teamAnswer,
+    riskAnswer,
+    "Open the latest patch impact if the run depends on operations, machine pressure, or changed routes."
+  ];
+}
+
+function getPatchImpact(sectionId) {
+  return PATCH_IMPACT_MAP[sectionId] ?? null;
+}
+
+function renderPatchImpactCallout(sectionId) {
+  const impact = getPatchImpact(sectionId);
+  if (!impact) {
+    return "";
+  }
+
+  return `
+    <div class="source-note">
+      <strong>Patch impact:</strong>
+      <p class="detail-copy">${impact.whatChanged}</p>
+      <div class="card-tags">${impact.tags.map((tag) => `<span class="content-tag">${tag}</span>`).join("")}</div>
+      ${renderCallout("tip", "What to do differently now", impact.action)}
+    </div>
+  `;
+}
+
+function getMilestones() {
+  const latestPlan = getLatestRunPlan();
+  return [
+    {
+      id: "first-extract-prep",
+      title: "First extraction prep complete",
+      complete: getPrepProgress() >= 3 || getLessonProgress() >= 1,
+      note: "Finish the briefing and prep checklist so your first clean extract is intentional, not accidental."
+    },
+    {
+      id: "first-quest-plan",
+      title: "First quest run planned",
+      complete: state.runPlans.some((plan) => plan.profileId === "quest-progression-run"),
+      note: "Build at least one quest-focused plan so progression stops depending on random raid drift."
+    },
+    {
+      id: "first-crafting-relief",
+      title: "First crafting bottleneck resolved",
+      complete: state.materialHelper.objective === "future" || getMaterialProgress() >= 1,
+      note: "Use stash support and material guidance to stop treating every part like sacred inventory mythology."
+    },
+    {
+      id: "first-saved-plan",
+      title: "First saved run plan",
+      complete: state.runPlans.length > 0,
+      note: latestPlan ? `Latest saved plan: ${latestPlan.name}` : "Save one plan so the site starts acting like a companion system instead of a pamphlet."
+    }
+  ];
+}
+
+function getTodaysFocus() {
+  const latestPlan = getLatestRunPlan();
+  const unreadPatch = !isCompletedItem("release", releases[0].id);
+  const incompleteMilestone = getMilestones().find((milestone) => !milestone.complete);
+
+  if (latestPlan && !latestPlan.readyToDrop) {
+    return {
+      title: "Finish your current run plan",
+      copy: `Your latest saved plan is ${latestPlan.name}. Convert it into a ready-to-drop execution panel before you queue and donate gear to chaos.`,
+      cta: "Open Pre-Raid Mode",
+      action: () => {
+        state.selectedRunPlanId = latestPlan.id;
+        render();
+        scrollElementIntoView(preRaidPanelElement);
+      },
+      tags: ["Continue last plan", latestPlan.runType, "Highest leverage"]
+    };
+  }
+
+  if (unreadPatch) {
+    return {
+      title: "Review the live patch impact",
+      copy: "The guide is patch-aware now, which is lovely, but it still helps if you actually read what changed before following older route or machine assumptions.",
+      cta: "Check patch impact",
+      action: () => {
+        state.activeView = "updates";
+        render();
+        scrollElementIntoView(updateCenterElement);
+      },
+      tags: ["Today's focus", "Latest patch", "Recommended adjustment"]
+    };
+  }
+
+  if (incompleteMilestone) {
+    return {
+      title: incompleteMilestone.title,
+      copy: incompleteMilestone.note,
+      cta: "Plan my next run",
+      action: () => {
+        scrollElementIntoView(document.querySelector("#raid-decision-engine"));
+      },
+      tags: ["Milestone", "Guided progress", "Return value"]
+    };
+  }
+
+  return {
+    title: "Plan a focused run",
+    copy: "Build one run with a clear goal, patch-aware context, and a sane loadout philosophy instead of hoping a vague mood counts as prep.",
+    cta: "Plan my next run",
+    action: () => {
+      scrollElementIntoView(document.querySelector("#raid-decision-engine"));
+    },
+    tags: ["Today's focus", "Run planning", "Mission control"]
+  };
+}
+
+function getMissionNudges() {
+  const nudges = [];
+  const latestPlan = getLatestRunPlan();
+  const sinceLastVisit = getSinceLastVisitEntries();
+  const incompleteMilestones = getMilestones().filter((milestone) => !milestone.complete);
+
+  if (sinceLastVisit.length) {
+    nudges.push(`Since your last visit, ${sinceLastVisit[0].title} was refreshed.`);
+  }
+  if (latestPlan && !latestPlan.readyToDrop) {
+    nudges.push(`${latestPlan.name} is saved but not marked ready to drop yet.`);
+  }
+  if (!state.runPlans.length) {
+    nudges.push("Save your first run plan so return visits give you something concrete to continue.");
+  }
+  if (getPrepProgress() < prepChecklist.length) {
+    nudges.push("Your prep checklist is not fully green. That is usually where 'why did that run feel sloppy?' begins.");
+  }
+  if (!isCompletedItem("release", releases[0].id)) {
+    nudges.push(`${releases[0].title} still is not marked reviewed. Patch drift is real, and it is annoying.`);
+  }
+  if (incompleteMilestones.length) {
+    nudges.push(incompleteMilestones[0].note);
+  }
+
+  return nudges.slice(0, 4);
 }
 
 function openDecisionEngineLink(entry) {
@@ -3224,6 +3585,8 @@ function renderDecisionEngine() {
   const storedPlan = getStoredDecisionPlan();
   const activePlan = buildDecisionRecommendation(state.decisionEngine.answers) ?? storedPlan;
   const continueItem = getContinueItem();
+  const savedPlanCount = state.runPlans.length;
+  const editingPlan = state.decisionEngine.editingPlanId ? getRunPlanById(state.decisionEngine.editingPlanId) : null;
 
   if (decisionEngineLastPlanElement) {
     decisionEngineLastPlanElement.hidden = !storedPlan;
@@ -3241,6 +3604,10 @@ function renderDecisionEngine() {
       <div class="decision-engine-progress">
         <div class="decision-engine-progress-bar" aria-hidden="true"><span style="width:${percent}%"></span></div>
         <p class="decision-engine-note">${hasUserProgressData() ? `Guide progress ${getOverallProgressPercent()}%, ${state.savedItems.length} saved, and ${continueItem?.title ?? "New Raider path"} is your current continuation.` : "No stored state yet. Build a plan once and this section starts behaving like it remembers you, because it will."}</p>
+        <div class="card-tags">
+          <span class="content-tag">${savedPlanCount} saved plan${savedPlanCount === 1 ? "" : "s"}</span>
+          ${editingPlan ? `<span class="content-tag">Editing ${editingPlan.name}</span>` : ""}
+        </div>
       </div>
     </article>
   `;
@@ -3311,7 +3678,12 @@ function renderDecisionEngine() {
       ])}
       ${renderCallout("tip", "Suggested approach", activePlan.approach)}
       ${renderCallout("warning", "Risk warning", activePlan.warning)}
-      ${activePlan.dominantLink ? `<button class="hero-button hero-button-primary decision-engine-primary-cta" type="button" data-decision-open="${activePlan.dominantLink.type}:${activePlan.dominantLink.id}">${activePlan.dominantCta}</button>` : ""}
+      <div class="mission-actions">
+        ${activePlan.dominantLink ? `<button class="hero-button hero-button-primary decision-engine-primary-cta" type="button" data-decision-open="${activePlan.dominantLink.type}:${activePlan.dominantLink.id}">${activePlan.dominantCta}</button>` : ""}
+        <button class="hero-button hero-button-secondary" type="button" data-plan-save="${editingPlan ? "update" : "save"}">${editingPlan ? "Update saved plan" : "Save run plan"}</button>
+        <button class="hero-button hero-button-secondary" type="button" data-plan-save="duplicate">Duplicate plan</button>
+        <button class="hero-button hero-button-secondary" type="button" data-plan-copy-current>Copy summary</button>
+      </div>
     </article>
     <article class="decision-engine-links">
       <div class="decision-engine-link-head">
@@ -3348,7 +3720,10 @@ function renderDecisionEngine() {
     button.addEventListener("click", () => {
       applyDecisionEngineAnswer(button.dataset.toolKey, button.dataset.toolValue);
       renderDecisionEngine();
+      renderMissionControl();
       renderHeroDashboard();
+      renderRunPlans();
+      renderPreRaidMode();
       renderPersonalHub();
       saveState();
     });
@@ -3362,6 +3737,7 @@ function renderDecisionEngine() {
         delete state.decisionEngine.answers[previousQuestion.id];
       }
       renderDecisionEngine();
+      renderMissionControl();
       saveState();
     });
   }
@@ -3370,6 +3746,420 @@ function renderDecisionEngine() {
     button.addEventListener("click", () => {
       const [type, id] = button.dataset.decisionOpen.split(":");
       openDecisionEngineLink({ type, id });
+    });
+  }
+
+  for (const button of decisionEngineResultElement.querySelectorAll("[data-plan-save]")) {
+    button.addEventListener("click", () => {
+      const plan = saveCurrentRunPlan(button.dataset.planSave);
+      if (!plan) {
+        return;
+      }
+      renderDecisionEngine();
+      renderMissionControl();
+      renderHeroDashboard();
+      renderRunPlans();
+      renderPreRaidMode();
+      renderPersonalHub();
+      saveState();
+    });
+  }
+
+  decisionEngineResultElement.querySelector("[data-plan-copy-current]")?.addEventListener("click", () => {
+    const snapshot = buildRunPlanSnapshot(state.decisionEngine.answers, editingPlan);
+    if (!snapshot) {
+      return;
+    }
+    copyRunPlanSummary(snapshot).catch(() => undefined);
+  });
+}
+
+function renderMissionControl() {
+  if (!todayFocusCardElement || !continuePlanCardElement || !latestPatchImpactCardElement || !missionNudgesCardElement) {
+    return;
+  }
+
+  const focus = getTodaysFocus();
+  const latestPlan = getLatestRunPlan();
+  const patchImpact = getPatchImpact("updates");
+  const milestones = getMilestones();
+  const nudges = getMissionNudges();
+  const sinceLastVisit = getSinceLastVisitEntries();
+
+  todayFocusCardElement.innerHTML = `
+    <div class="mission-card-top">
+      <div>
+        <p class="eyebrow">Today's Focus</p>
+        <h3 class="mission-title">${focus.title}</h3>
+      </div>
+      <span class="hero-mini-pill">${getOverallProgressPercent()}% guide progress</span>
+    </div>
+    <p class="mission-copy">${focus.copy}</p>
+    <div class="card-tags">${focus.tags.map((tag) => `<span class="content-tag">${tag}</span>`).join("")}</div>
+    <div class="mission-actions">
+      <button class="hero-button hero-button-primary" type="button" data-mission-action="focus">${focus.cta}</button>
+      <button class="hero-button hero-button-secondary" type="button" data-mission-action="plan">Plan my next run</button>
+    </div>
+  `;
+
+  continuePlanCardElement.innerHTML = latestPlan ? `
+    <div class="mission-card-top">
+      <div>
+        <p class="eyebrow">Continue Last Plan</p>
+        <h3 class="mission-title">${latestPlan.name}</h3>
+      </div>
+      <span class="hero-mini-pill">${latestPlan.readyToDrop ? "Ready to drop" : "Needs prep"}</span>
+    </div>
+    <p class="mission-copy">${latestPlan.summary}</p>
+    ${renderDecisionMetaRows([
+      { label: "Run type", value: latestPlan.runType },
+      { label: "Updated", value: latestPlan.updatedAt },
+      { label: "Priority", value: latestPlan.priority }
+    ])}
+    <div class="mission-actions">
+      <button class="hero-button hero-button-primary" type="button" data-run-plan-open="${latestPlan.id}">Use last plan</button>
+      <button class="hero-button hero-button-secondary" type="button" data-run-plan-edit="${latestPlan.id}">Adjust last plan</button>
+    </div>
+  ` : `
+    <div class="mission-card-top">
+      <div>
+        <p class="eyebrow">Continue Last Plan</p>
+        <h3 class="mission-title">No saved run plans yet</h3>
+      </div>
+    </div>
+    <p class="mission-copy">Save your first run plan and this card becomes your fastest path back into the game instead of a decorative reminder that time is real.</p>
+    <div class="mission-actions">
+      <button class="hero-button hero-button-primary" type="button" data-mission-action="plan">Create first plan</button>
+    </div>
+  `;
+
+  latestPatchImpactCardElement.innerHTML = `
+    <div class="mission-card-top">
+      <div>
+        <p class="eyebrow">Latest Patch Impact</p>
+        <h3 class="mission-title">${releases[0].title}</h3>
+      </div>
+      <span class="hero-mini-pill">${releases[0].date}</span>
+    </div>
+    <p class="mission-copy">${patchImpact?.meaning ?? releases[0].summary}</p>
+    <div class="card-tags">
+      ${(patchImpact?.tags ?? ["Official source", "Recently updated"]).map((tag) => `<span class="content-tag">${tag}</span>`).join("")}
+    </div>
+    ${renderCallout("tip", "What to do differently now", patchImpact?.action ?? "Review the release detail and adjust the affected guide sections before following older advice.")}
+    <div class="mission-actions">
+      <button class="hero-button hero-button-primary" type="button" data-mission-action="patch">Review patch impact</button>
+    </div>
+  `;
+
+  missionNudgesCardElement.innerHTML = `
+    <div class="mission-card-top">
+      <div>
+        <p class="eyebrow">Daily Return Loops</p>
+        <h3 class="mission-title">Keep the useful pressure</h3>
+      </div>
+      <span class="hero-mini-pill">${sinceLastVisit.length ? `${sinceLastVisit.length} since last visit` : `${milestones.filter((item) => item.complete).length}/${milestones.length} milestones`}</span>
+    </div>
+    <div class="milestone-grid">
+      ${milestones.slice(0, 4).map((milestone) => `
+        <article class="milestone-card">
+          <strong>${milestone.title}</strong>
+          <p class="mission-copy">${milestone.note}</p>
+          <div class="card-tags"><span class="content-tag">${milestone.complete ? "Complete" : "In progress"}</span></div>
+        </article>
+      `).join("")}
+    </div>
+    <div class="callout callout-trust">
+      <strong>Smart nudges</strong>
+      <ul class="detail-list">${nudges.map((item) => `<li>${item}</li>`).join("")}</ul>
+    </div>
+  `;
+
+  todayFocusCardElement.querySelector("[data-mission-action='focus']")?.addEventListener("click", () => {
+    focus.action();
+    saveState();
+  });
+  for (const button of document.querySelectorAll("[data-mission-action='plan']")) {
+    button.addEventListener("click", () => {
+      scrollElementIntoView(document.querySelector("#raid-decision-engine"));
+    });
+  }
+  latestPatchImpactCardElement.querySelector("[data-mission-action='patch']")?.addEventListener("click", () => {
+    state.activeView = "updates";
+    render();
+    scrollElementIntoView(updateCenterElement);
+    saveState();
+  });
+  continuePlanCardElement.querySelector("[data-run-plan-open]")?.addEventListener("click", (event) => {
+    const planId = event.currentTarget.dataset.runPlanOpen;
+    state.selectedRunPlanId = planId;
+    renderRunPlans();
+    renderPreRaidMode();
+    scrollElementIntoView(preRaidPanelElement);
+    saveState();
+  });
+  continuePlanCardElement.querySelector("[data-run-plan-edit]")?.addEventListener("click", (event) => {
+    const planId = event.currentTarget.dataset.runPlanEdit;
+    loadRunPlanIntoEngine(planId, "edit");
+    renderDecisionEngine();
+    scrollElementIntoView(document.querySelector("#raid-decision-engine"));
+    saveState();
+  });
+}
+
+function renderRunPlans() {
+  if (!runPlanListElement) {
+    return;
+  }
+
+  const plans = getRunPlans();
+  if (!plans.length) {
+    runPlanListElement.innerHTML = `
+      <article class="empty-state-card">
+        <strong>No saved plans yet</strong>
+        <p>Use the Raid Decision Engine to generate a run, then save it here so future you can stop rebuilding the same decision tree from scratch.</p>
+      </article>
+    `;
+    return;
+  }
+
+  runPlanListElement.innerHTML = plans.map((plan) => `
+    <article class="run-plan-card ${plan.id === state.selectedRunPlanId ? "is-active" : ""}">
+      <div class="run-plan-top">
+        <div>
+          <p class="eyebrow">Saved Run Plan</p>
+          <h3 class="run-plan-title">${plan.name}</h3>
+        </div>
+        <span class="hero-mini-pill">${plan.readyToDrop ? "Ready" : "Draft"}</span>
+      </div>
+      <p class="run-plan-copy">${plan.summary}</p>
+      ${renderDecisionMetaRows([
+        { label: "Run type", value: plan.runType },
+        { label: "Updated", value: plan.updatedAt },
+        { label: "Priority", value: plan.priority }
+      ])}
+      <div class="card-tags">${plan.tags.map((tag) => `<span class="content-tag">${tag}</span>`).join("")}</div>
+      <div class="run-plan-actions">
+        <button class="hero-button hero-button-primary" type="button" data-plan-select="${plan.id}">Use plan</button>
+        <button class="hero-button hero-button-secondary" type="button" data-plan-edit="${plan.id}">Edit</button>
+        <button class="hero-button hero-button-secondary" type="button" data-plan-duplicate="${plan.id}">Duplicate</button>
+        <button class="hero-button hero-button-secondary" type="button" data-plan-copy="${plan.id}">Copy summary</button>
+      </div>
+    </article>
+  `).join("");
+
+  for (const button of runPlanListElement.querySelectorAll("[data-plan-select]")) {
+    button.addEventListener("click", () => {
+      state.selectedRunPlanId = button.dataset.planSelect;
+      renderRunPlans();
+      renderPreRaidMode();
+      saveState();
+    });
+  }
+
+  for (const button of runPlanListElement.querySelectorAll("[data-plan-edit]")) {
+    button.addEventListener("click", () => {
+      loadRunPlanIntoEngine(button.dataset.planEdit, "edit");
+      renderDecisionEngine();
+      scrollElementIntoView(document.querySelector("#raid-decision-engine"));
+      saveState();
+    });
+  }
+
+  for (const button of runPlanListElement.querySelectorAll("[data-plan-duplicate]")) {
+    button.addEventListener("click", () => {
+      const plan = getRunPlanById(button.dataset.planDuplicate);
+      if (!plan) {
+        return;
+      }
+      state.decisionEngine.answers = { ...plan.answers };
+      state.decisionEngine.editingPlanId = null;
+      const duplicatedPlan = saveCurrentRunPlan("duplicate");
+      renderDecisionEngine();
+      renderMissionControl();
+      renderRunPlans();
+      renderPreRaidMode();
+      renderPersonalHub();
+      saveState();
+      if (duplicatedPlan) {
+        state.selectedRunPlanId = duplicatedPlan.id;
+      }
+    });
+  }
+
+  for (const button of runPlanListElement.querySelectorAll("[data-plan-copy]")) {
+    button.addEventListener("click", () => {
+      const plan = getRunPlanById(button.dataset.planCopy);
+      copyRunPlanSummary(plan).catch(() => undefined);
+    });
+  }
+}
+
+function renderPreRaidMode() {
+  if (!preRaidPanelElement) {
+    return;
+  }
+
+  const plan = getRunPlanById(state.selectedRunPlanId) ?? getLatestRunPlan();
+  if (!plan) {
+    preRaidPanelElement.innerHTML = `
+      <article class="empty-state-card">
+        <strong>No active plan</strong>
+        <p>Save or select a run plan and Pre-Raid Mode turns it into a fast mobile execution board instead of a memory test you absolutely did not prepare for.</p>
+      </article>
+    `;
+    return;
+  }
+
+  const checklist = buildPreRaidChecklist(plan);
+  preRaidPanelElement.innerHTML = `
+    <article class="pre-raid-card">
+      <div class="pre-raid-top">
+        <div>
+          <p class="eyebrow">Pre-Raid Mode</p>
+          <h3 class="pre-raid-title">${plan.name}</h3>
+        </div>
+        <span class="hero-mini-pill">${plan.readyToDrop ? "Ready to drop" : "Check before launch"}</span>
+      </div>
+      ${renderDecisionMetaRows([
+        { label: "Mission focus", value: plan.priority },
+        { label: "Bring", value: plan.utility },
+        { label: "Avoid", value: plan.warning }
+      ])}
+      ${renderCallout("tip", "Suggested approach", plan.approach)}
+      <div class="pre-raid-checklist">
+        ${checklist.map((item, index) => `
+          <article class="pre-raid-check ${plan.readyToDrop ? "is-ready" : ""}">
+            <span class="pre-raid-marker" aria-hidden="true"></span>
+            <div>
+              <strong>${index + 1}. Ready check</strong>
+              <p class="pre-raid-copy">${item}</p>
+            </div>
+          </article>
+        `).join("")}
+      </div>
+      <div class="pre-raid-actions">
+        <button class="hero-button hero-button-primary" type="button" data-pre-raid-ready="${plan.id}">${plan.readyToDrop ? "Mark as needs adjustment" : "Ready to drop"}</button>
+        <button class="hero-button hero-button-secondary" type="button" data-pre-raid-edit="${plan.id}">Adjust plan</button>
+        <button class="hero-button hero-button-secondary" type="button" data-pre-raid-copy="${plan.id}">Copy summary</button>
+      </div>
+    </article>
+  `;
+
+  preRaidPanelElement.querySelector("[data-pre-raid-ready]")?.addEventListener("click", () => {
+    toggleRunPlanReady(plan.id);
+    renderMissionControl();
+    renderRunPlans();
+    renderPreRaidMode();
+    saveState();
+  });
+  preRaidPanelElement.querySelector("[data-pre-raid-edit]")?.addEventListener("click", () => {
+    loadRunPlanIntoEngine(plan.id, "edit");
+    renderDecisionEngine();
+    scrollElementIntoView(document.querySelector("#raid-decision-engine"));
+    saveState();
+  });
+  preRaidPanelElement.querySelector("[data-pre-raid-copy]")?.addEventListener("click", () => {
+    copyRunPlanSummary(plan).catch(() => undefined);
+  });
+}
+
+function getStashSupportDecision() {
+  const { pressure, bottleneck, pathway } = state.stashSupport;
+  const pressureLine = pressure === "high"
+    ? "Space is the fire right now, so common bulk loot becomes your pressure valve."
+    : pressure === "medium"
+      ? "The stash is crowded enough that lazy keeping will start costing progression."
+      : "You still have room, which means this is the time to protect the materials that actually matter.";
+
+  const bottleneckMap = {
+    healing: {
+      keep: "Chemicals, fabric-style sustain parts, and support inputs that keep healing online.",
+      sell: "Overflow basics only after your next few raids can still support safe recovery.",
+      prioritize: "Anything that preserves raid survival or reset options."
+    },
+    weapons: {
+      keep: "Weapon pipeline parts tied to the gun family you actually use.",
+      sell: "Off-path duplicates once your own replacement path feels stable.",
+      prioritize: "Reliable ammo and weapon support over random premium vanity stock."
+    },
+    projects: {
+      keep: "Project and expedition-linked materials, especially premium ARC tech and long-cycle requirements.",
+      sell: "Only common overflow that clearly sits outside the current project push.",
+      prioritize: "Consistent account momentum over short-term stash tidiness."
+    },
+    "premium-tech": {
+      keep: "Sensors, powercells, circuitry, and other premium ARC tech almost by default.",
+      sell: "Emergency-only. This is exactly the stuff people regret panic-selling later.",
+      prioritize: "Progression gates and workshop unlocks that have no cheap replacement path."
+    }
+  };
+
+  const pathMap = {
+    "first-extract": "Bias toward survival stock and keep the kit affordable enough that one bad raid does not reset your confidence.",
+    "quest-push": "Keep route-supporting materials and utility that let you finish objectives cleanly and leave.",
+    workshop: "Prioritize parts that unlock crafts, stabilize the stash, and keep the workshop from stalling.",
+    "long-cycle": "Protect premium tech and project-linked materials because long-cycle progress punishes careless selling."
+  };
+
+  return {
+    pressureLine,
+    ...(bottleneckMap[bottleneck] ?? bottleneckMap.healing),
+    pathwayNote: pathMap[pathway] ?? pathMap.workshop
+  };
+}
+
+function renderStashSupport() {
+  if (!stashSupportElement) {
+    return;
+  }
+
+  const decision = getStashSupportDecision();
+  stashSupportElement.innerHTML = `
+    <div class="tool-grid">
+      <section class="widget-card">
+        <p class="detail-kicker">Stash pressure</p>
+        <div class="discovery-filters">${renderSelectableChips(STASH_SUPPORT_OPTIONS.pressure, state.stashSupport.pressure, "stash-pressure")}</div>
+        <p class="detail-kicker">Biggest bottleneck</p>
+        <div class="discovery-filters">${renderSelectableChips(STASH_SUPPORT_OPTIONS.bottleneck, state.stashSupport.bottleneck, "stash-bottleneck")}</div>
+        <p class="detail-kicker">Current pathway</p>
+        <div class="discovery-filters">${renderSelectableChips(STASH_SUPPORT_OPTIONS.pathway, state.stashSupport.pathway, "stash-pathway")}</div>
+      </section>
+      <section class="widget-card widget-card-accent">
+        <div class="stash-support-top">
+          <div>
+            <p class="detail-kicker">Progression support</p>
+            <h3 class="stash-support-title">What to protect next</h3>
+          </div>
+          <span class="card-badge">Operation Overwatch</span>
+        </div>
+        <p class="stash-support-copy">${decision.pressureLine}</p>
+        <div class="stash-support-grid">
+          <article class="stash-support-card">
+            <strong>Keep</strong>
+            <p class="stash-support-copy">${decision.keep}</p>
+          </article>
+          <article class="stash-support-card">
+            <strong>Sell or recycle first</strong>
+            <p class="stash-support-copy">${decision.sell}</p>
+          </article>
+          <article class="stash-support-card">
+            <strong>Prioritize</strong>
+            <p class="stash-support-copy">${decision.prioritize}</p>
+          </article>
+        </div>
+        ${renderCallout("tip", "What this unlocks", decision.pathwayNote)}
+      </section>
+    </div>
+  `;
+
+  for (const button of stashSupportElement.querySelectorAll("[data-tool-key]")) {
+    button.addEventListener("click", () => {
+      const { toolKey, toolValue } = button.dataset;
+      if (toolKey === "stash-pressure") state.stashSupport.pressure = toolValue;
+      if (toolKey === "stash-bottleneck") state.stashSupport.bottleneck = toolValue;
+      if (toolKey === "stash-pathway") state.stashSupport.pathway = toolValue;
+      renderStashSupport();
+      saveState();
     });
   }
 }
@@ -4068,6 +4858,7 @@ function renderMachines() {
       <p>When a fight starts getting messy, stop thinking about raw health pools first. Kill or break the units that expand the fight, expose you, or force you out of cover.</p>
     </section>
     ${renderCallout("warning", "Combat warning", "Machine advice mixes official machine coverage with public field-tested counterplay. Use it as practical raid guidance, not as a secret developer damage spreadsheet.")}
+    ${renderPatchImpactCallout("machines")}
     <div class="machine-priority-grid">
       <article class="machine-priority-card">
         <strong>1. Detection first</strong>
@@ -4153,6 +4944,7 @@ function renderQuestOverview() {
     </article>
     <p class="quest-overview-copy">ARC Raiders' official public material currently gives enough information to guide players through Trader quests, Feats, weekly Trials, larger Projects, and Expeditions. This section focuses on how to complete those systems reliably rather than pretending there is a public, fixed list of every named in-game task.</p>
     ${renderCallout("trust", "Last verified", `Quest system guidance is aligned with official public ARC Raiders progression posts verified through ${OFFICIAL_POSTS_VERIFIED}.`)}
+    ${renderPatchImpactCallout("quests")}
     <div class="source-note">
       <strong>Source scope:</strong>
       <p class="quest-note">This guide is grounded in the current official public overview of quests, Traders, Feats, Trials, Projects, and Expedition-related posts from ARC Raiders.</p>
@@ -4330,7 +5122,10 @@ function saveState() {
     playstylePreference: state.playstylePreference,
     loadoutBuilder: state.loadoutBuilder,
     materialHelper: state.materialHelper,
+    stashSupport: state.stashSupport,
     decisionEngine: state.decisionEngine,
+    runPlans: state.runPlans,
+    selectedRunPlanId: state.selectedRunPlanId,
     lastVisited: state.lastVisited,
     filters: state.filters,
     lastSeenUpdated: APP_UPDATED
@@ -4360,11 +5155,14 @@ function loadState() {
     state.playstylePreference = parsedState.playstylePreference || state.playstylePreference;
     state.loadoutBuilder = { ...state.loadoutBuilder, ...(parsedState.loadoutBuilder ?? {}) };
     state.materialHelper = { ...state.materialHelper, ...(parsedState.materialHelper ?? {}) };
+    state.stashSupport = { ...state.stashSupport, ...(parsedState.stashSupport ?? {}) };
     state.decisionEngine = {
       ...state.decisionEngine,
       ...(parsedState.decisionEngine ?? {}),
       answers: { ...(parsedState.decisionEngine?.answers ?? {}) }
     };
+    state.runPlans = Array.isArray(parsedState.runPlans) ? parsedState.runPlans : [];
+    state.selectedRunPlanId = parsedState.selectedRunPlanId ?? state.selectedRunPlanId;
     state.lastVisited = parsedState.lastVisited ?? state.lastVisited;
     state.filters = { ...state.filters, ...(parsedState.filters ?? {}) };
     previousSeenUpdated = parsedState.lastSeenUpdated ?? null;
@@ -4373,10 +5171,13 @@ function loadState() {
     state.completedItems = [];
     state.savedItems = [];
     state.checkedPrepItems = [];
+    state.runPlans = [];
+    state.selectedRunPlanId = null;
     state.decisionEngine = {
       currentStep: 0,
       answers: {},
-      lastPlan: null
+      lastPlan: null,
+      editingPlanId: null
     };
   }
 }
@@ -4737,23 +5538,25 @@ function renderHeroDashboard() {
   const nextFocusView = focusViews.find((view) => view.id === nextFocus);
   const lessonProgress = getLessonProgress();
   const storedPlan = getStoredDecisionPlan();
+  const latestPlan = getLatestRunPlan();
 
   heroUpdateCardElement.innerHTML = `
-    <span class="hero-card-label">Latest official update</span>
+    <span class="hero-card-label">Latest Patch Impact</span>
     <strong>${currentRelease.title}</strong>
-    <p>${currentRelease.summary}</p>
+    <p>${getPatchImpact("updates")?.meaning ?? currentRelease.summary}</p>
     <div class="hero-stat-row">
       <span class="hero-mini-pill">${currentRelease.status}</span>
       <span class="hero-mini-pill">${currentRelease.date}</span>
+      <span class="hero-mini-pill">Verified ${OFFICIAL_POSTS_VERIFIED}</span>
     </div>
   `;
 
   heroPersonalCardElement.innerHTML = `
-    <span class="hero-card-label">Continue from here</span>
-    <strong>${continueItem?.title ?? "New Raider"}</strong>
-    <p>${reviewedCount} lesson${reviewedCount === 1 ? "" : "s"} reviewed so far, ${lessonProgress} fully completed, and your current path is tuned for <strong>${playstyle.label}</strong>.</p>
+    <span class="hero-card-label">Continue Last Plan</span>
+    <strong>${latestPlan?.name ?? continueItem?.title ?? "New Raider"}</strong>
+    <p>${latestPlan ? `${latestPlan.summary} ${latestPlan.readyToDrop ? "This one is marked ready to drop." : "It still needs a final prep pass."}` : `${reviewedCount} lesson${reviewedCount === 1 ? "" : "s"} reviewed so far, ${lessonProgress} fully completed, and your current path is tuned for ${playstyle.label}.`}</p>
     <div class="hero-stat-row">
-      <span class="hero-mini-pill">${playstyle.label}</span>
+      <span class="hero-mini-pill">${latestPlan ? latestPlan.runType : playstyle.label}</span>
       <span class="hero-mini-pill">${nextFocusView?.label ?? "Next move"}</span>
       <span class="hero-mini-pill">${getOverallProgressPercent()}% done</span>
     </div>
@@ -4779,6 +5582,13 @@ function renderHeroDashboard() {
       title: storedPlan ? `Use ${storedPlan.title}` : "Build a run plan",
       copy: storedPlan?.summary ?? "Use the Raid Decision Engine when you want one practical next-run recommendation instead of winging it and hoping the map pities you.",
       badges: ["Raid Decision Engine", storedPlan ? "Last plan saved" : "Signature feature"]
+    },
+    {
+      title: latestPlan?.readyToDrop ? "Plan is ready to drop" : "Finish pre-raid checks",
+      copy: latestPlan?.readyToDrop
+        ? `${latestPlan.name} is marked ready. Good. Try not to sabotage it with a last-second bad idea.`
+        : "Use Pre-Raid Mode to turn a saved plan into a quick execution board before you queue.",
+      badges: ["Pre-Raid Mode", latestPlan?.readyToDrop ? "Ready" : "Needs prep"]
     }
   ];
 
@@ -4818,6 +5628,7 @@ function renderPersonalHub() {
     .map((key) => registry[key])
     .filter(Boolean)
     .slice(0, 6);
+  const latestPlans = getRunPlans().slice(0, 3);
 
   personalOverviewElement.innerHTML = `
     <div class="personal-card-head">
@@ -4899,8 +5710,26 @@ function renderPersonalHub() {
         <p class="eyebrow">Saved for later</p>
         <h3 class="personal-title">Bookmarks</h3>
       </div>
-      <span class="hero-mini-pill">${state.savedItems.length} saved</span>
+      <span class="hero-mini-pill">${state.savedItems.length} saved · ${state.runPlans.length} plans</span>
     </div>
+    ${latestPlans.length ? `
+      <div class="saved-list">
+        ${latestPlans.map((plan) => `
+          <article class="saved-item">
+            <div>
+              <span class="saved-type">Run plan</span>
+              <strong>${plan.name}</strong>
+              <p>${plan.summary}</p>
+              <div class="card-tags">${plan.tags.map((tag) => `<span class="content-tag">${tag}</span>`).join("")}</div>
+            </div>
+            <div class="saved-actions">
+              <button class="hero-button hero-button-secondary saved-action" type="button" data-open-plan="${plan.id}">Open</button>
+              <button class="hero-button hero-button-secondary saved-action" type="button" data-edit-plan="${plan.id}">Edit</button>
+            </div>
+          </article>
+        `).join("")}
+      </div>
+    ` : ""}
     ${savedItems.length ? `
       <div class="saved-list">
         ${savedItems.map((item) => `
@@ -4973,6 +5802,25 @@ function renderPersonalHub() {
     });
   }
 
+  for (const button of savedPanelElement.querySelectorAll("[data-open-plan]")) {
+    button.addEventListener("click", () => {
+      state.selectedRunPlanId = button.dataset.openPlan;
+      renderRunPlans();
+      renderPreRaidMode();
+      scrollElementIntoView(preRaidPanelElement);
+      saveState();
+    });
+  }
+
+  for (const button of savedPanelElement.querySelectorAll("[data-edit-plan]")) {
+    button.addEventListener("click", () => {
+      loadRunPlanIntoEngine(button.dataset.editPlan, "edit");
+      renderDecisionEngine();
+      scrollElementIntoView(document.querySelector("#raid-decision-engine"));
+      saveState();
+    });
+  }
+
   for (const button of savedPanelElement.querySelectorAll("[data-unsave]")) {
     button.addEventListener("click", () => {
       const [type, ...rest] = button.dataset.unsave.split(":");
@@ -5001,6 +5849,7 @@ function renderMediaIntel() {
       </div>
       <p class="detail-copy">${item.copy}</p>
       <div class="card-tags">${renderTagMarkup(item.tags)}</div>
+      ${renderCallout("tip", "Use this for", item.details[0])}
       <details class="widget-panel">
         <summary>Open reference notes</summary>
         <div class="widget-panel-body">
@@ -5404,6 +6253,7 @@ function renderMaterialsOverview() {
     </article>
     <p class="materials-copy">ARC Raiders' public material information is best understood as a routing problem, not a perfect loot-table spreadsheet. Official sources tell us which map types exist, which conditions boost certain loot, and which material families are definitely in circulation. This section translates that into practical material-hunting advice.</p>
     ${renderCallout("trust", "Last verified", `Official April posts confirm the workshop now includes Acquire Resources support for missing ingredients, but they still do not publish a brand-new material family list or a replaced material catalog. Based on current public information, the catalog below still holds after the April 8, 2026 patch cycle and remains verified through ${OFFICIAL_POSTS_VERIFIED}.`)}
+    ${renderPatchImpactCallout("materials")}
     <div class="source-note">
       <strong>Source scope:</strong>
       <p class="material-note">This guide uses official public details about the Workshop, Acquire Resources flow, maps, special conditions, boosted cache drops, the named basic materials used in the tunnel restoration event, and post-Flashpoint workshop changes.</p>
@@ -5589,6 +6439,7 @@ function renderGearOverview() {
       <strong class="meta-value">Build for the actual raid objective</strong>
     </article>
     ${renderCallout("trust", "Method note", "Gear guidance is role-first and ARC Raiders-specific. It is built around raid intent, public patch context, and field use instead of pretending one universal meta loadout solves everything.")}
+    ${renderPatchImpactCallout("gear")}
     <div class="source-note">
       <strong>What this section should do for a new Raider:</strong>
       <p class="release-note">This is now a loadout-planning section, not a generic weapon overview. Use it to answer: what kind of kit should I bring for questing, farming, operations, recovery, or heavy ARC pressure?</p>
@@ -5880,6 +6731,7 @@ function render() {
   renderSearchSuggestions();
   renderFocusNav();
   syncFlowSections();
+  renderMissionControl();
   renderUpdateSpotlight();
   renderEmbarkFeed();
   renderLiveSignals();
@@ -5887,6 +6739,8 @@ function render() {
   renderReleaseDetail();
   renderStartHereFlow();
   renderDecisionEngine();
+  renderRunPlans();
+  renderPreRaidMode();
   renderBriefing();
   renderMediaIntel();
   renderPainPoints();
@@ -5906,6 +6760,7 @@ function render() {
   renderMaterialsDetail();
   renderMaterialsCatalog();
   renderMaterialUsageGuide();
+  renderStashSupport();
   renderMaterialHelper();
   renderGearOverview();
   renderWeaponRoles();
@@ -5999,14 +6854,23 @@ decisionEngineStartElement?.addEventListener("click", () => {
   scrollElementIntoView(document.querySelector("#raid-decision-engine"));
 });
 decisionEngineLastPlanElement?.addEventListener("click", () => {
-  resetDecisionEngine(true);
+  const latestPlan = getLatestRunPlan();
+  if (latestPlan) {
+    loadRunPlanIntoEngine(latestPlan.id, "edit");
+  } else {
+    resetDecisionEngine(true);
+  }
   renderDecisionEngine();
+  renderRunPlans();
+  renderPreRaidMode();
   saveState();
   scrollElementIntoView(document.querySelector("#raid-decision-engine"));
 });
 decisionEngineResetElement?.addEventListener("click", () => {
   resetDecisionEngine(false);
   renderDecisionEngine();
+  renderRunPlans();
+  renderPreRaidMode();
   saveState();
 });
 

@@ -620,6 +620,161 @@ button { color: inherit; }
   width: 100%;
 }
 
+.mission-control {
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.mission-control-grid,
+.decision-engine-support,
+.stash-support,
+.pre-raid-checklist,
+.stash-support-grid,
+.milestone-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.mission-control-grid {
+  grid-template-columns: minmax(0, 1.2fr) repeat(3, minmax(0, 0.93fr));
+}
+
+.mission-card,
+.decision-engine-support-panel,
+.pre-raid-card,
+.stash-support-card,
+.milestone-card {
+  padding: 16px;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+  display: grid;
+  gap: 12px;
+}
+
+.mission-card-primary {
+  background:
+    radial-gradient(circle at top right, rgba(217, 122, 53, 0.18), transparent 34%),
+    linear-gradient(180deg, rgba(217, 122, 53, 0.12), rgba(255, 255, 255, 0.03));
+  border-color: rgba(217, 122, 53, 0.34);
+}
+
+.mission-card-top,
+.pre-raid-top,
+.run-plan-top,
+.stash-support-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mission-title,
+.run-plan-title,
+.pre-raid-title,
+.stash-support-title {
+  margin: 0;
+  font-family: var(--display-font);
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  color: var(--signal);
+}
+
+.mission-copy,
+.run-plan-copy,
+.pre-raid-copy,
+.stash-support-copy {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.mission-control-grid .decision-meta-grid,
+.run-plan-list .decision-meta-grid,
+.pre-raid-panel .decision-meta-grid,
+.stash-support .decision-meta-grid {
+  margin: 0;
+}
+
+.decision-engine-support {
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.9fr);
+  margin-top: 18px;
+}
+
+.run-plan-list,
+.pre-raid-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.run-plan-card {
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.025);
+  display: grid;
+  gap: 10px;
+}
+
+.run-plan-card.is-active {
+  border-color: rgba(217, 122, 53, 0.36);
+  background: rgba(217, 122, 53, 0.1);
+}
+
+.run-plan-actions,
+.mission-actions,
+.pre-raid-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pre-raid-checklist {
+  grid-template-columns: 1fr;
+}
+
+.pre-raid-check {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: start;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.pre-raid-check.is-ready {
+  border-color: rgba(129, 203, 218, 0.3);
+  background: rgba(129, 203, 218, 0.08);
+}
+
+.pre-raid-marker {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.26);
+}
+
+.pre-raid-check.is-ready .pre-raid-marker {
+  border-color: rgba(129, 203, 218, 0.7);
+  background: rgba(129, 203, 218, 0.4);
+}
+
+.stash-support-panel {
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.stash-support-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.milestone-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .media-intel-panel,
 .tools-panel {
   padding: 20px;
@@ -2946,7 +3101,7 @@ button { color: inherit; }
 }
 
 @media (max-width: 1120px) {
-  .hero, .update-layout, .curriculum-layout, .quest-layout, .materials-layout, .gear-layout, .intel-grid, .status-grid, .briefing-list, .launchpad-grid, .personal-hub-grid, .tool-grid, .compare-grid, .feedback-grid, .app-footer, .start-here-steps, .live-signal-grid, .decision-engine-layout { grid-template-columns: 1fr; }
+  .hero, .update-layout, .curriculum-layout, .quest-layout, .materials-layout, .gear-layout, .intel-grid, .status-grid, .briefing-list, .launchpad-grid, .personal-hub-grid, .tool-grid, .compare-grid, .feedback-grid, .app-footer, .start-here-steps, .live-signal-grid, .decision-engine-layout, .mission-control-grid, .decision-engine-support, .stash-support-grid, .milestone-grid { grid-template-columns: 1fr; }
   .curriculum-layout { gap: 16px; }
   .materials-catalog { grid-template-columns: 1fr; }
   .site-tools-row { grid-template-columns: 1fr; }
@@ -2969,7 +3124,7 @@ button { color: inherit; }
   .app-shell { width: min(100%, calc(100% - 16px)); padding-top: 12px; }
   .site-header,
   .search-results-panel { padding: 16px; }
-  .hero, .status-card, .briefing, .pain-points-panel, .overview-panel, .rail-panel, .detail-panel, .intel-panel, .start-here-flow, .decision-engine { padding: 16px; }
+  .hero, .status-card, .briefing, .pain-points-panel, .overview-panel, .rail-panel, .detail-panel, .intel-panel, .start-here-flow, .decision-engine, .mission-control, .stash-support-panel { padding: 16px; }
   .personal-hub { padding: 16px; }
   .hero h1, .hero h2 { font-size: clamp(1.7rem, 8vw, 2.5rem); max-width: 12ch; }
   .hero-actions { display: grid; grid-template-columns: 1fr; }
@@ -2987,6 +3142,10 @@ button { color: inherit; }
   .decision-engine-link-head { flex-direction: column; }
   .decision-engine-actions { justify-content: flex-start; }
   .decision-engine-primary-cta { width: 100%; }
+  .mission-card-top,
+  .pre-raid-top,
+  .run-plan-top,
+  .stash-support-top { flex-direction: column; }
   .lesson-list, .machine-list, .track-list { grid-template-columns: 1fr; }
   .machine-priority-grid { grid-template-columns: 1fr; }
   .machine-tactics-grid { grid-template-columns: 1fr; }

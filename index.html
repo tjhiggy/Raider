@@ -94,6 +94,19 @@
       </div>
     </section>
 
+    <section id="mission-control" class="panel mission-control flow-section" data-view="start">
+      <div class="section-heading">
+        <h2>Operation Overwatch</h2>
+        <p>Use the guide like mission control: know today’s best move, react to the live patch, continue your run planning, and return to unfinished pressure points without rummaging through the whole site like a confused raccoon.</p>
+      </div>
+      <div class="mission-control-grid">
+        <section id="today-focus-card" class="mission-card mission-card-primary" aria-live="polite"></section>
+        <section id="continue-plan-card" class="mission-card" aria-live="polite"></section>
+        <section id="latest-patch-impact-card" class="mission-card" aria-live="polite"></section>
+        <section id="mission-nudges-card" class="mission-card" aria-live="polite"></section>
+      </div>
+    </section>
+
     <section id="raid-decision-engine" class="panel decision-engine flow-section" data-view="start">
       <div class="decision-engine-head">
         <div>
@@ -113,6 +126,22 @@
           <div id="decision-engine-flow" class="decision-engine-flow" aria-live="polite"></div>
         </section>
         <aside id="decision-engine-result" class="decision-engine-result" aria-live="polite"></aside>
+      </div>
+      <div class="decision-engine-support">
+        <section class="decision-engine-support-panel">
+          <div class="section-heading section-heading-compact">
+            <h2>Run Plan Hangar</h2>
+            <p>Save, edit, duplicate, and reuse run plans without rebuilding the same logic every time you open the site.</p>
+          </div>
+          <div id="run-plan-list" class="run-plan-list" aria-live="polite"></div>
+        </section>
+        <aside class="decision-engine-support-panel">
+          <div class="section-heading section-heading-compact">
+            <h2>Pre-Raid Mode</h2>
+            <p>Turn a saved plan into a compact drop-ready panel with mission focus, bring/avoid guidance, and the reminders that stop sloppy queues.</p>
+          </div>
+          <div id="pre-raid-panel" class="pre-raid-panel" aria-live="polite"></div>
+        </aside>
       </div>
     </section>
 
@@ -515,6 +544,14 @@
         <p>Use this when you are deciding whether a material should stay in the stash, get recycled into workshop progress, or be sold for breathing room.</p>
       </div>
       <div id="material-usage-guide" class="material-usage-guide" aria-live="polite"></div>
+    </section>
+
+    <section class="panel stash-support-panel flow-section" data-view="materials">
+      <div class="section-heading">
+        <h2>Stash and Progression Support</h2>
+        <p>Use this layer when the real problem is not one material, but stash pressure, blocked workshop progress, or not knowing what to prioritize next.</p>
+      </div>
+      <div id="stash-support" class="stash-support" aria-live="polite"></div>
     </section>
 
     <section class="panel tools-panel flow-section" data-view="materials">
