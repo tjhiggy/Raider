@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.32.0",
+    date: "2026-04-14",
+    summary: "Centralized the Discord invite so every community link now points to the latest server through one shared config value.",
+    changes: [
+      "Replaced every live Discord invite in the site markup and feedback flow with one centralized invite constant.",
+      "Standardized Discord CTA labels to Join Community and normalized target and rel behavior for every community link.",
+      "Added a fallback note so users know to check back here if the invite ever expires again, because stale community links are embarrassing."
+    ]
+  },
+  {
     version: "v1.31.0",
     date: "2026-04-14",
     summary: "Added a lightweight Why You're Struggling diagnostic so players can identify likely causes and get one corrective move fast.",
@@ -470,6 +480,10 @@ const VERSION_HISTORY = [
     ]
   }
 ];
+
+const DISCORD_INVITE_URL = "https://discord.gg/y2JeKU9D";
+const DISCORD_LINK_LABEL = "Join Community";
+const DISCORD_FALLBACK_NOTE = "If the invite expires, check back here for the latest link.";
 
 const APP_VERSION = VERSION_HISTORY[0].version;
 const APP_UPDATED = VERSION_HISTORY[0].date;
@@ -2663,6 +2677,16 @@ function getLastVisitedItem() {
 
 function setLastVisited(type, id) {
   state.lastVisited = { type, id };
+}
+
+function syncDiscordLinks(scope = document) {
+  for (const link of scope.querySelectorAll("[data-discord-link]")) {
+    link.setAttribute("href", DISCORD_INVITE_URL);
+    link.setAttribute("target", "_blank");
+    link.setAttribute("rel", "noopener noreferrer");
+    link.setAttribute("title", DISCORD_FALLBACK_NOTE);
+    link.textContent = DISCORD_LINK_LABEL;
+  }
 }
 
 function isSavedItem(type, id) {
@@ -7195,13 +7219,14 @@ function renderFeedbackPanel(actionKey) {
           <h3>Send it through</h3>
           <div class="footer-link-stack">
             <a class="hero-button hero-button-primary" href="https://github.com/tjhiggy/Raider/issues/new?title=${issueTitle}&body=${issueBody}" target="_blank" rel="noreferrer">Open GitHub issue</a>
-            <a class="hero-button hero-button-secondary" href="https://discord.gg/4JZ9f39h" target="_blank" rel="noreferrer">Ask in Discord</a>
+            <a class="hero-button hero-button-secondary" href="#" data-discord-link target="_blank" rel="noopener noreferrer">Join Community</a>
           </div>
-          <p class="feedback-copy">GitHub issues are best for trackable fixes. Discord is better when you want a quick gut-check before filing a formal problem.</p>
+          <p class="feedback-copy">GitHub issues are best for trackable fixes. Discord is better when you want a quick gut-check before filing a formal problem. ${DISCORD_FALLBACK_NOTE}</p>
         </section>
       </div>
     </article>
   `;
+  syncDiscordLinks(feedbackPanelElement);
 }
 
 function openFeedback(actionKey = "improvement") {
@@ -7269,6 +7294,7 @@ function revealEasterEgg() {
 }
 
 function render() {
+  syncDiscordLinks();
   renderCounts();
   renderSearchSuggestions();
   renderFocusNav();
