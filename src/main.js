@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.31.0",
+    date: "2026-04-14",
+    summary: "Added a lightweight Why You're Struggling diagnostic so players can identify likely causes and get one corrective move fast.",
+    changes: [
+      "Added a compact input-driven diagnostic tool near the top of the homepage using existing chip and widget patterns.",
+      "Maps common struggle states to 2-3 likely causes plus one high-leverage corrective action instead of dumping generic advice.",
+      "Connects the corrective action back into the guide so the insight turns into a next step, not just a depressing little mirror."
+    ]
+  },
+  {
     version: "v1.30.0",
     date: "2026-04-14",
     summary: "Added adaptive recovery suggestions so the guide reacts to repeated failed runs with safer pivots and clearer try-this-instead guidance.",
@@ -2310,6 +2320,27 @@ const QUICK_USE_META = {
   "Flashpoint: Surge Coil": { level: "Intermediate", priority: "Advanced", mode: "Solo + squad", goal: "Hold space", tags: ["flashpoint", "surge coil", "anti flank"] }
 };
 
+const STRUGGLE_DIAGNOSTIC_OPTIONS = {
+  symptom: [
+    { id: "dying-early", label: "Dying early" },
+    { id: "no-progress", label: "No progression" },
+    { id: "craft-blocked", label: "Crafting blocked" },
+    { id: "bad-loadouts", label: "Wrong loadouts" },
+    { id: "chaotic-fights", label: "Fights spiral fast" }
+  ],
+  context: [
+    { id: "solo", label: "Mostly solo" },
+    { id: "squad", label: "Mostly squad" },
+    { id: "new", label: "Still learning" }
+  ],
+  pressure: [
+    { id: "quests", label: "Quest pressure" },
+    { id: "survival", label: "Survival pressure" },
+    { id: "stash", label: "Stash pressure" },
+    { id: "patch", label: "Patch confusion" }
+  ]
+};
+
 const DISCOVERY_FILTERS = {
   tracks: [
     { id: "all", label: "All" },
@@ -2433,6 +2464,11 @@ const state = {
     rarity: "basic",
     objective: "healing"
   },
+  struggleDiagnostic: {
+    symptom: "dying-early",
+    context: "solo",
+    pressure: "quests"
+  },
   stashSupport: {
     pressure: "medium",
     bottleneck: "healing",
@@ -2515,6 +2551,7 @@ const savedPanelElement = document.querySelector("#saved-panel");
 const mediaIntelGridElement = document.querySelector("#media-intel-grid");
 const materialHelperElement = document.querySelector("#material-helper");
 const loadoutBuilderElement = document.querySelector("#loadout-builder");
+const struggleDiagnosticElement = document.querySelector("#struggle-diagnostic");
 const machineOverviewElement = document.querySelector("#machine-overview");
 const painPointListElement = document.querySelector("#pain-point-list");
 const briefingListElement = document.querySelector("#briefing-list");
@@ -3009,6 +3046,86 @@ function getLoadoutBuilderRecommendation() {
   }).slice(0, 2);
 
   return { role, caution, quickUse };
+}
+
+function getStruggleDiagnosticResult() {
+  const { symptom, context, pressure } = state.struggleDiagnostic;
+  const causes = [];
+  let action = {
+    label: "Open First Raid Briefing",
+    action: () => {
+      state.activeView = "start";
+      render();
+      scrollElementIntoView(document.querySelector(".briefing"));
+    }
+  };
+
+  if (symptom === "dying-early") {
+    causes.push("You are likely committing before you have enough information about sightlines, machine pressure, or exits.");
+    causes.push(context === "solo" ? "Your solo bailout path is probably not decided before the first contact spike." : "Your team is probably stacking noise and pressure without a clean leave call.");
+    causes.push("Your kit is likely missing enough healing, reset, or escape utility to recover from one mistake.");
+    action = {
+      label: "Build a safer recovery kit",
+      action: () => {
+        state.activeView = "gear";
+        render();
+        scrollElementIntoView(document.querySelector("#loadout-builder"));
+      }
+    };
+  } else if (symptom === "no-progress") {
+    causes.push("Your raids are probably trying to do too many jobs, which means nothing gets finished cleanly.");
+    causes.push(pressure === "quests" ? "You are likely entering quest runs without routing around the actual objective." : "You are probably extracting with random value instead of progression value.");
+    causes.push("You may be staying too long after the win condition was already secured.");
+    action = {
+      label: "Open Quest Operations",
+      action: () => {
+        state.activeView = "quests";
+        render();
+        scrollElementIntoView(document.querySelector("#quest-ops"));
+      }
+    };
+  } else if (symptom === "craft-blocked") {
+    causes.push("You are probably protecting too much low-leverage loot and starving the workshop of the parts that actually matter.");
+    causes.push("Your material runs are likely too random to solve the real bottleneck.");
+    causes.push(pressure === "stash" ? "Stash pressure is turning every keep-or-sell call into a worse decision." : "Your progression path is likely unclear, so extracted materials are not turning into momentum.");
+    action = {
+      label: "Open stash support",
+      action: () => {
+        state.activeView = "materials";
+        render();
+        scrollElementIntoView(document.querySelector(".stash-support-panel"));
+      }
+    };
+  } else if (symptom === "bad-loadouts") {
+    causes.push("Your kit likely does not match the goal of the run, so you are overbuilt in the wrong places and underbuilt where it matters.");
+    causes.push(context === "new" ? "You may still be choosing gear by rarity or comfort instead of reliability and recovery." : "Your route or squad pressure likely needs different quick-use support than you are bringing.");
+    causes.push("Healing, disengage, or space-control utility is probably too thin.");
+    action = {
+      label: "Fix the loadout",
+      action: () => {
+        state.activeView = "gear";
+        render();
+        scrollElementIntoView(document.querySelector("#gear-field-guide"));
+      }
+    };
+  } else {
+    causes.push("Target priority is likely wrong, so fights escalate before you stabilize the board.");
+    causes.push("You are probably staying in loud or exposed space too long after the first contact spike.");
+    causes.push(pressure === "patch" ? "Patch drift may be distorting your assumptions about routes, operations, or machine behavior." : "Your extraction timing is probably being treated like an afterthought instead of part of the fight.");
+    action = {
+      label: "Review ARC intel",
+      action: () => {
+        state.activeView = "machines";
+        render();
+        scrollElementIntoView(document.querySelector("#machine-intel"));
+      }
+    };
+  }
+
+  return {
+    causes: causes.slice(0, 3),
+    action
+  };
 }
 
 function getMaterialHelperDecision() {
@@ -5475,6 +5592,7 @@ function saveState() {
     playstylePreference: state.playstylePreference,
     loadoutBuilder: state.loadoutBuilder,
     materialHelper: state.materialHelper,
+    struggleDiagnostic: state.struggleDiagnostic,
     stashSupport: state.stashSupport,
     recoverySignals: state.recoverySignals,
     quickActionOverlayOpen: state.quickActionOverlayOpen,
@@ -5510,6 +5628,7 @@ function loadState() {
     state.playstylePreference = parsedState.playstylePreference || state.playstylePreference;
     state.loadoutBuilder = { ...state.loadoutBuilder, ...(parsedState.loadoutBuilder ?? {}) };
     state.materialHelper = { ...state.materialHelper, ...(parsedState.materialHelper ?? {}) };
+    state.struggleDiagnostic = { ...state.struggleDiagnostic, ...(parsedState.struggleDiagnostic ?? {}) };
     state.stashSupport = { ...state.stashSupport, ...(parsedState.stashSupport ?? {}) };
     state.recoverySignals = {
       ...state.recoverySignals,
@@ -5534,6 +5653,11 @@ function loadState() {
     state.checkedPrepItems = [];
     state.runPlans = [];
     state.selectedRunPlanId = null;
+    state.struggleDiagnostic = {
+      symptom: "dying-early",
+      context: "solo",
+      pressure: "quests"
+    };
     state.recoverySignals = { outcomes: [] };
     state.quickActionOverlayOpen = false;
     state.decisionEngine = {
@@ -6275,6 +6399,59 @@ function renderMaterialHelper() {
       saveState();
     });
   }
+}
+
+function renderStruggleDiagnostic() {
+  if (!struggleDiagnosticElement) {
+    return;
+  }
+
+  const result = getStruggleDiagnosticResult();
+  struggleDiagnosticElement.innerHTML = `
+    <section class="widget-card">
+      <p class="detail-kicker">What keeps happening?</p>
+      <div class="discovery-filters">${renderSelectableChips(STRUGGLE_DIAGNOSTIC_OPTIONS.symptom, state.struggleDiagnostic.symptom, "struggle-symptom")}</div>
+      <p class="detail-kicker">How are you usually playing?</p>
+      <div class="discovery-filters">${renderSelectableChips(STRUGGLE_DIAGNOSTIC_OPTIONS.context, state.struggleDiagnostic.context, "struggle-context")}</div>
+      <p class="detail-kicker">What pressure is driving the bad run?</p>
+      <div class="discovery-filters">${renderSelectableChips(STRUGGLE_DIAGNOSTIC_OPTIONS.pressure, state.struggleDiagnostic.pressure, "struggle-pressure")}</div>
+    </section>
+    <section class="widget-card widget-card-accent">
+      <p class="detail-kicker">Likely causes</p>
+      <h3 class="media-card-title">Why you're probably struggling</h3>
+      <div class="mini-flow">
+        ${result.causes.map((cause, index) => `
+          <article class="mini-flow-step">
+            <span class="mini-flow-index">0${index + 1}</span>
+            <div>
+              <strong>Likely cause</strong>
+              <p>${cause}</p>
+            </div>
+          </article>
+        `).join("")}
+      </div>
+      ${renderCallout("tip", "Corrective action", "Do this next instead of trying to fix all three causes at once. One cleaner adjustment beats another heroic sloppy run.")}
+      <div class="mission-actions">
+        <button class="hero-button hero-button-primary" type="button" data-struggle-action> ${result.action.label}</button>
+      </div>
+    </section>
+  `;
+
+  for (const button of struggleDiagnosticElement.querySelectorAll("[data-tool-key]")) {
+    button.addEventListener("click", () => {
+      const { toolKey, toolValue } = button.dataset;
+      if (toolKey === "struggle-symptom") state.struggleDiagnostic.symptom = toolValue;
+      if (toolKey === "struggle-context") state.struggleDiagnostic.context = toolValue;
+      if (toolKey === "struggle-pressure") state.struggleDiagnostic.pressure = toolValue;
+      renderStruggleDiagnostic();
+      saveState();
+    });
+  }
+
+  struggleDiagnosticElement.querySelector("[data-struggle-action]")?.addEventListener("click", () => {
+    result.action.action();
+    saveState();
+  });
 }
 
 function renderLoadoutBuilder() {
@@ -7128,6 +7305,7 @@ function render() {
   renderMaterialUsageGuide();
   renderStashSupport();
   renderMaterialHelper();
+  renderStruggleDiagnostic();
   renderGearOverview();
   renderWeaponRoles();
   renderQuickUseItems();
