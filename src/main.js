@@ -1,5 +1,25 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.30.0",
+    date: "2026-04-14",
+    summary: "Added adaptive recovery suggestions so the guide reacts to repeated failed runs with safer pivots and clearer try-this-instead guidance.",
+    changes: [
+      "Added a lightweight recovery-memory layer that tracks recent failed or recovered runs and uses it to detect when the current approach is not working.",
+      "Added adaptive recovery suggestions across mission control, Pre-Raid Mode, the dashboard, and the Quick Action Overlay so players get a practical fallback instead of silently repeating bad runs.",
+      "Added fast outcome logging for failed and recovered runs so the companion can respond to player struggle without pretending it has hidden live telemetry."
+    ]
+  },
+  {
+    version: "v1.29.0",
+    date: "2026-04-14",
+    summary: "Added a global Quick Action Overlay so players can scan their active run plan, priorities, and warnings mid-session in a few seconds.",
+    changes: [
+      "Added a floating Quick Action launcher on desktop and mobile that opens a compact field panel anywhere on the site.",
+      "Connected the overlay to saved run plans and Pre-Raid Mode so it shows the current plan summary, top priorities, and risk warnings instead of fake dashboard fluff.",
+      "Added fast actions for opening the full pre-raid panel, adjusting the plan, and copying the run summary so the tool actually helps during gameplay."
+    ]
+  },
+  {
     version: "v1.28.0",
     date: "2026-04-13",
     summary: "Operation Overwatch turns the field guide into a mission-control companion system with saved run plans, Pre-Raid Mode, patch impact intelligence, and stronger daily-return loops.",
@@ -2418,6 +2438,10 @@ const state = {
     bottleneck: "healing",
     pathway: "first-extract"
   },
+  recoverySignals: {
+    outcomes: []
+  },
+  quickActionOverlayOpen: false,
   decisionEngine: {
     currentStep: 0,
     answers: {},
@@ -2528,6 +2552,8 @@ const quickUseFiltersElement = document.querySelector("#quickuse-filters");
 const detailPanelElement = document.querySelector(".detail-panel");
 const lessonPanelElement = document.querySelector(".lesson-column");
 const backToTopElement = document.querySelector("#back-to-top");
+const quickActionToggleElement = document.querySelector("#quick-action-toggle");
+const quickActionOverlayElement = document.querySelector("#quick-action-overlay");
 const easterEggTriggerElement = document.querySelector("#easter-egg-trigger");
 const easterEggToastElement = document.querySelector("#easter-egg-toast");
 const appVersionButtonElement = document.querySelector("#app-version");
@@ -3239,6 +3265,38 @@ function buildDecisionRecommendation(answers) {
   };
 }
 
+function buildDecisionRecommendationFromProfile(profileId, answers = {}, why = []) {
+  const profile = RAID_DECISION_PROFILES.find((entry) => entry.id === profileId);
+  if (!profile) {
+    return null;
+  }
+
+  const links = profile.links
+    .map((entry) => getDecisionEngineEntry(entry))
+    .filter(Boolean)
+    .slice(0, 4);
+
+  const dominantLink = getDecisionEngineEntry({ type: profile.ctaType, id: profile.ctaId }) ?? links[0] ?? null;
+
+  return {
+    profileId: profile.id,
+    title: profile.label,
+    runType: profile.runType,
+    priority: profile.priority,
+    approach: profile.approach,
+    loadout: profile.loadout,
+    utility: profile.utility,
+    warning: profile.warning,
+    summary: profile.summary,
+    tags: profile.tags,
+    dominantCta: profile.dominantCta,
+    dominantLink,
+    links,
+    why,
+    answers: { ...answers }
+  };
+}
+
 function getStoredDecisionPlan() {
   if (!state.decisionEngine.lastPlan?.answers) {
     return null;
@@ -3338,6 +3396,28 @@ function formatRunPlanSummary(plan) {
   return `${plan.name}: ${plan.runType}. Priority: ${plan.priority} Loadout: ${plan.loadout} Utility: ${plan.utility} Warning: ${plan.warning}`;
 }
 
+function getQuickActionPlan() {
+  return getRunPlanById(state.selectedRunPlanId) ?? getLatestRunPlan();
+}
+
+function getQuickActionPriorities(plan) {
+  const checklist = buildPreRaidChecklist(plan);
+  return [
+    {
+      title: "Mission focus",
+      copy: plan.priority
+    },
+    {
+      title: "Bring first",
+      copy: plan.utility
+    },
+    {
+      title: "Do not forget",
+      copy: checklist[0] ?? "Lock one clear objective before the drop."
+    }
+  ];
+}
+
 async function copyRunPlanSummary(plan) {
   const targetPlan = plan ?? getRunPlanById(state.selectedRunPlanId) ?? getLatestRunPlan();
   if (!targetPlan || !navigator.clipboard?.writeText) {
@@ -3416,6 +3496,82 @@ function toggleRunPlanReady(planId) {
   ));
 }
 
+function recordRunOutcome(planId, outcome) {
+  const plan = getRunPlanById(planId) ?? getLatestRunPlan();
+  if (!plan) {
+    return;
+  }
+
+  const entry = {
+    id: `outcome-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+    planId: plan.id,
+    profileId: plan.profileId,
+    priority: plan.priority,
+    blocker: plan.answers?.blocker ?? null,
+    risk: plan.answers?.risk ?? null,
+    outcome,
+    date: new Date().toISOString().slice(0, 10)
+  };
+
+  state.recoverySignals.outcomes = [
+    entry,
+    ...state.recoverySignals.outcomes.filter((item) => item.planId !== plan.id || item.outcome !== outcome).slice(0, 7)
+  ];
+}
+
+function getRecentRunOutcomes() {
+  return state.recoverySignals.outcomes.slice(0, 4);
+}
+
+function getAdaptiveRecoverySuggestion() {
+  const plan = getQuickActionPlan();
+  const outcomes = getRecentRunOutcomes();
+  const failures = outcomes.filter((item) => item.outcome === "failed");
+  const repeatedFailures = failures.length >= 2;
+  const sameProfileFailures = plan ? failures.filter((item) => item.profileId === plan.profileId).length : 0;
+  const prepDrag = getPrepProgress() < Math.min(3, prepChecklist.length) ? 1 : 0;
+  const unstablePlan = plan && !plan.readyToDrop ? 1 : 0;
+  const heuristicScore = failures.length + prepDrag + unstablePlan;
+
+  if (!plan || (!repeatedFailures && heuristicScore < 3)) {
+    return null;
+  }
+
+  let targetProfileId = "safe-learning-run";
+  let reason = "Two or more recent failures suggest the current approach is asking for more confidence than it is returning.";
+
+  if (plan.profileId === "aggressive-confidence-run" || plan.answers?.risk === "high") {
+    targetProfileId = "conservative-extraction-run";
+    reason = "Recent failures plus a high-pressure plan usually mean the smart move is rebuilding momentum, not doubling down on chaos.";
+  } else if (plan.profileId === "quest-progression-run") {
+    targetProfileId = "safe-learning-run";
+    reason = "If quest runs keep dying, strip the raid back to survival and route discipline first, then re-enter progression with cleaner reps.";
+  } else if (plan.profileId === "material-farming-run" || plan.profileId === "workshop-support-run" || plan.answers?.blocker === "crafting") {
+    targetProfileId = "workshop-support-run";
+    reason = "If the stash and workshop are still the blocker, use a lighter repeatable support run instead of forcing heavier material greed.";
+  } else if (plan.answers?.blocker === "survival" || plan.answers?.blocker === "loadout") {
+    targetProfileId = "conservative-extraction-run";
+    reason = "The current pain point looks like survival confidence, so the better answer is one clean extraction run that resets tempo.";
+  }
+
+  const why = [
+    `${failures.length} recent failed run${failures.length === 1 ? "" : "s"}`,
+    sameProfileFailures >= 2 ? "Same run type keeps failing" : "Current run type is underdelivering",
+    prepDrag ? "Prep checklist still incomplete" : "Prep state looks stable"
+  ];
+  const recommendation = buildDecisionRecommendationFromProfile(targetProfileId, plan.answers, why);
+  if (!recommendation) {
+    return null;
+  }
+
+  return {
+    ...recommendation,
+    title: `Try this instead: ${recommendation.title}`,
+    recoveryReason: reason,
+    failureCount: failures.length
+  };
+}
+
 function buildPreRaidChecklist(plan) {
   const teamAnswer = plan.answers.team === "squad" ? "Confirm squad roles and final leave call." : "Confirm your solo exit route and one hard bailout path.";
   const riskAnswer = plan.answers.risk === "high"
@@ -3484,6 +3640,24 @@ function getTodaysFocus() {
   const latestPlan = getLatestRunPlan();
   const unreadPatch = !isCompletedItem("release", releases[0].id);
   const incompleteMilestone = getMilestones().find((milestone) => !milestone.complete);
+  const recoverySuggestion = getAdaptiveRecoverySuggestion();
+
+  if (recoverySuggestion) {
+    return {
+      title: recoverySuggestion.title,
+      copy: recoverySuggestion.recoveryReason,
+      cta: "Open recovery plan",
+      action: () => {
+        state.activeView = "start";
+        state.decisionEngine.answers = { ...recoverySuggestion.answers };
+        state.decisionEngine.currentStep = RAID_DECISION_QUESTIONS.length;
+        state.decisionEngine.editingPlanId = null;
+        render();
+        scrollElementIntoView(document.querySelector("#raid-decision-engine"));
+      },
+      tags: ["Try this instead", `${recoverySuggestion.failureCount} recent failures`, recoverySuggestion.runType]
+    };
+  }
 
   if (latestPlan && !latestPlan.readyToDrop) {
     return {
@@ -3724,6 +3898,7 @@ function renderDecisionEngine() {
       renderHeroDashboard();
       renderRunPlans();
       renderPreRaidMode();
+      renderQuickActionOverlay();
       renderPersonalHub();
       saveState();
     });
@@ -3738,6 +3913,7 @@ function renderDecisionEngine() {
       }
       renderDecisionEngine();
       renderMissionControl();
+      renderQuickActionOverlay();
       saveState();
     });
   }
@@ -3760,6 +3936,7 @@ function renderDecisionEngine() {
       renderHeroDashboard();
       renderRunPlans();
       renderPreRaidMode();
+      renderQuickActionOverlay();
       renderPersonalHub();
       saveState();
     });
@@ -3785,6 +3962,7 @@ function renderMissionControl() {
   const milestones = getMilestones();
   const nudges = getMissionNudges();
   const sinceLastVisit = getSinceLastVisitEntries();
+  const recoverySuggestion = getAdaptiveRecoverySuggestion();
 
   todayFocusCardElement.innerHTML = `
     <div class="mission-card-top">
@@ -3872,6 +4050,7 @@ function renderMissionControl() {
       <strong>Smart nudges</strong>
       <ul class="detail-list">${nudges.map((item) => `<li>${item}</li>`).join("")}</ul>
     </div>
+    ${recoverySuggestion ? renderCallout("warning", "Try this instead", `${recoverySuggestion.recoveryReason} Recommended pivot: ${recoverySuggestion.runType}.`) : ""}
   `;
 
   todayFocusCardElement.querySelector("[data-mission-action='focus']")?.addEventListener("click", () => {
@@ -3894,6 +4073,7 @@ function renderMissionControl() {
     state.selectedRunPlanId = planId;
     renderRunPlans();
     renderPreRaidMode();
+    renderQuickActionOverlay();
     scrollElementIntoView(preRaidPanelElement);
     saveState();
   });
@@ -3901,6 +4081,7 @@ function renderMissionControl() {
     const planId = event.currentTarget.dataset.runPlanEdit;
     loadRunPlanIntoEngine(planId, "edit");
     renderDecisionEngine();
+    renderQuickActionOverlay();
     scrollElementIntoView(document.querySelector("#raid-decision-engine"));
     saveState();
   });
@@ -3952,6 +4133,7 @@ function renderRunPlans() {
       state.selectedRunPlanId = button.dataset.planSelect;
       renderRunPlans();
       renderPreRaidMode();
+      renderQuickActionOverlay();
       saveState();
     });
   }
@@ -3960,6 +4142,7 @@ function renderRunPlans() {
     button.addEventListener("click", () => {
       loadRunPlanIntoEngine(button.dataset.planEdit, "edit");
       renderDecisionEngine();
+      renderQuickActionOverlay();
       scrollElementIntoView(document.querySelector("#raid-decision-engine"));
       saveState();
     });
@@ -3978,6 +4161,7 @@ function renderRunPlans() {
       renderMissionControl();
       renderRunPlans();
       renderPreRaidMode();
+      renderQuickActionOverlay();
       renderPersonalHub();
       saveState();
       if (duplicatedPlan) {
@@ -4000,6 +4184,7 @@ function renderPreRaidMode() {
   }
 
   const plan = getRunPlanById(state.selectedRunPlanId) ?? getLatestRunPlan();
+  const recoverySuggestion = getAdaptiveRecoverySuggestion();
   if (!plan) {
     preRaidPanelElement.innerHTML = `
       <article class="empty-state-card">
@@ -4041,7 +4226,10 @@ function renderPreRaidMode() {
         <button class="hero-button hero-button-primary" type="button" data-pre-raid-ready="${plan.id}">${plan.readyToDrop ? "Mark as needs adjustment" : "Ready to drop"}</button>
         <button class="hero-button hero-button-secondary" type="button" data-pre-raid-edit="${plan.id}">Adjust plan</button>
         <button class="hero-button hero-button-secondary" type="button" data-pre-raid-copy="${plan.id}">Copy summary</button>
+        <button class="hero-button hero-button-secondary" type="button" data-pre-raid-failed="${plan.id}">That run failed</button>
+        <button class="hero-button hero-button-secondary" type="button" data-pre-raid-recovered="${plan.id}">Recovered clean</button>
       </div>
+      ${recoverySuggestion ? renderCallout("warning", "Try this instead", `${recoverySuggestion.recoveryReason} Better fit now: ${recoverySuggestion.title}.`) : ""}
     </article>
   `;
 
@@ -4050,16 +4238,181 @@ function renderPreRaidMode() {
     renderMissionControl();
     renderRunPlans();
     renderPreRaidMode();
+    renderQuickActionOverlay();
     saveState();
   });
   preRaidPanelElement.querySelector("[data-pre-raid-edit]")?.addEventListener("click", () => {
     loadRunPlanIntoEngine(plan.id, "edit");
     renderDecisionEngine();
+    renderQuickActionOverlay();
     scrollElementIntoView(document.querySelector("#raid-decision-engine"));
     saveState();
   });
   preRaidPanelElement.querySelector("[data-pre-raid-copy]")?.addEventListener("click", () => {
     copyRunPlanSummary(plan).catch(() => undefined);
+  });
+  preRaidPanelElement.querySelector("[data-pre-raid-failed]")?.addEventListener("click", () => {
+    recordRunOutcome(plan.id, "failed");
+    renderMissionControl();
+    renderPreRaidMode();
+    renderQuickActionOverlay();
+    renderPersonalHub();
+    saveState();
+  });
+  preRaidPanelElement.querySelector("[data-pre-raid-recovered]")?.addEventListener("click", () => {
+    recordRunOutcome(plan.id, "recovered");
+    renderMissionControl();
+    renderPreRaidMode();
+    renderQuickActionOverlay();
+    renderPersonalHub();
+    saveState();
+  });
+}
+
+function renderQuickActionOverlay() {
+  if (!quickActionToggleElement || !quickActionOverlayElement) {
+    return;
+  }
+
+  const plan = getQuickActionPlan();
+  quickActionToggleElement.setAttribute("aria-expanded", String(state.quickActionOverlayOpen));
+  quickActionOverlayElement.hidden = !state.quickActionOverlayOpen;
+
+  if (!state.quickActionOverlayOpen) {
+    return;
+  }
+
+  if (!plan) {
+    quickActionOverlayElement.innerHTML = `
+      <div class="quick-action-overlay-inner">
+        <div class="quick-action-head">
+          <div>
+            <p class="eyebrow">Quick Action</p>
+            <h2 class="quick-action-title">No live run plan</h2>
+          </div>
+          <button class="quick-action-close" type="button" data-quick-action-close aria-label="Close quick action overlay">Close</button>
+        </div>
+        <article class="quick-action-card">
+          <p class="quick-action-summary">Build or save a run plan first. Then this overlay becomes your in-match glance board instead of a dramatic little empty box.</p>
+          <div class="quick-action-actions">
+            <button class="hero-button hero-button-primary" type="button" data-quick-action-open-engine>Plan my next run</button>
+          </div>
+        </article>
+      </div>
+    `;
+  } else {
+    const priorities = getQuickActionPriorities(plan);
+    const unreadPatch = !isCompletedItem("release", releases[0].id);
+    const recoverySuggestion = getAdaptiveRecoverySuggestion();
+    quickActionOverlayElement.innerHTML = `
+      <div class="quick-action-overlay-inner">
+        <div class="quick-action-head">
+          <div>
+            <p class="eyebrow">Quick Action</p>
+            <h2 class="quick-action-title">${plan.name}</h2>
+          </div>
+          <button class="quick-action-close" type="button" data-quick-action-close aria-label="Close quick action overlay">Close</button>
+        </div>
+        <article class="quick-action-card quick-action-stack">
+          <div class="quick-action-top">
+            <div>
+              <p class="eyebrow">Current run plan</p>
+              <p class="quick-action-summary">${plan.summary}</p>
+            </div>
+            <span class="hero-mini-pill">${plan.readyToDrop ? "Ready to drop" : "Needs check"}</span>
+          </div>
+          ${renderDecisionMetaRows([
+            { label: "Run type", value: plan.runType },
+            { label: "Priority", value: plan.priority },
+            { label: "Loadout", value: plan.loadout }
+          ])}
+        </article>
+        <article class="quick-action-card quick-action-stack">
+          <div class="quick-action-top">
+            <div>
+              <p class="eyebrow">Top priorities</p>
+              <p class="quick-action-summary">Built to be scanned in under five seconds, because you are playing a game, not studying for a zoning exam.</p>
+            </div>
+          </div>
+          <div class="quick-action-priority-list">
+            ${priorities.map((item, index) => `
+              <article class="quick-action-priority-item">
+                <span class="quick-action-priority-index">${index + 1}</span>
+                <div>
+                  <strong>${item.title}</strong>
+                  <p class="quick-action-summary">${item.copy}</p>
+                </div>
+              </article>
+            `).join("")}
+          </div>
+          ${renderCallout("warning", "Warning", unreadPatch ? `${plan.warning} Also, ${releases[0].title} is still unread, so patch drift may be making your assumptions worse.` : plan.warning)}
+        </article>
+        <div class="quick-action-actions">
+          <button class="hero-button hero-button-primary" type="button" data-quick-action-open-pre-raid>Open Pre-Raid Mode</button>
+          <button class="hero-button hero-button-secondary" type="button" data-quick-action-edit-plan>Edit plan</button>
+          <button class="hero-button hero-button-secondary" type="button" data-quick-action-copy-plan>Copy summary</button>
+          <button class="hero-button hero-button-secondary" type="button" data-quick-action-failed>That run failed</button>
+        </div>
+        ${recoverySuggestion ? renderCallout("warning", "Try this instead", `${recoverySuggestion.recoveryReason} Good pivot now: ${recoverySuggestion.title}.`) : ""}
+      </div>
+    `;
+  }
+
+  quickActionOverlayElement.querySelector("[data-quick-action-close]")?.addEventListener("click", () => {
+    state.quickActionOverlayOpen = false;
+    renderQuickActionOverlay();
+    saveState();
+  });
+
+  quickActionOverlayElement.querySelector("[data-quick-action-open-engine]")?.addEventListener("click", () => {
+    state.quickActionOverlayOpen = false;
+    state.activeView = "start";
+    render();
+    scrollElementIntoView(document.querySelector("#raid-decision-engine"));
+    saveState();
+  });
+
+  quickActionOverlayElement.querySelector("[data-quick-action-open-pre-raid]")?.addEventListener("click", () => {
+    if (!plan) {
+      return;
+    }
+    state.selectedRunPlanId = plan.id;
+    state.quickActionOverlayOpen = false;
+    state.activeView = "start";
+    render();
+    scrollElementIntoView(preRaidPanelElement);
+    saveState();
+  });
+
+  quickActionOverlayElement.querySelector("[data-quick-action-edit-plan]")?.addEventListener("click", () => {
+    if (!plan) {
+      return;
+    }
+    loadRunPlanIntoEngine(plan.id, "edit");
+    state.quickActionOverlayOpen = false;
+    state.activeView = "start";
+    render();
+    scrollElementIntoView(document.querySelector("#raid-decision-engine"));
+    saveState();
+  });
+
+  quickActionOverlayElement.querySelector("[data-quick-action-copy-plan]")?.addEventListener("click", () => {
+    if (!plan) {
+      return;
+    }
+    copyRunPlanSummary(plan).catch(() => undefined);
+  });
+
+  quickActionOverlayElement.querySelector("[data-quick-action-failed]")?.addEventListener("click", () => {
+    if (!plan) {
+      return;
+    }
+    recordRunOutcome(plan.id, "failed");
+    renderMissionControl();
+    renderPreRaidMode();
+    renderQuickActionOverlay();
+    renderPersonalHub();
+    saveState();
   });
 }
 
@@ -5123,6 +5476,8 @@ function saveState() {
     loadoutBuilder: state.loadoutBuilder,
     materialHelper: state.materialHelper,
     stashSupport: state.stashSupport,
+    recoverySignals: state.recoverySignals,
+    quickActionOverlayOpen: state.quickActionOverlayOpen,
     decisionEngine: state.decisionEngine,
     runPlans: state.runPlans,
     selectedRunPlanId: state.selectedRunPlanId,
@@ -5156,6 +5511,12 @@ function loadState() {
     state.loadoutBuilder = { ...state.loadoutBuilder, ...(parsedState.loadoutBuilder ?? {}) };
     state.materialHelper = { ...state.materialHelper, ...(parsedState.materialHelper ?? {}) };
     state.stashSupport = { ...state.stashSupport, ...(parsedState.stashSupport ?? {}) };
+    state.recoverySignals = {
+      ...state.recoverySignals,
+      ...(parsedState.recoverySignals ?? {}),
+      outcomes: Array.isArray(parsedState.recoverySignals?.outcomes) ? parsedState.recoverySignals.outcomes : []
+    };
+    state.quickActionOverlayOpen = Boolean(parsedState.quickActionOverlayOpen);
     state.decisionEngine = {
       ...state.decisionEngine,
       ...(parsedState.decisionEngine ?? {}),
@@ -5173,6 +5534,8 @@ function loadState() {
     state.checkedPrepItems = [];
     state.runPlans = [];
     state.selectedRunPlanId = null;
+    state.recoverySignals = { outcomes: [] };
+    state.quickActionOverlayOpen = false;
     state.decisionEngine = {
       currentStep: 0,
       answers: {},
@@ -5624,6 +5987,7 @@ function renderPersonalHub() {
   const nextSection = sections
     .filter((section) => section.total > 0)
     .sort((a, b) => (a.completed / a.total) - (b.completed / b.total))[0];
+  const recoverySuggestion = getAdaptiveRecoverySuggestion();
   const savedItems = state.savedItems
     .map((key) => registry[key])
     .filter(Boolean)
@@ -5673,6 +6037,7 @@ function renderPersonalHub() {
       <strong>Why this is next</strong>
       <p>${nextSection ? `${nextSection.label} is your weakest current section at ${Math.round((nextSection.completed / nextSection.total) * 100)}% complete, so this is the cleanest gain.` : "You are still early enough that the best play is continuing the core learning path."}</p>
     </article>
+    ${recoverySuggestion ? renderCallout("warning", "Try this instead", `${recoverySuggestion.recoveryReason} Recommended pivot: ${recoverySuggestion.runType}.`) : ""}
     <div class="personal-actions">
       <button class="hero-button hero-button-primary" type="button" data-open-next-step>Open recommended step</button>
       ${storedPlan ? '<button class="hero-button hero-button-secondary" type="button" data-open-last-plan>Use last plan</button>' : ""}
@@ -6741,6 +7106,7 @@ function render() {
   renderDecisionEngine();
   renderRunPlans();
   renderPreRaidMode();
+  renderQuickActionOverlay();
   renderBriefing();
   renderMediaIntel();
   renderPainPoints();
@@ -6772,6 +7138,31 @@ function render() {
 
 backToTopElement.addEventListener("click", () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+quickActionToggleElement?.addEventListener("click", () => {
+  state.quickActionOverlayOpen = !state.quickActionOverlayOpen;
+  renderQuickActionOverlay();
+  saveState();
+});
+
+document.addEventListener("click", (event) => {
+  if (!state.quickActionOverlayOpen || !quickActionOverlayElement || !quickActionToggleElement) {
+    return;
+  }
+
+  const target = event.target;
+  if (!(target instanceof Node)) {
+    return;
+  }
+
+  if (quickActionOverlayElement.contains(target) || quickActionToggleElement.contains(target)) {
+    return;
+  }
+
+  state.quickActionOverlayOpen = false;
+  renderQuickActionOverlay();
+  saveState();
 });
 
 easterEggTriggerElement.addEventListener("click", revealEasterEgg);
@@ -6920,6 +7311,13 @@ installAppButtonElement.addEventListener("click", async () => {
 window.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && (!changelogModalElement.hidden || !feedbackModalElement.hidden)) {
     closeAllModals();
+    return;
+  }
+
+  if (event.key === "Escape" && state.quickActionOverlayOpen) {
+    state.quickActionOverlayOpen = false;
+    renderQuickActionOverlay();
+    saveState();
   }
 });
 
