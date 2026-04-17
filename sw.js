@@ -1,10 +1,28 @@
-const CACHE_NAME = "arc-raiders-guide-v1-32-0";
+const CACHE_NAME = "arc-raiders-guide-v1-33-0";
 const APP_ASSETS = [
   "./",
   "./index.html",
   "./styles.css",
   "./site.webmanifest",
   "./src/main.js",
+  "./src/raider-interface/entry.js",
+  "./src/raider-interface/design/tokens.js",
+  "./src/raider-interface/commands/command-model.js",
+  "./src/raider-interface/components/primitives.js",
+  "./src/raider-interface/modes/mode-framework.js",
+  "./src/raider-interface/modes/intent-modes.js",
+  "./src/raider-interface/modes/catch-up-deltas.js",
+  "./src/raider-interface/modes/problem-diagnostics.js",
+  "./src/raider-interface/state/persistence.js",
+  "./src/raider-interface/state/user-context.js",
+  "./src/raider-interface/state/adaptive-layer.js",
+  "./src/raider-interface/state/app-state.js",
+  "./src/raider-interface/content/content-delivery.js",
+  "./src/raider-interface/content/contextual-support.js",
+  "./src/raider-interface/overlay/live-companion.js",
+  "./src/raider-interface/architecture/rewrite-plan.js",
+  "./src/raider-interface/preview/sandbox.js",
+  "./src/raider-interface/README.md",
   "./assets/arc-signal.svg",
   "./assets/hero-raider-scene.svg",
   "./assets/machine-schematic.svg"
@@ -32,19 +50,6 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") {
-    return;
-  }
-
-  if (event.request.mode === "navigate") {
-    event.respondWith(
-      fetch(event.request)
-        .then((networkResponse) => {
-          const responseClone = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
-          return networkResponse;
-        })
-        .catch(() => caches.match(event.request).then((cachedResponse) => cachedResponse || caches.match("./index.html")))
-    );
     return;
   }
 

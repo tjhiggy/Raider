@@ -4,7 +4,7 @@ Static browser app for helping ARC Raiders players learn the game from beginner 
 
 ## Run
 
-Open [index.html](/C:/Users/Jim/OneDrive%20-%20Higgins/Documents/Playground/arc-raiders-guide/index.html) in any modern browser.
+Open `index.html` in any modern browser.
 
 ## Files
 

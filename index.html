@@ -15,60 +15,60 @@
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-  <button id="easter-egg-trigger" class="easter-egg-trigger" type="button" aria-label="Hidden easter egg trigger"></button>
+  <a class="skip-link" href="#raider-interface-preview-root">Skip to Raider Interface</a>
   <main class="app-shell">
-    <header class="panel site-header command-bar">
-      <div class="site-header-top">
-        <div class="site-brand">
-          <p class="site-kicker">ARC Raiders</p>
-          <div class="site-brand-copy">
-            <h1 class="site-title">Field Guide</h1>
-            <p class="site-tagline">Training hub for raids, quests, builds, and live update intel.</p>
+    <section id="raider-interface-shell" class="raider-interface-shell" hidden aria-hidden="true" data-interface-phase="phase-12-launch-hardening">
+      <div id="raider-interface-preview-root" class="raider-interface-shell__inner">
+        <p class="eyebrow">Raider Interface</p>
+        <h2 class="raider-interface-shell__title">Loading tactical interface.</h2>
+        <p class="raider-interface-shell__copy">
+          If this fallback is still visible, the Raider Interface shell did not finish mounting.
+        </p>
+      </div>
+    </section>
+
+    <section class="reference-archive-shell" aria-label="Reference archive">
+      <details id="reference-archive" class="reference-archive">
+        <summary class="reference-archive__summary">
+          <div>
+            <p class="eyebrow">Reference Archive</p>
+            <h2 class="reference-archive__title">Deep guide browsing lives here now.</h2>
+            <p class="reference-archive__copy">Use this when you want the full stacks, searchable boards, and detailed reference panels. The Raider Interface should handle the first move.</p>
           </div>
+          <span class="reference-archive__toggle">Open archive</span>
+        </summary>
+        <div class="reference-archive__body">
+    <section class="panel command-bar">
+      <div class="command-top">
+        <div>
+          <p class="eyebrow">Archive Console</p>
+          <h2 class="command-title">Reference access</h2>
         </div>
-        <nav class="site-nav" aria-label="Primary guide navigation">
-          <a class="quick-link" href="#curriculum" data-focus-view="learn">Learn</a>
-          <a class="quick-link" href="#quest-ops" data-focus-view="quests">Quests</a>
-          <a class="quick-link" href="#materials-intel" data-focus-view="materials">Materials</a>
-          <a class="quick-link" href="#gear-field-guide" data-focus-view="gear">Gear</a>
-          <a class="quick-link" href="#machine-intel" data-focus-view="machines">ARC Intel</a>
-          <a class="quick-link" href="#update-center" data-focus-view="updates">Updates</a>
-        </nav>
-        <div class="site-header-actions">
-          <button id="toggle-command-bar" class="hero-button hero-button-secondary command-toggle" type="button" aria-expanded="true" aria-controls="command-bar-body">Hide menu</button>
+        <div class="command-actions">
           <button id="share-app" class="hero-button hero-button-secondary" type="button">Share</button>
           <button id="install-app" class="hero-button hero-button-secondary" type="button" hidden>Install app</button>
-          <a class="hero-button hero-button-primary" href="#" data-discord-link target="_blank" rel="noopener noreferrer">Join Community</a>
         </div>
       </div>
-      <div id="command-bar-body" class="command-body site-header-body">
-        <div class="site-tools-row">
-          <div class="site-search">
-            <label class="search-label" for="global-search">Search</label>
-            <input id="global-search" class="search-input" type="search" placeholder="Search lessons, quests, materials, weapons, and machine intel">
-            <div id="search-suggestions" class="search-suggestions" aria-label="Suggested searches"></div>
-          </div>
-          <div class="progress-strip">
-            <article class="meta-pill">
-              <span class="meta-label">Reviewed lessons</span>
-              <strong id="reviewed-count" class="meta-value">0</strong>
-            </article>
-            <article class="meta-pill">
-              <span class="meta-label">Guide progress</span>
-              <strong id="overall-progress" class="meta-value">0%</strong>
-            </article>
-            <article class="meta-pill">
-              <span class="meta-label">Saved items</span>
-              <strong id="saved-count" class="meta-value">0</strong>
-            </article>
-            <article class="meta-pill">
-              <span class="meta-label">Continue from</span>
-              <strong id="continue-label" class="meta-value">New Raider</strong>
-            </article>
-          </div>
-        </div>
+      <label class="search-label" for="global-search">Search the guide</label>
+      <input id="global-search" class="search-input" type="search" placeholder="Search lessons, quests, materials, and machine intel">
+      <div class="quick-links" aria-label="Quick links">
+        <a class="quick-link" href="#update-center">Updates</a>
+        <a class="quick-link" href="#curriculum">Curriculum</a>
+        <a class="quick-link" href="#quest-ops">Quests</a>
+        <a class="quick-link" href="#materials-intel">Materials</a>
+        <a class="quick-link" href="#machine-intel">Machines</a>
       </div>
-    </header>
+      <div class="progress-strip">
+        <article class="meta-pill">
+          <span class="meta-label">Reviewed lessons</span>
+          <strong id="reviewed-count" class="meta-value">0</strong>
+        </article>
+        <article class="meta-pill">
+          <span class="meta-label">Continue from</span>
+          <strong id="continue-label" class="meta-value">New Raider</strong>
+        </article>
+      </div>
+    </section>
 
     <section id="search-results-panel" class="panel search-results-panel" hidden>
       <div class="section-heading">
@@ -78,276 +78,7 @@
       <div id="search-results" class="search-results" aria-live="polite"></div>
     </section>
 
-    <section id="start-here-flow" class="panel start-here-flow flow-section" data-view="start">
-      <div class="start-here-head">
-        <div>
-          <p class="eyebrow">New Raider Onboarding</p>
-          <h2>Start Here</h2>
-          <p class="start-here-copy">If the game still feels noisy, use this guided path. Four steps, one clear next move, and zero decision paralysis theater.</p>
-        </div>
-        <div id="start-here-summary" class="start-here-summary" aria-live="polite"></div>
-      </div>
-      <div id="start-here-steps" class="start-here-steps" aria-live="polite"></div>
-      <div class="start-here-actions">
-        <button id="start-here-cta" class="hero-button hero-button-primary" type="button">Start New Raider Path</button>
-        <a class="hero-button hero-button-secondary" href="#curriculum" data-focus-view="learn">Browse Full Guide</a>
-      </div>
-    </section>
-
-    <section id="mission-control" class="panel mission-control flow-section" data-view="start">
-      <div class="section-heading">
-        <h2>Operation Overwatch</h2>
-        <p>Use the guide like mission control: know today’s best move, react to the live patch, continue your run planning, and return to unfinished pressure points without rummaging through the whole site like a confused raccoon.</p>
-      </div>
-      <div class="mission-control-grid">
-        <section id="today-focus-card" class="mission-card mission-card-primary" aria-live="polite"></section>
-        <section id="continue-plan-card" class="mission-card" aria-live="polite"></section>
-        <section id="latest-patch-impact-card" class="mission-card" aria-live="polite"></section>
-        <section id="mission-nudges-card" class="mission-card" aria-live="polite"></section>
-      </div>
-    </section>
-
-    <section id="raid-decision-engine" class="panel decision-engine flow-section" data-view="start">
-      <div class="decision-engine-head">
-        <div>
-          <p class="eyebrow">Signature Planning Tool</p>
-          <h2>Raid Decision Engine</h2>
-          <p class="decision-engine-copy">Answer a few practical questions and get the best-fit run plan based on your situation, not generic gamer horoscope nonsense.</p>
-        </div>
-        <div class="decision-engine-actions">
-          <button id="decision-engine-start" class="hero-button hero-button-primary" type="button">Plan my next run</button>
-          <button id="decision-engine-last-plan" class="hero-button hero-button-secondary" type="button" hidden>Use last plan</button>
-          <button id="decision-engine-reset" class="hero-button hero-button-secondary" type="button">Rebuild plan</button>
-        </div>
-      </div>
-      <div class="decision-engine-layout">
-        <section class="decision-engine-panel">
-          <div id="decision-engine-status" class="decision-engine-status" aria-live="polite"></div>
-          <div id="decision-engine-flow" class="decision-engine-flow" aria-live="polite"></div>
-        </section>
-        <aside id="decision-engine-result" class="decision-engine-result" aria-live="polite"></aside>
-      </div>
-      <div class="decision-engine-support">
-        <section class="decision-engine-support-panel">
-          <div class="section-heading section-heading-compact">
-            <h2>Run Plan Hangar</h2>
-            <p>Save, edit, duplicate, and reuse run plans without rebuilding the same logic every time you open the site.</p>
-          </div>
-          <div id="run-plan-list" class="run-plan-list" aria-live="polite"></div>
-        </section>
-        <aside class="decision-engine-support-panel">
-          <div class="section-heading section-heading-compact">
-            <h2>Pre-Raid Mode</h2>
-            <p>Turn a saved plan into a compact drop-ready panel with mission focus, bring/avoid guidance, and the reminders that stop sloppy queues.</p>
-          </div>
-          <div id="pre-raid-panel" class="pre-raid-panel" aria-live="polite"></div>
-        </aside>
-      </div>
-    </section>
-
-    <section id="personal-hub" class="panel personal-hub flow-section" data-view="start" hidden>
-      <div class="section-heading">
-        <h2>Your Raider Dashboard</h2>
-        <p>Pick up where you left off, reopen saved intel, and get one clear next move without re-reading the whole site like you lost a bet.</p>
-      </div>
-      <div class="personal-hub-grid">
-        <section id="personal-overview" class="personal-card" aria-live="polite"></section>
-        <section id="personal-next" class="personal-card" aria-live="polite"></section>
-        <section id="section-progress" class="personal-card" aria-live="polite"></section>
-        <section id="saved-panel" class="personal-card" aria-live="polite"></section>
-      </div>
-    </section>
-
-    <section class="hero panel">
-      <div class="hero-ambient" aria-hidden="true">
-        <span class="hero-orb hero-orb-alpha"></span>
-        <span class="hero-orb hero-orb-beta"></span>
-        <span class="hero-scanline"></span>
-        <span class="hero-grid-glow"></span>
-      </div>
-      <div class="hero-copy">
-        <p class="eyebrow">ARC Raiders Companion App</p>
-        <h2>
-          <span class="hero-title-line">Train for the Rust Belt.</span>
-          <span class="hero-title-line hero-title-accent">Win more extractions.</span>
-        </h2>
-        <p class="hero-subheadline">
-          A purpose-built field guide for ARC Raiders players who want cleaner raid decisions, faster learning, sharper quest routing, and patch-aware intel without digging through scattered posts.
-        </p>
-        <div class="hero-meta-row" aria-label="Site strengths">
-          <span class="hero-mini-pill">New Raider friendly</span>
-          <span class="hero-mini-pill">Flashpoint aware</span>
-          <span class="hero-mini-pill">Mobile ready</span>
-        </div>
-        <div class="hero-actions">
-          <a class="hero-button hero-button-primary" href="#curriculum" data-focus-view="learn">Start Learning Path</a>
-          <a class="hero-button hero-button-secondary" href="#update-center" data-focus-view="updates">Check Live Updates</a>
-        </div>
-        <div class="hero-proof">
-          <div class="hero-proof-item">
-            <span class="hero-proof-label">Built for</span>
-            <strong>Raid prep, progression, and patch context</strong>
-          </div>
-          <div class="hero-proof-item">
-            <span class="hero-proof-label">Designed to help</span>
-            <strong>New Raiders get useful faster</strong>
-          </div>
-        </div>
-        <div class="hero-community">
-          <span class="hero-card-label">Need teammates?</span>
-          <p class="hero-community-copy">Join the Discord to squad up, ask questions, and learn with other Raiders.</p>
-          <a class="hero-button hero-button-secondary" href="#" data-discord-link target="_blank" rel="noopener noreferrer">Join Community</a>
-        </div>
-      </div>
-
-      <aside class="hero-stage">
-        <div class="hero-stage-shell">
-          <div class="hero-stage-top">
-            <span class="tag hero-stage-tag">Live training hub</span>
-            <span class="tag hero-stage-tag">Patch aware</span>
-          </div>
-          <div class="hero-dashboard-grid">
-            <section id="hero-update-card" class="hero-card hero-card-accent hero-card-spotlight" aria-live="polite"></section>
-            <article class="hero-card hero-visual-card">
-              <span class="hero-card-label">Field Signal</span>
-              <div class="hero-signal">
-                <span class="hero-signal-ring hero-signal-ring-outer"></span>
-                <span class="hero-signal-ring hero-signal-ring-mid"></span>
-                <span class="hero-signal-ring hero-signal-ring-core"></span>
-                <span class="hero-signal-sweep"></span>
-              </div>
-              <p>Know the patch. Pick a goal. Extract with progress instead of guesswork.</p>
-            </article>
-            <section id="hero-personal-card" class="hero-card" aria-live="polite"></section>
-            <section class="hero-card hero-card-tall">
-              <span class="hero-card-label">Best next actions</span>
-              <div id="hero-task-list" class="hero-task-list" aria-live="polite"></div>
-            </section>
-          </div>
-        </div>
-      </aside>
-    </section>
-
-    <section class="panel live-signal-panel flow-section" data-view="start">
-      <div class="section-heading">
-        <h2>Live Signal</h2>
-        <p>Spot what changed, what players keep opening, and what matters since your last visit without digging through the whole guide like a sleep-deprived loot goblin.</p>
-      </div>
-      <div class="live-signal-grid">
-        <section class="live-signal-column">
-          <div class="section-heading section-heading-compact">
-            <h3>Recently Updated</h3>
-            <p>Fresh guide content and newly touched areas.</p>
-          </div>
-          <div id="recently-updated-list" class="signal-list" aria-live="polite"></div>
-        </section>
-        <section class="live-signal-column">
-          <div class="section-heading section-heading-compact">
-            <h3>Trending Right Now</h3>
-            <p>High-interest topics ranked with lightweight app logic.</p>
-          </div>
-          <div id="trending-content-list" class="signal-list" aria-live="polite"></div>
-        </section>
-        <aside id="since-last-visit-panel" class="signal-side-panel" aria-live="polite"></aside>
-      </div>
-    </section>
-
-    <section class="launchpad-grid flow-section" data-view="start">
-      <a class="panel launchpad-card" href="#curriculum" data-focus-view="learn">
-        <span class="status-label">Start here</span>
-        <strong class="status-value">Learn the basics</strong>
-        <p class="status-copy">Go straight into the New Raider path if you still feel overwhelmed by the game loop.</p>
-        <div class="decision-meta-grid">
-          <article class="decision-meta-item">
-            <span class="decision-meta-label">Best for</span>
-            <strong class="decision-meta-value">First-time Raiders</strong>
-          </article>
-          <article class="decision-meta-item">
-            <span class="decision-meta-label">Time</span>
-            <strong class="decision-meta-value">5 min start</strong>
-          </article>
-          <article class="decision-meta-item">
-            <span class="decision-meta-label">Outcome</span>
-            <strong class="decision-meta-value">Understand the raid loop</strong>
-          </article>
-          <article class="decision-meta-item">
-            <span class="decision-meta-label">Difficulty</span>
-            <strong class="decision-meta-value">Beginner</strong>
-          </article>
-        </div>
-      </a>
-      <a class="panel launchpad-card" href="#quest-ops" data-focus-view="quests">
-        <span class="status-label">Need progress</span>
-        <strong class="status-value">Finish quests faster</strong>
-        <p class="status-copy">Use the quest board when you want to turn raids into reliable progression instead of random looting.</p>
-        <div class="decision-meta-grid">
-          <article class="decision-meta-item">
-            <span class="decision-meta-label">Best for</span>
-            <strong class="decision-meta-value">Trader and progression runs</strong>
-          </article>
-          <article class="decision-meta-item">
-            <span class="decision-meta-label">Time</span>
-            <strong class="decision-meta-value">2 min orient</strong>
-          </article>
-          <article class="decision-meta-item">
-            <span class="decision-meta-label">Outcome</span>
-            <strong class="decision-meta-value">Turn raids into account progress</strong>
-          </article>
-          <article class="decision-meta-item">
-            <span class="decision-meta-label">Difficulty</span>
-            <strong class="decision-meta-value">Beginner+</strong>
-          </article>
-        </div>
-      </a>
-      <a class="panel launchpad-card" href="#materials-intel" data-focus-view="materials">
-        <span class="status-label">Stuck crafting</span>
-        <strong class="status-value">Find materials</strong>
-        <p class="status-copy">Jump into material families and route advice when your workshop or stash is blocking progress.</p>
-        <div class="decision-meta-grid">
-          <article class="decision-meta-item">
-            <span class="decision-meta-label">Best for</span>
-            <strong class="decision-meta-value">Crafting blocks and stash pressure</strong>
-          </article>
-          <article class="decision-meta-item">
-            <span class="decision-meta-label">Time</span>
-            <strong class="decision-meta-value">2 min route check</strong>
-          </article>
-          <article class="decision-meta-item">
-            <span class="decision-meta-label">Outcome</span>
-            <strong class="decision-meta-value">Know what to keep and where to look</strong>
-          </article>
-          <article class="decision-meta-item">
-            <span class="decision-meta-label">Difficulty</span>
-            <strong class="decision-meta-value">Beginner</strong>
-          </article>
-        </div>
-      </a>
-      <a class="panel launchpad-card" href="#gear-field-guide" data-focus-view="gear">
-        <span class="status-label">Build a kit</span>
-        <strong class="status-value">Choose your loadout</strong>
-        <p class="status-copy">Use the gear guide when you know your goal for the run but still are not sure what kind of weapons or quick-use items to bring.</p>
-        <div class="decision-meta-grid">
-          <article class="decision-meta-item">
-            <span class="decision-meta-label">Best for</span>
-            <strong class="decision-meta-value">Quest, loot, and recovery kits</strong>
-          </article>
-          <article class="decision-meta-item">
-            <span class="decision-meta-label">Time</span>
-            <strong class="decision-meta-value">2 min build</strong>
-          </article>
-          <article class="decision-meta-item">
-            <span class="decision-meta-label">Outcome</span>
-            <strong class="decision-meta-value">Bring a purpose-built loadout</strong>
-          </article>
-          <article class="decision-meta-item">
-            <span class="decision-meta-label">Difficulty</span>
-            <strong class="decision-meta-value">Intermediate</strong>
-          </article>
-        </div>
-      </a>
-    </section>
-
-    <section id="update-center" class="update-layout flow-section" data-view="updates">
+    <section id="update-center" class="update-layout">
       <section class="panel update-spotlight-panel">
         <div class="section-heading">
           <h2>Update Center</h2>
@@ -366,27 +97,55 @@
 
       <aside class="panel release-detail-panel">
         <div class="section-heading">
-          <h2>Player Action Board</h2>
-          <p>Use this panel for why the release matters, what to do next, and what parts of the guide changed because of it.</p>
+          <h2>Release Detail</h2>
+          <p>Officially confirmed highlights, prep notes, and app-update ideas for each release.</p>
         </div>
         <div id="release-detail" class="release-detail" aria-live="polite"></div>
-        <div class="detail-actions">
-          <button id="mark-release-complete" class="hero-button hero-button-secondary detail-action" type="button">Mark update reviewed</button>
-          <button id="save-release" class="hero-button hero-button-secondary detail-action" type="button">Save update</button>
-          <button id="report-update-issue" class="hero-button hero-button-secondary detail-action" type="button">Report outdated info</button>
-        </div>
       </aside>
     </section>
 
-    <section class="panel embark-feed-panel flow-section" data-view="updates">
-      <div class="section-heading">
-        <h2>Updates Feed</h2>
-        <p>Use this as the active official feed so you can scan major changes, minor fixes, and current patch rhythm without guessing what still matters.</p>
+    <section class="hero panel">
+      <div class="hero-copy">
+        <p class="eyebrow">ARC Raiders Learning App</p>
+        <h1>Know what to run, what to learn, and what changed.</h1>
+        <p class="hero-text">
+          Use this guide like a raid console: check the latest update, continue your learning path, and jump straight into quests, materials, or machine intel without hunting through the app.
+        </p>
+        <div class="hero-actions">
+          <a class="hero-button hero-button-primary" href="#curriculum">Continue learning</a>
+          <a class="hero-button hero-button-secondary" href="#update-center">View latest update</a>
+        </div>
       </div>
-      <div id="embark-feed" class="embark-feed" aria-live="polite"></div>
+
+      <div class="hero-aside hero-dashboard">
+        <section id="hero-update-card" class="hero-card hero-card-accent" aria-live="polite"></section>
+        <section id="hero-personal-card" class="hero-card" aria-live="polite"></section>
+        <section class="hero-card">
+          <span class="hero-card-label">Best next actions</span>
+          <div id="hero-task-list" class="hero-task-list" aria-live="polite"></div>
+        </section>
+      </div>
     </section>
 
-    <section class="panel briefing flow-section" data-view="start">
+    <section class="status-grid">
+      <article class="panel status-card">
+        <span class="status-label">Guide tracks</span>
+        <strong id="track-count" class="status-value">2</strong>
+        <p class="status-copy">Separate routes for onboarding and advanced play.</p>
+      </article>
+      <article class="panel status-card">
+        <span class="status-label">Lessons</span>
+        <strong id="lesson-count" class="status-value">8</strong>
+        <p class="status-copy">Short, focused teaching modules built for quick review on desktop or mobile.</p>
+      </article>
+      <article class="panel status-card">
+        <span class="status-label">Machine profiles</span>
+        <strong id="machine-count" class="status-value">6</strong>
+        <p class="status-copy">Threat summaries for common ARC units you should recognize fast.</p>
+      </article>
+    </section>
+
+    <section id="first-raid-briefing" class="panel briefing">
       <div class="section-heading">
         <h2>First Raid Briefing</h2>
         <p>These are the habits that keep a new Raider alive long enough to learn.</p>
@@ -394,39 +153,14 @@
       <div id="briefing-list" class="briefing-list" aria-live="polite"></div>
     </section>
 
-    <section class="panel media-intel-panel flow-section" data-view="start">
-      <div class="section-heading">
-        <h2>Visual Intel Deck</h2>
-        <p>Quick visual references for route reading, ARC pressure, and what a good prep board should actually tell you. Placeholders are labeled where real assets still need to be dropped in.</p>
-      </div>
-      <div id="media-intel-grid" class="media-intel-grid" aria-live="polite"></div>
-    </section>
-
-    <section class="panel pain-points-panel flow-section" data-view="start">
-      <div class="section-heading">
-        <h2>Fix the Most Common Problems</h2>
-        <p>These are the biggest pain points players keep hitting, with direct paths to the part of the guide that helps most.</p>
-      </div>
-      <div id="pain-point-list" class="pain-point-list" aria-live="polite"></div>
-    </section>
-
-    <section class="panel tools-panel flow-section" data-view="start">
-      <div class="section-heading">
-        <h2>Why You're Struggling</h2>
-        <p>Pick what keeps going wrong and get the likely causes plus one clear corrective action. Short, blunt, useful.</p>
-      </div>
-      <div id="struggle-diagnostic" class="tool-grid" aria-live="polite"></div>
-    </section>
-
-    <section id="curriculum" class="curriculum-layout flow-section" data-view="learn">
+    <section id="curriculum" class="curriculum-layout">
       <aside class="panel rail-panel">
-      <div class="section-heading">
-        <h2>Guide Tracks</h2>
-        <p>Switch between the new player route and advanced gameplay route.</p>
-      </div>
-      <div id="track-filters" class="discovery-filters" aria-label="Track filters"></div>
-      <div id="track-list" class="track-list" aria-label="Guide tracks"></div>
-    </aside>
+        <div class="section-heading">
+          <h2>Guide Tracks</h2>
+          <p>Switch between the new player route and advanced gameplay route.</p>
+        </div>
+        <div id="track-list" class="track-list" aria-label="Guide tracks"></div>
+      </aside>
 
       <section class="lesson-column">
         <section id="track-overview" class="panel overview-panel" aria-live="polite"></section>
@@ -435,7 +169,6 @@
             <h2>Lessons</h2>
             <p>Tap a lesson for the practical breakdown, checks, and field notes.</p>
           </div>
-          <div id="lesson-filters" class="discovery-filters" aria-label="Lesson filters"></div>
           <div id="lesson-list" class="lesson-list"></div>
         </section>
       </section>
@@ -446,22 +179,11 @@
           <p>Use this panel as your quick-reference board before queueing up.</p>
         </div>
         <div id="lesson-detail" class="lesson-detail" aria-live="polite"></div>
-        <div class="detail-actions">
-          <button id="mark-reviewed" class="hero-button hero-button-secondary detail-action" type="button">Mark lesson reviewed</button>
-          <button id="mark-lesson-complete" class="hero-button hero-button-secondary detail-action" type="button">Mark lesson complete</button>
-          <button id="save-lesson" class="hero-button hero-button-secondary detail-action" type="button">Save lesson</button>
-        </div>
-        <section class="related-block">
-          <div class="section-heading section-heading-compact">
-            <h2>Related Content</h2>
-            <p>Use these next if you want to keep building on the same skill.</p>
-          </div>
-          <div id="lesson-related" class="related-grid" aria-live="polite"></div>
-        </section>
+        <button id="mark-reviewed" class="hero-button hero-button-secondary detail-action" type="button">Mark lesson reviewed</button>
       </aside>
     </section>
 
-    <section id="quest-ops" class="quest-layout flow-section" data-view="quests">
+    <section id="quest-ops" class="quest-layout">
       <section class="panel quest-overview-panel">
         <div class="section-heading">
           <h2>Quest Operations</h2>
@@ -475,9 +197,7 @@
           <h2>Quest Types</h2>
           <p>Pick a quest type to see the goal, the safest approach, and the common mistake that slows people down.</p>
         </div>
-        <div id="quest-filters" class="discovery-filters" aria-label="Quest filters"></div>
         <div id="quest-list" class="quest-list"></div>
-        <div id="quest-directory" class="quest-directory" aria-live="polite"></div>
       </section>
 
       <aside class="panel quest-detail-panel">
@@ -486,21 +206,10 @@
           <p>Built from current official public information about ARC Raiders progression systems.</p>
         </div>
         <div id="quest-detail" class="quest-detail" aria-live="polite"></div>
-        <div class="detail-actions">
-          <button id="mark-quest-complete" class="hero-button hero-button-secondary detail-action" type="button">Mark quest guide complete</button>
-          <button id="save-quest" class="hero-button hero-button-secondary detail-action" type="button">Save quest guide</button>
-        </div>
-        <section class="related-block">
-          <div class="section-heading section-heading-compact">
-            <h2>Related Prep</h2>
-            <p>These connect questing to loadouts, lessons, and farming decisions.</p>
-          </div>
-          <div id="quest-related" class="related-grid" aria-live="polite"></div>
-        </section>
       </aside>
     </section>
 
-    <section id="materials-intel" class="materials-layout flow-section" data-view="materials">
+    <section id="materials-intel" class="materials-layout">
       <section class="panel materials-overview-panel">
         <div class="section-heading">
           <h2>Crafting Materials Intel</h2>
@@ -514,7 +223,6 @@
           <h2>Material Families</h2>
           <p>Pick a material family to see where it tends to appear, what map spaces suit it, and how to farm it safely.</p>
         </div>
-        <div id="material-filters" class="discovery-filters" aria-label="Material filters"></div>
         <div id="materials-list" class="materials-list"></div>
       </section>
 
@@ -524,96 +232,18 @@
           <p>Built from current official public map, workshop, and event information.</p>
         </div>
         <div id="materials-detail" class="materials-detail" aria-live="polite"></div>
-        <div class="detail-actions">
-          <button id="mark-material-complete" class="hero-button hero-button-secondary detail-action" type="button">Mark material guide complete</button>
-          <button id="save-material" class="hero-button hero-button-secondary detail-action" type="button">Save material guide</button>
-        </div>
-        <section class="related-block">
-          <div class="section-heading section-heading-compact">
-            <h2>Connected Guides</h2>
-            <p>Use these if this material is blocking a craft, quest, or progression step.</p>
-          </div>
-          <div id="material-related" class="related-grid" aria-live="polite"></div>
-        </section>
       </aside>
     </section>
 
-    <section class="panel materials-catalog-panel flow-section" data-view="materials">
-      <div class="section-heading">
-        <h2>Full Materials Catalog</h2>
-        <p>A complete material reference based on the current community-supported ARC Raiders Wiki categories.</p>
-      </div>
-      <div id="materials-catalog" class="materials-catalog" aria-live="polite"></div>
-    </section>
-
-    <section class="panel material-usage-panel flow-section" data-view="materials">
-      <div class="section-heading">
-        <h2>Material Value Guide</h2>
-        <p>Use this when you are deciding whether a material should stay in the stash, get recycled into workshop progress, or be sold for breathing room.</p>
-      </div>
-      <div id="material-usage-guide" class="material-usage-guide" aria-live="polite"></div>
-    </section>
-
-    <section class="panel stash-support-panel flow-section" data-view="materials">
-      <div class="section-heading">
-        <h2>Stash and Progression Support</h2>
-        <p>Use this layer when the real problem is not one material, but stash pressure, blocked workshop progress, or not knowing what to prioritize next.</p>
-      </div>
-      <div id="stash-support" class="stash-support" aria-live="polite"></div>
-    </section>
-
-    <section class="panel tools-panel flow-section" data-view="materials">
-      <div class="section-heading">
-        <h2>Material Decision Helper</h2>
-        <p>Pick the pressure you are under and get a direct keep, sell, or recycle answer instead of pretending every item deserves shrine status in your stash.</p>
-      </div>
-      <div id="material-helper" class="tool-shell" aria-live="polite"></div>
-    </section>
-
-    <section id="gear-field-guide" class="gear-layout flow-section" data-view="gear">
-      <section class="panel gear-overview-panel">
-        <div class="section-heading">
-          <h2>Weapons and Quick-Use Gear</h2>
-          <p>This section helps new Raiders understand what to bring, what each gear type is good at, and how to build a safe loadout without overcomplicating it.</p>
-        </div>
-        <div id="gear-overview" class="gear-overview" aria-live="polite"></div>
-      </section>
-
-      <section class="panel gear-list-panel">
-        <div class="section-heading">
-          <h2>Weapon Roles</h2>
-          <p>Think in roles first, not perfect meta. Pick the weapon style that matches your raid goal and comfort level.</p>
-        </div>
-        <div id="weapon-filters" class="discovery-filters" aria-label="Weapon role filters"></div>
-        <div id="weapon-role-list" class="weapon-role-list" aria-live="polite"></div>
-      </section>
-
-      <aside class="panel gear-quickuse-panel">
-        <div class="section-heading">
-          <h2>Quick-Use Essentials</h2>
-          <p>These are the consumables and gadgets that save runs, create space, and help newer players survive long enough to learn.</p>
-        </div>
-        <div id="quickuse-filters" class="discovery-filters" aria-label="Quick-use filters"></div>
-        <div id="quick-use-list" class="quick-use-list" aria-live="polite"></div>
-      </aside>
-    </section>
-
-    <section class="panel tools-panel flow-section" data-view="gear">
-      <div class="section-heading">
-        <h2>Beginner Loadout Builder</h2>
-        <p>Choose your raid intent, risk level, and team style, then get a practical build recommendation that lines up with the guide instead of forcing you to guess the meta from vibes.</p>
-      </div>
-      <div id="loadout-builder" class="tool-shell" aria-live="polite"></div>
-    </section>
-
-    <section id="machine-intel" class="intel-grid flow-section" data-view="machines">
+    <section id="machine-intel" class="intel-grid">
       <section class="panel intel-panel">
         <div class="section-heading">
           <h2>ARC Machine Intel</h2>
           <p>Learn the job each machine does so you can react faster under pressure.</p>
         </div>
-        <div id="machine-filters" class="discovery-filters" aria-label="Machine intel filters"></div>
-        <div id="machine-overview" class="machine-overview" aria-live="polite"></div>
+        <figure class="section-art-card">
+          <img class="section-art" src="./assets/machine-schematic.svg" alt="ARC Raiders-inspired machine schematic graphic">
+        </figure>
         <div id="machine-list" class="machine-list"></div>
       </section>
 
@@ -626,52 +256,18 @@
       </section>
     </section>
 
-    <footer class="app-footer panel">
-      <section class="footer-column">
-        <p class="eyebrow">About</p>
-        <h2 class="footer-title">ARC Raiders Field Guide</h2>
-        <p class="footer-copy">A practical companion guide focused on raid decision-making, patch context, progression support, and ARC Raiders-specific learning instead of generic shooter filler.</p>
-        <p class="footer-note"><strong>Maintained by:</strong> ongoing community field-guide upkeep with official Embark posts verified first and community-supported coverage labeled when the official trail runs cold.</p>
-        <div class="footer-tag-row">
-          <span id="app-updated" class="footer-item">Updated 2026-03-30</span>
-          <span id="app-verified" class="footer-item">Official posts verified 2026-03-30</span>
-        </div>
-      </section>
-      <section class="footer-column">
-        <p class="eyebrow">Trust</p>
-        <div class="footer-link-stack">
-          <button id="app-version" class="footer-link-button" type="button" aria-haspopup="dialog" aria-controls="changelog-modal">Open changelog</button>
-          <button id="open-methodology" class="footer-link-button" type="button" aria-haspopup="dialog" aria-controls="feedback-modal">Methodology and sources</button>
-          <button id="open-faq" class="footer-link-button" type="button" aria-haspopup="dialog" aria-controls="feedback-modal">FAQ and coverage notes</button>
-        </div>
-        <p class="footer-note">Methodology: official news, roadmap, and patch notes first. Community-supported quest and material coverage is clearly labeled when official public detail stops short.</p>
-      </section>
-      <section class="footer-column">
-        <p class="eyebrow">Feedback</p>
-        <div class="footer-link-stack">
-          <button class="footer-link-button" type="button" data-feedback-action="outdated">Report outdated info</button>
-          <button class="footer-link-button" type="button" data-feedback-action="improvement">Suggest a guide improvement</button>
-          <button class="footer-link-button" type="button" data-feedback-action="topic">Request a topic</button>
-          <a class="footer-link-button footer-link" href="https://github.com/tjhiggy/Raider/issues/new" target="_blank" rel="noreferrer">Open GitHub issue</a>
-        </div>
-      </section>
-      <section class="footer-column">
-        <p class="eyebrow">Community</p>
-        <div class="footer-link-stack">
-          <a class="footer-link-button footer-link" href="#" data-discord-link target="_blank" rel="noopener noreferrer">Join Community</a>
-          <a class="footer-link-button footer-link" href="https://arcraiders.com/en/news" target="_blank" rel="noreferrer">Official news hub</a>
-        </div>
-        <p class="footer-note">Site maintained for desktop and mobile browsers. Feedback is intentionally friction-light because stale guide info is worse than no guide info. If the invite expires, check back here for the latest link.</p>
-      </section>
+    <footer class="app-footer">
+      <span class="footer-item">ARC Raiders Field Guide</span>
+      <button id="app-version" class="footer-item footer-button" type="button" aria-haspopup="dialog" aria-controls="changelog-modal">v1.0.0</button>
+      <span id="app-updated" class="footer-item">Updated 2026-03-30</span>
+      <span class="footer-item">Optimized for desktop and mobile browsers</span>
     </footer>
+        </div>
+      </details>
+    </section>
   </main>
 
   <button id="back-to-top" class="back-to-top" type="button" aria-label="Back to top">Top</button>
-  <button id="quick-action-toggle" class="quick-action-toggle" type="button" aria-label="Open quick action overlay" aria-expanded="false" aria-controls="quick-action-overlay">
-    <span class="quick-action-toggle-label">Quick Action</span>
-  </button>
-  <aside id="quick-action-overlay" class="quick-action-overlay" aria-live="polite" hidden></aside>
-  <div id="easter-egg-toast" class="easter-egg-toast" aria-live="polite" aria-hidden="true"></div>
   <div id="modal-backdrop" class="modal-backdrop" hidden></div>
   <section id="changelog-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="changelog-title" hidden>
     <div class="modal-panel">
@@ -685,19 +281,8 @@
       <div id="changelog-list" class="changelog-list" aria-live="polite"></div>
     </div>
   </section>
-  <section id="feedback-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="feedback-title" hidden>
-    <div class="modal-panel">
-      <div class="modal-head">
-        <div>
-          <p class="eyebrow">Guide Feedback</p>
-          <h2 id="feedback-title">Help keep the guide current</h2>
-        </div>
-        <button id="close-feedback" class="modal-close" type="button" aria-label="Close feedback">Close</button>
-      </div>
-      <div id="feedback-panel" class="feedback-panel" aria-live="polite"></div>
-    </div>
-  </section>
 
   <script src="./src/main.js"></script>
+  <script type="module" src="./src/raider-interface/entry.js"></script>
 </body>
 </html>
