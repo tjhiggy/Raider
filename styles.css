@@ -1145,6 +1145,51 @@ body[data-raider-interface="entry-live"] .reference-archive[open] .reference-arc
   gap: 10px;
 }
 
+.ri-live-intel-strip {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid rgba(121, 198, 255, 0.14);
+  border-radius: 18px;
+  background: rgba(8, 12, 18, 0.58);
+}
+
+.ri-live-intel-strip__items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ri-live-intel-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(121, 198, 255, 0.14);
+  background: rgba(255, 255, 255, 0.025);
+  color: rgba(228, 236, 248, 0.84);
+  font-size: 0.79rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.ri-live-intel-pill[data-tone="ready"] {
+  border-color: rgba(91, 194, 137, 0.26);
+  color: #c6f4d6;
+}
+
+.ri-live-intel-pill[data-tone="caution"] {
+  border-color: rgba(224, 165, 74, 0.26);
+  color: #ffd89d;
+}
+
+.ri-live-intel-pill[data-tone="danger"] {
+  border-color: rgba(224, 92, 92, 0.26);
+  color: #ffbeb2;
+}
+
 .ri-adaptive-strip {
   position: relative;
   z-index: 1;

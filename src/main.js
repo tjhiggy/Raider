@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.36.0",
+    date: "2026-04-17",
+    summary: "Added Live Raid Intelligence as a lightweight signal layer inside Brief Me, Prep My Run, and the entry stateboard.",
+    changes: [
+      "Integrated compact live intel signals for player trends, hot zones, and recommended behavior shifts without changing the product structure.",
+      "Added prep-aware intelligence so planning output now adjusts its supporting readout based on goal, team shape, and risk posture.",
+      "Kept the new layer intentionally small and directive so it supports action instead of turning into another fake dashboard."
+    ]
+  },
+  {
     version: "v1.35.0",
     date: "2026-04-17",
     summary: "Added Why You Died, a sharp Fix-mode verdict card that turns obvious mistakes into shareable corrective action.",

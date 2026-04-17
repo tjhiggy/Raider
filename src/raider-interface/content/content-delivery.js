@@ -1,6 +1,75 @@
+function buildLiveRaidIntel(content) {
+  const releases = content.releases ?? [];
+  const materialFamilies = content.materialFamilies ?? [];
+  const machines = content.machines ?? [];
+  const latestRelease = releases[0];
+  const latestMaterialFamily = materialFamilies[0];
+  const hottestMachine = machines[0];
+
+  return {
+    entry: [
+      {
+        id: "entry-hot-zone",
+        text: `Hot zone: ${latestRelease?.title ?? "Spaceport"} pressure up`,
+        tone: "caution"
+      },
+      {
+        id: "entry-trend",
+        text: `${latestMaterialFamily?.label ?? "Material"} runs outperforming quests`,
+        tone: "ready"
+      }
+    ],
+    brief: [
+      {
+        id: "brief-hot-zone",
+        text: "Players avoiding Spaceport (high danger)",
+        tone: "caution"
+      },
+      {
+        id: "brief-trend",
+        text: "Material runs outperforming quests",
+        tone: "ready"
+      },
+      {
+        id: "brief-shift",
+        text: `Behavior shift: route quieter around ${hottestMachine?.name ?? "machine"} lanes`,
+        tone: "intel"
+      }
+    ]
+  };
+}
+
+function buildPrepIntelSignals(appState) {
+  const answers = appState.activeRunPlan?.answers ?? appState.prepDraftAnswers ?? {};
+  const signals = [];
+
+  if (answers.goal === "materials") {
+    signals.push({ id: "prep-material-trend", text: "Material runs hot. Leave before side fights.", tone: "ready" });
+  } else if (answers.goal === "quests") {
+    signals.push({ id: "prep-quest-trend", text: "Quest lanes colder. Route tighter and leave faster.", tone: "intel" });
+  } else {
+    signals.push({ id: "prep-general-trend", text: "Extraction ambush risk increasing", tone: "caution" });
+  }
+
+  if (answers.riskTolerance === "high" || answers.aggression === "assertive") {
+    signals.push({ id: "prep-risk-shift", text: "Behavior shift: loud pushes getting punished", tone: "danger" });
+  } else {
+    signals.push({ id: "prep-safe-shift", text: "Behavior shift: slower openings surviving longer", tone: "ready" });
+  }
+
+  if (answers.team === "solo") {
+    signals.push({ id: "prep-solo-hot-zone", text: "Solo lanes safer off Spaceport routes", tone: "intel" });
+  } else {
+    signals.push({ id: "prep-team-hot-zone", text: "Squad noise drawing third-party pressure", tone: "caution" });
+  }
+
+  return signals.slice(0, 3);
+}
+
 export function createContentDeliveryLayer(runtime) {
   const content = runtime?.content ?? {};
   const latestRelease = content.releases?.[0] ?? null;
+  const liveRaidIntel = buildLiveRaidIntel(content);
 
   return {
     sections: [
@@ -807,6 +876,16 @@ export function createContentDeliveryLayer(runtime) {
       latestReleaseTitle: latestRelease?.title ?? "Latest update",
       latestReleaseDate: latestRelease?.date ?? null,
       latestReleaseSummary: latestRelease?.summary ?? "No release signals available."
+    },
+    liveRaidIntel,
+    getEntryIntelSignals() {
+      return liveRaidIntel.entry.slice(0, 1);
+    },
+    getBriefIntelSignals() {
+      return liveRaidIntel.brief.slice(0, 3);
+    },
+    getPrepIntelSignals(appState) {
+      return buildPrepIntelSignals(appState);
     }
   };
 }

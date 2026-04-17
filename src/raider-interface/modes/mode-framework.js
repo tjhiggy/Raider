@@ -18,6 +18,8 @@ function buildBriefMode(runtime, appState) {
   const firstTrack = getFirstTrack(runtime);
   const trackLessons = firstTrack ? getLessonsForTrack(runtime, firstTrack.id).slice(0, 3) : [];
   const latestRelease = getLatestRelease(runtime);
+  const contentDelivery = window.RAIDER_INTERFACE?.contentDelivery;
+  const intelSignals = contentDelivery?.getBriefIntelSignals?.() ?? [];
 
   return {
     id: "brief-me",
@@ -35,6 +37,7 @@ function buildBriefMode(runtime, appState) {
       { label: "Current track", value: firstTrack?.title ?? "Guide" },
       { label: "Latest signal", value: latestRelease?.title ?? "No release" }
     ],
+    intelSignals,
     panels: [
       {
         kicker: "Daily guidance",
@@ -63,6 +66,8 @@ function buildPrepMode(runtime, appState) {
   const prepChecklist = (runtime.content.prepChecklist ?? []).slice(0, 4);
   const machines = (runtime.content.machines ?? []).slice(0, 3);
   const planLabel = appState.activePlan?.label ?? "Low-attention prep lane";
+  const contentDelivery = window.RAIDER_INTERFACE?.contentDelivery;
+  const intelSignals = contentDelivery?.getPrepIntelSignals?.(appState) ?? [];
 
   return {
     id: "prep-my-run",
@@ -78,6 +83,7 @@ function buildPrepMode(runtime, appState) {
       { label: "Prep checks", value: `${prepChecklist.length} live` },
       { label: "Threat watch", value: `${machines.length} priority profiles` }
     ],
+    intelSignals,
     panels: [
       {
         kicker: "Checklist",

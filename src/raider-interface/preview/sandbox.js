@@ -320,6 +320,29 @@ function renderAdaptiveSummary(appState) {
   `;
 }
 
+function renderLiveIntelSignals(signals, title = "Live Raid Intelligence") {
+  if (!signals?.length) {
+    return "";
+  }
+
+  return `
+    <section class="ri-live-intel-strip" aria-label="${title}">
+      <p class="ri-kicker">${title}</p>
+      <div class="ri-live-intel-strip__items">
+        ${signals
+          .map(
+            (signal) => `
+              <article class="ri-live-intel-pill" data-tone="${signal.tone ?? "intel"}">
+                <span>${signal.text}</span>
+              </article>
+            `
+          )
+          .join("")}
+      </div>
+    </section>
+  `;
+}
+
 function renderBlockerRail(appState, contentDelivery) {
   if (appState.activeCommandId !== "fix-my-problem") {
     return "";
@@ -886,6 +909,7 @@ export function renderRaiderInterfacePreview({
     contentDelivery,
     commandIndex
   });
+  const entryIntelSignals = contentDelivery.getEntryIntelSignals?.(appState) ?? [];
 
   const commandMatrix = commands
     .map((command) => renderCommandTrigger(command, command.id === appState.activeCommandId, appState, contentDelivery))
@@ -971,6 +995,7 @@ export function renderRaiderInterfacePreview({
           )
           .join("")}
       </div>
+      ${renderLiveIntelSignals(modeWorkspace.intelSignals)}
       <div class="ri-mode-shell__body ri-mode-layout--${modeWorkspace.layout}">
         ${modeWorkspace.panels
           .map((panel, index) =>
@@ -1033,6 +1058,7 @@ export function renderRaiderInterfacePreview({
           <div class="ri-context-grid">
             ${renderContextModules(appState, contentDelivery)}
           </div>
+          ${renderLiveIntelSignals(entryIntelSignals, "Live Raid Intel")}
           ${renderAdaptiveSummary(appState)}
           <div class="ri-stateboard__actions">
             ${appState.savedBlockerId ? `<button class="ri-command-button" type="button" data-ri-adaptive-action="clear-blocker">Clear blocker</button>` : ""}
