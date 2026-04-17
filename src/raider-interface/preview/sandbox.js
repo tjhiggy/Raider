@@ -693,59 +693,73 @@ function renderLiveCompanionOverlay(liveCompanion) {
     return "";
   }
 
-  const buttonLabel = liveCompanion.hasPlan
-    ? `${liveCompanion.plan.missionType} ready`
-    : "No active plan";
+  const compactState = liveCompanion.hasPlan
+    ? liveCompanion.plan.compact
+    : liveCompanion.emptyState.compact;
 
   return `
-    <div class="ri-live-companion ${liveCompanion.isOpen ? "is-open" : ""}" data-detail="${liveCompanion.detailLevel}" data-has-plan="${liveCompanion.hasPlan ? "true" : "false"}">
+    <div class="ri-live-companion ri-reflex-mode ${liveCompanion.isOpen ? "is-open" : ""}" data-has-plan="${liveCompanion.hasPlan ? "true" : "false"}">
       <button
         class="ri-live-companion__toggle"
         type="button"
         data-ri-companion-action="toggle"
         aria-expanded="${liveCompanion.isOpen ? "true" : "false"}"
         aria-controls="ri-live-companion-panel"
-        aria-label="${liveCompanion.isOpen ? "Collapse Live Companion" : "Open Live Companion"}"
+        aria-label="${liveCompanion.isOpen ? "Collapse Reflex Mode" : "Expand Reflex Mode"}"
       >
-        <span class="ri-live-companion__toggle-label">Live Companion</span>
-        <strong class="ri-live-companion__toggle-value">${buttonLabel}</strong>
+        <div class="ri-reflex-mode__compact-top">
+          <span class="ri-live-companion__toggle-label">${liveCompanion.label}</span>
+          <strong class="ri-live-companion__toggle-value">${compactState.status.label}</strong>
+        </div>
+        <div class="ri-reflex-mode__compact-grid" aria-label="Reflex Mode compact view">
+          <div class="ri-reflex-mode__metric">
+            <span class="ri-reflex-mode__metric-label">Objective</span>
+            <strong class="ri-reflex-mode__metric-value">${compactState.objective}</strong>
+          </div>
+          <div class="ri-reflex-mode__metric">
+            <span class="ri-reflex-mode__metric-label">Next</span>
+            <strong class="ri-reflex-mode__metric-value">${compactState.nextAction}</strong>
+          </div>
+          <div class="ri-reflex-mode__metric">
+            <span class="ri-reflex-mode__metric-label">Danger</span>
+            <strong class="ri-reflex-mode__metric-value">${compactState.danger}</strong>
+          </div>
+          <div class="ri-reflex-mode__metric">
+            <span class="ri-reflex-mode__metric-label">Status</span>
+            <strong class="ri-reflex-mode__metric-value">${compactState.status.detail}</strong>
+          </div>
+        </div>
       </button>
 
-      <section id="ri-live-companion-panel" class="ri-live-companion__panel" aria-label="Live Run Companion" aria-hidden="${liveCompanion.isOpen ? "false" : "true"}" ${liveCompanion.isOpen ? "" : "inert"} tabindex="-1">
+      <section id="ri-live-companion-panel" class="ri-live-companion__panel" aria-label="Reflex Mode expanded view" aria-hidden="${liveCompanion.isOpen ? "false" : "true"}" ${liveCompanion.isOpen ? "" : "inert"} tabindex="-1">
         <div class="ri-live-companion__header">
           <div>
-            <p class="ri-kicker">Live run companion</p>
-            <h3 class="ri-live-companion__title">${liveCompanion.hasPlan ? liveCompanion.plan.label : liveCompanion.emptyState.status}</h3>
-            <p class="ri-live-companion__copy">${liveCompanion.modeContext}</p>
+            <p class="ri-kicker">Expanded execution view</p>
+            <h3 class="ri-live-companion__title">${liveCompanion.hasPlan ? liveCompanion.plan.missionType : liveCompanion.emptyState.status}</h3>
+            <p class="ri-live-companion__copy">${liveCompanion.hasPlan ? liveCompanion.plan.label : liveCompanion.modeContext}</p>
             <p class="ri-live-companion__note">${liveCompanion.contextNote}</p>
-          </div>
-          <div class="ri-live-companion__controls">
-            <button class="ri-command-button" type="button" data-ri-companion-action="compact">Compact</button>
-            <button class="ri-command-button" type="button" data-ri-companion-action="detailed">Detailed</button>
           </div>
         </div>
 
         ${liveCompanion.hasPlan ? `
           <div class="ri-live-companion__summary">
             <article class="ri-live-companion__card ri-live-companion__card-emphasis">
-              <p class="ri-kicker">Top priorities</p>
+              <p class="ri-kicker">Mission summary</p>
+              <p class="ri-live-companion__copy">${liveCompanion.plan.missionSummary}</p>
+            </article>
+            <article class="ri-live-companion__card">
+              <p class="ri-kicker">Top 3 priorities</p>
               <ul class="ri-live-companion__list">
                 ${liveCompanion.plan.topPriorities.map((item) => `<li>${item}</li>`).join("")}
               </ul>
             </article>
             <article class="ri-live-companion__card">
-              <p class="ri-kicker">Biggest warning</p>
-              <p class="ri-live-companion__copy">${liveCompanion.plan.biggestWarning}</p>
+              <p class="ri-kicker">If things go bad</p>
+              <p class="ri-live-companion__copy">${liveCompanion.plan.thingsGoBad}</p>
             </article>
             <article class="ri-live-companion__card">
-              <p class="ri-kicker">Fallback if it goes bad</p>
-              <p class="ri-live-companion__copy">${liveCompanion.plan.fallbackAction}</p>
-            </article>
-            <article class="ri-live-companion__card">
-              <p class="ri-kicker">Quick reminders</p>
-              <ul class="ri-live-companion__list">
-                ${liveCompanion.plan.reminders.map((item) => `<li>${item}</li>`).join("")}
-              </ul>
+              <p class="ri-kicker">Extraction trigger</p>
+              <p class="ri-live-companion__copy">${liveCompanion.plan.extractionTrigger}</p>
             </article>
             ${liveCompanion.plan.adaptiveWarning ? `
               <article class="ri-live-companion__card ri-live-companion__card-alert">
@@ -755,43 +769,42 @@ function renderLiveCompanionOverlay(liveCompanion) {
             ` : ""}
           </div>
 
-          ${liveCompanion.detailLevel === "detailed" ? `
-            <div class="ri-live-companion__detail">
+          <div class="ri-live-companion__detail">
+            <article class="ri-live-companion__card">
+              <p class="ri-kicker">Fallback action</p>
+              <p class="ri-live-companion__copy">${liveCompanion.plan.fallbackAction}</p>
+            </article>
+            <article class="ri-live-companion__card">
+              <p class="ri-kicker">Danger warning</p>
+              <p class="ri-live-companion__copy">${liveCompanion.plan.biggestWarning}</p>
+            </article>
+            ${liveCompanion.plan.reminders.length ? `
               <article class="ri-live-companion__card">
-                <p class="ri-kicker">Behavior</p>
-                <p class="ri-live-companion__copy">${liveCompanion.plan.detail.behavior}</p>
-              </article>
-              <article class="ri-live-companion__card">
-                <p class="ri-kicker">Loadout philosophy</p>
-                <p class="ri-live-companion__copy">${liveCompanion.plan.detail.loadout}</p>
-              </article>
-              <article class="ri-live-companion__card">
-                <p class="ri-kicker">Do this</p>
+                <p class="ri-kicker">Quick reminders</p>
                 <ul class="ri-live-companion__list">
-                  ${liveCompanion.plan.detail.doThis.map((item) => `<li>${item}</li>`).join("")}
+                  ${liveCompanion.plan.reminders.map((item) => `<li>${item}</li>`).join("")}
                 </ul>
               </article>
+            ` : ""}
+            ${liveCompanion.plan.detail.avoidThis.length ? `
               <article class="ri-live-companion__card">
-                <p class="ri-kicker">Avoid this</p>
+                <p class="ri-kicker">Avoid</p>
                 <ul class="ri-live-companion__list">
-                  ${liveCompanion.plan.detail.avoidThis.map((item) => `<li>${item}</li>`).join("")}
+                  ${liveCompanion.plan.detail.avoidThis.slice(0, 3).map((item) => `<li>${item}</li>`).join("")}
                 </ul>
               </article>
-            </div>
-          ` : ""}
+            ` : ""}
+          </div>
 
           <div class="ri-live-companion__actions">
             <button class="ri-command-button ri-command-button-primary" type="button" data-ri-companion-action="resume-plan">
-              ${liveCompanion.plan.resumeLabel}
+              ${liveCompanion.plan.compact.nextAction}
             </button>
             <button class="ri-command-button" type="button" data-ri-companion-action="adjust-plan">
               Adjust plan
             </button>
-            <button class="ri-command-button" type="button" data-ri-companion-action="log-failure">
-              Log failed run
-            </button>
-            <button class="ri-command-button" type="button" data-ri-companion-action="log-success">
-              Mark recovered
+            <button class="ri-command-button" type="button" data-ri-companion-action="toggle">
+              Collapse Reflex Mode
             </button>
           </div>
         ` : `

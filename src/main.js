@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.34.0",
+    date: "2026-04-17",
+    summary: "Added Reflex Mode, a fast execution overlay built for live run recall instead of planning.",
+    changes: [
+      "Reworked the global overlay into a compact Reflex Mode card that shows objective, next action, danger warning, and live status in a few seconds.",
+      "Added an expanded execution view with mission summary, top priorities, extraction trigger, and fallback guidance without turning the overlay into a paragraph swamp.",
+      "Kept the overlay tied to the active run plan and existing companion state so it stays global, persistent, and instant across the Raider Interface."
+    ]
+  },
+  {
     version: "v1.33.0",
     date: "2026-04-16",
     summary: "Hardened the Raider Interface for launch with better focus recovery, lighter archive rendering, stronger mobile ergonomics, and cleaner accessibility semantics.",

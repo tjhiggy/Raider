@@ -314,7 +314,7 @@ function mountRaiderInterfaceScaffold() {
         if (action === "toggle") {
           appState.toggleCompanion();
           queueFocus(appState.companionOpen ? "#ri-live-companion-panel" : ".ri-live-companion__toggle");
-          flashFeedback(appState.companionOpen ? "Companion open" : "Companion collapsed", "The live run utility has shifted state.", "intel");
+          flashFeedback(appState.companionOpen ? "Reflex Mode expanded" : "Reflex Mode compact", "The execution overlay has shifted state instantly.", "intel");
           renderEntry();
           return;
         }
@@ -480,7 +480,7 @@ function mountRaiderInterfaceScaffold() {
     event.preventDefault();
     appState.toggleCompanion(false);
     queueFocus(".ri-live-companion__toggle");
-    flashFeedback("Companion collapsed", "The live run utility stepped out of the way.", "intel");
+    flashFeedback("Reflex Mode compact", "The execution overlay stepped back into fast-scan mode.", "intel");
     renderEntry();
   });
 

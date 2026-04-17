@@ -153,7 +153,7 @@ export function createRaiderInterfaceState(runtime, contentDelivery = null) {
   const lastReviewedDeltaAt = storedState.lastReviewedDeltaAt ?? null;
 
   const appState = {
-    shellPhase: "phase-12-launch-hardening",
+    shellPhase: "phase-13-reflex-mode",
     runtimeVersion: runtime?.app?.version ?? "unknown",
     userContext,
     persistence,
@@ -193,7 +193,7 @@ export function createRaiderInterfaceState(runtime, contentDelivery = null) {
     patchChangesSinceLastVisit,
     incompleteMilestone: getIncompleteMilestone(userContext, storedState),
     adaptive: null,
-    lastAuditDate: "2026-04-16",
+    lastAuditDate: "2026-04-17",
     persist(patch = {}) {
       Object.assign(appState, patch);
       appState.hasReturningState = computeHasReturningState(appState, appState.userContext);

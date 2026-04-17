@@ -92,6 +92,12 @@ This folder is the rewrite scaffold for the next ARC Raiders companion experienc
 - archive rendering is lighter through content-visibility hints, while touch targets and mobile panel ergonomics are now less likely to betray the user mid-session
 - fallback copy and launch-state semantics were tightened so unfinished or collapsed surfaces announce themselves honestly instead of looking accidentally broken
 
+## Phase 13 additions
+
+- the global execution overlay now runs as Reflex Mode, with a compact view built for under-three-second scanning during live gameplay
+- expanding Reflex Mode reveals only the execution essentials: mission summary, top priorities, extraction trigger, and fallback guidance
+- the overlay still reuses active run-plan state and persistent shell memory, but it now behaves like a real-time execution layer instead of a mini planning board
+
 ## Visual direction
 
 - tactical over decorative

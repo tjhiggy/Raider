@@ -1588,8 +1588,8 @@ body[data-raider-interface="entry-live"] .reference-archive[open] .reference-arc
 
 .ri-live-companion__toggle {
   display: grid;
-  gap: 4px;
-  min-width: 220px;
+  gap: 12px;
+  min-width: min(360px, calc(100vw - 28px));
   padding: 14px 16px;
   border-radius: 20px;
   border: 1px solid rgba(121, 198, 255, 0.18);
@@ -1634,6 +1634,43 @@ body[data-raider-interface="entry-live"] .reference-archive[open] .reference-arc
   font-family: "Segoe UI Semibold", "Segoe UI", sans-serif;
 }
 
+.ri-reflex-mode__compact-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ri-reflex-mode__compact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.ri-reflex-mode__metric {
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(121, 198, 255, 0.12);
+  background: rgba(5, 9, 14, 0.44);
+  text-align: left;
+}
+
+.ri-reflex-mode__metric-label {
+  color: rgba(191, 203, 223, 0.66);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.ri-reflex-mode__metric-value {
+  color: #f4f7fb;
+  font-size: 0.84rem;
+  line-height: 1.25;
+}
+
 .ri-live-companion__panel {
   width: min(360px, calc(100vw - 28px));
   display: grid;
@@ -1672,7 +1709,6 @@ body[data-raider-interface="entry-live"] .reference-archive[open] .reference-arc
 }
 
 .ri-live-companion__header,
-.ri-live-companion__controls,
 .ri-live-companion__actions,
 .ri-live-companion__summary,
 .ri-live-companion__detail {
@@ -1681,12 +1717,8 @@ body[data-raider-interface="entry-live"] .reference-archive[open] .reference-arc
 }
 
 .ri-live-companion__header {
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: 1fr;
   align-items: start;
-}
-
-.ri-live-companion__controls {
-  grid-auto-flow: row;
 }
 
 .ri-live-companion__summary,
@@ -1728,10 +1760,6 @@ body[data-raider-interface="entry-live"] .reference-archive[open] .reference-arc
   margin: 0;
   padding-left: 18px;
   color: rgba(228, 236, 248, 0.78);
-}
-
-.ri-live-companion[data-detail="compact"] .ri-live-companion__detail {
-  display: none;
 }
 
 .ri-live-companion__empty {
@@ -2119,6 +2147,10 @@ body[data-raider-interface="entry-live"] .briefing {
     width: 100%;
   }
 
+  .ri-reflex-mode__compact-grid {
+    grid-template-columns: 1fr;
+  }
+
   .ri-live-companion__panel {
     border-radius: 24px 24px 18px 18px;
     max-height: min(72vh, 560px);
@@ -2130,9 +2162,8 @@ body[data-raider-interface="entry-live"] .briefing {
     grid-template-columns: 1fr;
   }
 
-  .ri-live-companion__controls,
   .ri-live-companion__actions {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
   }
 }
 

@@ -12,12 +12,54 @@ function getModeContext(appState) {
   }
 }
 
+function buildStatusIndicator(appState, activePlan) {
+  const repeatedFailure = appState.adaptive?.repeatedFailure ?? null;
+
+  if (repeatedFailure) {
+    return {
+      label: "Caution",
+      tone: "danger",
+      detail: `${repeatedFailure.label} repeating`
+    };
+  }
+
+  if (activePlan.missionType.toLowerCase().includes("aggressive")) {
+    return {
+      label: "Hot",
+      tone: "caution",
+      detail: "Tempo matters"
+    };
+  }
+
+  return {
+    label: "Ready",
+    tone: "ready",
+    detail: "Execution lane armed"
+  };
+}
+
+function buildExtractionTrigger(activePlan) {
+  return activePlan.priorityStack?.[2]
+    ?? activePlan.doThis?.[2]
+    ?? "Leave the run the second the objective is secure.";
+}
+
 function buildEmptyState(appState) {
   return {
-    status: "No active run plan",
+    status: "No active plan",
     copy: appState.savedRunPlans?.length
       ? "You have saved plans, but none is active. Promote one or build a cleaner lane before you drop."
       : "No active plan yet. Build one before the run so this overlay can do something smarter than shrug.",
+    compact: {
+      objective: "No live objective",
+      nextAction: appState.savedRunPlans?.length ? "Promote a saved plan" : "Open Prep My Run",
+      danger: "Running blind",
+      status: {
+        label: "Idle",
+        tone: "inactive",
+        detail: "No execution lane"
+      }
+    },
     primaryAction: appState.savedRunPlans?.length
       ? { label: "Use latest saved plan", action: "use-latest-plan" }
       : { label: "Plan my run", action: "open-prep" },
@@ -42,10 +84,10 @@ export function createLiveCompanionOverlay(runtime, appState) {
 
   if (!hasPlan) {
     return {
-      id: "live-companion-overlay",
+      id: "reflex-mode-overlay",
+      label: "Reflex Mode",
       modeContext: getModeContext(appState),
       isOpen: appState.companionOpen,
-      detailLevel: appState.companionDetailLevel,
       hasPlan: false,
       contextNote: recommendation
         ? `${recommendation.label} is the best fit right now. ${recommendation.reason}`
@@ -56,32 +98,35 @@ export function createLiveCompanionOverlay(runtime, appState) {
   }
 
   return {
-    id: "live-companion-overlay",
+    id: "reflex-mode-overlay",
+    label: "Reflex Mode",
     modeContext: getModeContext(appState),
     isOpen: appState.companionOpen,
-    detailLevel: appState.companionDetailLevel,
     hasPlan: true,
     plan: {
       id: activePlan.id,
       label: activePlan.label,
       missionType: activePlan.missionType,
-      objective: activePlan.priorityObjective,
+      compact: {
+        objective: activePlan.priorityObjective,
+        nextAction: activePlan.nextBestAction?.label ?? "Hold the lane",
+        danger: activePlan.keyWarning,
+        status: buildStatusIndicator(appState, activePlan)
+      },
+      missionSummary: activePlan.recommendedBehavior,
       topPriorities: (activePlan.priorityStack ?? []).slice(0, 3),
       biggestWarning: activePlan.keyWarning,
-      fallbackAction: activePlan.fallbackStrategy,
+      thingsGoBad: activePlan.fallbackStrategy,
+      extractionTrigger: buildExtractionTrigger(activePlan),
+      fallbackAction: activePlan.doThis?.[0] ?? activePlan.nextBestAction?.label ?? "Reset and protect the bag",
       reminders: buildQuickReminders(activePlan),
       adaptiveWarning: repeatedFailure
         ? `${repeatedFailure.label} has repeated ${repeatedFailure.count} times. Do not run the same mistake back unchanged.`
         : null,
       resumeTarget: activePlan.nextBestAction?.target ?? "#machine-intel",
       resumeLabel: activePlan.nextBestAction?.label ?? "Resume plan",
-      checklistState: appState.compactExecutionMode ? "Compact execution" : "Detailed execution",
-      compactSteps: activePlan.compactExecution?.steps ?? [],
       detail: {
-        behavior: activePlan.recommendedBehavior,
-        loadout: activePlan.loadoutPhilosophy,
         utility: activePlan.utilityReminders ?? [],
-        doThis: activePlan.doThis ?? [],
         avoidThis: activePlan.avoidThis ?? []
       }
     },
