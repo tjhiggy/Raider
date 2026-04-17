@@ -76,6 +76,56 @@ function buildQuickReminders(plan) {
   return [...new Set(reminders)].slice(0, 3);
 }
 
+function buildConditionalTriggers(plan) {
+  const triggers = [];
+  const goal = plan.answers?.goal ?? "learn";
+  const blocker = plan.answers?.blocker ?? "none";
+  const risk = plan.answers?.riskTolerance ?? "low";
+
+  if (blocker === "survival" || risk === "high") {
+    triggers.push({
+      if: "If the first lane turns loud",
+      then: "Break contact and route to extraction."
+    });
+  }
+
+  if (goal === "materials" || blocker === "materials") {
+    triggers.push({
+      if: "If side loot starts filling the bag",
+      then: "Cut junk and protect the target family."
+    });
+  }
+
+  if (goal === "quests" || blocker === "quests") {
+    triggers.push({
+      if: "If the objective zone is hot",
+      then: "Loop once, reset, and re-enter on your terms."
+    });
+  }
+
+  if (goal === "confidence" || risk === "high") {
+    triggers.push({
+      if: "If the first fight burns tempo",
+      then: "Reset the run and stop chasing the second fight."
+    });
+  }
+
+  if (!triggers.length) {
+    triggers.push(
+      {
+        if: "If the route feels wrong early",
+        then: "Downgrade the plan and bank the clean win."
+      },
+      {
+        if: "If attention spikes after the objective",
+        then: "Extract instead of farming one more mistake."
+      }
+    );
+  }
+
+  return triggers.slice(0, 3);
+}
+
 export function createLiveCompanionOverlay(runtime, appState) {
   const activePlan = appState.activeRunPlan ?? null;
   const hasPlan = Boolean(activePlan);
@@ -107,6 +157,7 @@ export function createLiveCompanionOverlay(runtime, appState) {
       id: activePlan.id,
       label: activePlan.label,
       missionType: activePlan.missionType,
+      confidence: activePlan.confidence ?? null,
       compact: {
         objective: activePlan.priorityObjective,
         nextAction: activePlan.nextBestAction?.label ?? "Hold the lane",
@@ -119,6 +170,7 @@ export function createLiveCompanionOverlay(runtime, appState) {
       thingsGoBad: activePlan.fallbackStrategy,
       extractionTrigger: buildExtractionTrigger(activePlan),
       fallbackAction: activePlan.doThis?.[0] ?? activePlan.nextBestAction?.label ?? "Reset and protect the bag",
+      conditionalTriggers: buildConditionalTriggers(activePlan),
       reminders: buildQuickReminders(activePlan),
       adaptiveWarning: repeatedFailure
         ? `${repeatedFailure.label} has repeated ${repeatedFailure.count} times. Do not run the same mistake back unchanged.`

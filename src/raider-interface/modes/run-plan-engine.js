@@ -376,6 +376,91 @@ function buildPlanLabel(profile, answers) {
   return `${teamLabel} ${goalLabel} lane`;
 }
 
+function toDirective(text) {
+  if (!text) {
+    return "";
+  }
+
+  return text
+    .replace(/^You will\s+/i, "")
+    .replace(/^You are\s+/i, "")
+    .replace(/^This run exists to\s+/i, "")
+    .replace(/^The trap is\s+/i, "Avoid ")
+    .replace(/^The danger is\s+/i, "Avoid ")
+    .replace(/^The common failure is\s+/i, "Avoid ")
+    .replace(/^The mistake is\s+/i, "Avoid ")
+    .replace(/^If\s+/i, "If ")
+    .trim();
+}
+
+function trimActions(list, limit = 3) {
+  return (list ?? []).slice(0, limit).map((item) => toDirective(item));
+}
+
+function calculateConfidenceLevel(answers, profileId) {
+  let score = 0;
+
+  if (answers.confidence === "high") {
+    score += 2;
+  } else if (answers.confidence === "medium") {
+    score += 1;
+  }
+
+  if (answers.riskTolerance === "low") {
+    score += 2;
+  } else if (answers.riskTolerance === "medium") {
+    score += 1;
+  } else {
+    score -= 1;
+  }
+
+  if (answers.team === "squad" || answers.team === "duo") {
+    score += 1;
+  }
+
+  if (answers.blocker === "survival" || answers.blocker === "machines") {
+    score -= 1;
+  }
+
+  if (answers.timeWindow === "short") {
+    score -= 1;
+  }
+
+  if (answers.aggression === "assertive") {
+    score -= 1;
+  }
+
+  if (profileId === "aggressive-confidence-run") {
+    score -= 1;
+  }
+
+  if (profileId === "safe-learning-run" || profileId === "conservative-extraction-run") {
+    score += 1;
+  }
+
+  if (score >= 4) {
+    return {
+      level: "high",
+      label: "High confidence",
+      reason: "Inputs support a stable lane with manageable exposure."
+    };
+  }
+
+  if (score >= 1) {
+    return {
+      level: "medium",
+      label: "Medium confidence",
+      reason: "The lane is workable, but the run still depends on clean discipline."
+    };
+  }
+
+  return {
+    level: "low",
+    label: "Low confidence",
+    reason: "Risk and current pressure say this plan needs tighter execution or a safer variation."
+  };
+}
+
 export function createDefaultPrepAnswers(userContext, storedState = {}) {
   return {
     team: storedState.prepDraftAnswers?.team ?? "solo",
@@ -401,6 +486,11 @@ export function buildRunPlan({ answers, contentDelivery }) {
   const { outputs } = selectedProfile;
   const blockerMatch = contentDelivery.blockers.find((blocker) => blocker.id === answers.blocker);
   const generatedAt = new Date().toISOString();
+  const confidence = calculateConfidenceLevel(answers, selectedProfile.id);
+  const priorityStack = trimActions(outputs.priorityStack);
+  const doThis = trimActions(outputs.doThis);
+  const avoidThis = trimActions(outputs.avoidThis);
+  const utilityReminders = trimActions(outputs.utility);
 
   return {
     id: createId("run"),
@@ -409,27 +499,28 @@ export function buildRunPlan({ answers, contentDelivery }) {
     generatedAt,
     answers: { ...answers },
     missionType: selectedProfile.missionType,
-    priorityObjective: outputs.objective,
-    recommendedBehavior: outputs.mindset,
-    loadoutPhilosophy: outputs.loadout,
-    utilityReminders: outputs.utility,
-    keyWarning: outputs.warning,
-    fallbackStrategy: outputs.fallback,
+    priorityObjective: toDirective(outputs.objective),
+    recommendedBehavior: toDirective(outputs.mindset),
+    loadoutPhilosophy: toDirective(outputs.loadout),
+    utilityReminders,
+    keyWarning: toDirective(outputs.warning),
+    fallbackStrategy: toDirective(outputs.fallback),
     nextBestAction: outputs.nextAction,
+    confidence,
     relatedSystems: blockerMatch
       ? [outputs.related[0], { label: blockerMatch.primaryLabel, target: blockerMatch.primaryTarget }, ...outputs.related.slice(1)]
       : outputs.related,
-    priorityStack: outputs.priorityStack,
-    doThis: outputs.doThis,
-    avoidThis: outputs.avoidThis,
+    priorityStack,
+    doThis,
+    avoidThis,
     compactExecution: {
       headline: selectedProfile.missionType,
       steps: [
-        outputs.priorityStack[0],
-        outputs.doThis[0],
-        outputs.avoidThis[0]
+        priorityStack[0],
+        doThis[0],
+        avoidThis[0]
       ],
-      warning: outputs.warning
+      warning: toDirective(outputs.warning)
     }
   };
 }

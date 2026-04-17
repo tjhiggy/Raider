@@ -1,12 +1,12 @@
 const VERSION_HISTORY = [
   {
-    version: "v1.36.0",
+    version: "v1.37.0",
     date: "2026-04-17",
-    summary: "Added Live Raid Intelligence as a lightweight signal layer inside Brief Me, Prep My Run, and the entry stateboard.",
+    summary: "Tightened Raider Interface outputs into directive commands, added Reflex trigger logic, surfaced plan confidence, and reduced planning friction.",
     changes: [
-      "Integrated compact live intel signals for player trends, hot zones, and recommended behavior shifts without changing the product structure.",
-      "Added prep-aware intelligence so planning output now adjusts its supporting readout based on goal, team shape, and risk posture.",
-      "Kept the new layer intentionally small and directive so it supports action instead of turning into another fake dashboard."
+      "Cut visible plan and mode output down to sharper action-first directives while moving secondary explanation behind expandable detail.",
+      "Added Reflex Mode conditional triggers, visible run-plan confidence, and faster prep handoff by auto-loading the last active plan when available.",
+      "Refined share actions, visual hierarchy, and button contrast so primary moves scan faster under pressure."
     ]
   },
   {

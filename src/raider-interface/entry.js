@@ -147,6 +147,17 @@ function mountRaiderInterfaceScaffold() {
     renderEntry();
   }
 
+  function armPrepModeFromExistingPlan() {
+    const preferredPlanId = appState.activeRunPlanId ?? appState.savedRunPlans[0]?.id ?? null;
+
+    if (!preferredPlanId) {
+      return false;
+    }
+
+    appState.loadRunPlanToDraft(preferredPlanId);
+    return true;
+  }
+
   function activateCommand(commandId, feedbackTone = "intel", feedbackCopy = "Mode shifted. The interface has reprioritized the board for this lane.") {
     const command = commandIndex[commandId];
     if (!command) {
@@ -160,11 +171,14 @@ function mountRaiderInterfaceScaffold() {
     };
 
     if (commandId === "prep-my-run") {
-      nextPatch.activePlan = {
-        id: "prep-lane",
-        label: "Low-attention prep lane",
-        target: "#machine-intel"
-      };
+      const armedExistingPlan = armPrepModeFromExistingPlan();
+      if (!armedExistingPlan) {
+        nextPatch.activePlan = {
+          id: "prep-lane",
+          label: "Low-attention prep lane",
+          target: "#machine-intel"
+        };
+      }
     }
 
     appState.persist(nextPatch);
@@ -466,14 +480,21 @@ function mountRaiderInterfaceScaffold() {
         }
 
         if (action === "open-prep") {
-          appState.persist({
-            activeCommandId: "prep-my-run",
-            selectedModeId: "run-planning",
-            lastModeId: "run-planning",
-            modeHistory: ["run-planning", ...appState.modeHistory.filter((modeId) => modeId !== "run-planning")].slice(0, 8)
-          });
+          const armedExistingPlan = armPrepModeFromExistingPlan();
+          if (!armedExistingPlan) {
+            appState.persist({
+              activeCommandId: "prep-my-run",
+              selectedModeId: "run-planning",
+              lastModeId: "run-planning",
+              modeHistory: ["run-planning", ...appState.modeHistory.filter((modeId) => modeId !== "run-planning")].slice(0, 8)
+            });
+          }
           queueFocus('.ri-mode-shell[data-mode="prep-my-run"]');
-          flashFeedback("Planning opened", "Prep My Run is now live and ready for a cleaner lane.", "ready");
+          flashFeedback(
+            armedExistingPlan ? "Last plan loaded" : "Planning opened",
+            armedExistingPlan ? "Prep My Run loaded the last active lane so you can move immediately." : "Prep My Run is now live and ready for a cleaner lane.",
+            "ready"
+          );
           writeModeToLocation("prep-my-run");
           renderEntry();
           return;

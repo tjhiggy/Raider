@@ -16,6 +16,66 @@ function formatModeLabel(modeId) {
     .join(" ");
 }
 
+function renderDirectiveList(items, className = "ri-mode-list", limit = 3) {
+  const visibleItems = (items ?? []).slice(0, limit);
+  if (!visibleItems.length) {
+    return "";
+  }
+
+  return `
+    <ul class="${className}">
+      ${visibleItems.map((item) => `<li>${item}</li>`).join("")}
+    </ul>
+  `;
+}
+
+function renderExpandableNote(summary, body) {
+  if (!body) {
+    return "";
+  }
+
+  return `
+    <details class="ri-inline-details">
+      <summary>${summary}</summary>
+      <p>${body}</p>
+    </details>
+  `;
+}
+
+function renderPlanConfidence(confidence) {
+  if (!confidence) {
+    return "";
+  }
+
+  return `
+    <article class="ri-mode-indicator ri-mode-indicator-confidence" data-tone="${confidence.level}">
+      <span class="ri-mode-indicator__label">Confidence</span>
+      <strong class="ri-mode-indicator__value">${confidence.label}</strong>
+      <span class="ri-mode-indicator__detail">${confidence.reason}</span>
+    </article>
+  `;
+}
+
+function renderConditionalTriggers(triggers) {
+  if (!triggers?.length) {
+    return "";
+  }
+
+  return `
+    <article class="ri-live-companion__card">
+      <p class="ri-kicker">If this happens</p>
+      <ul class="ri-live-companion__trigger-list">
+        ${triggers.map((trigger) => `
+          <li>
+            <span class="ri-live-companion__trigger-if">${trigger.if}</span>
+            <strong class="ri-live-companion__trigger-then">${trigger.then}</strong>
+          </li>
+        `).join("")}
+      </ul>
+    </article>
+  `;
+}
+
 function getStatusHeadline(appState) {
   if (appState.adaptive?.repeatedFailure) {
     return `${appState.adaptive.repeatedFailure.label} has repeated ${appState.adaptive.repeatedFailure.count} times. The interface is pushing a safer variation now.`;
@@ -49,10 +109,10 @@ function buildCommandResult({ appState, contentDelivery, commandIndex }) {
   if (activeCommand.id === "brief-me") {
     return {
       eyebrow: "Briefing lane",
-      title: appState.userContext.reviewedLessonCount ? "Resume the learning path fast." : "Start with the fast survival brief.",
+      title: appState.userContext.reviewedLessonCount ? "Resume the learning path." : "Start with the survival brief.",
       copy: appState.userContext.reviewedLessonCount
-        ? `You have ${appState.userContext.reviewedLessonCount} reviewed lesson${appState.userContext.reviewedLessonCount > 1 ? "s" : ""}. The fastest useful next move is to lock the briefing, then continue into the track.`
-        : "New Raiders do not need a giant homepage. They need the briefing, the first lessons, and one clear next move.",
+        ? `Lock the briefing, then continue the track. ${appState.userContext.reviewedLessonCount} lesson${appState.userContext.reviewedLessonCount > 1 ? "s are" : " is"} already reviewed.`
+        : "Open the briefing, clear the first lessons, and stop wandering the board.",
       primary: commandTarget,
       secondary: {
         target: "#curriculum",
@@ -71,8 +131,8 @@ function buildCommandResult({ appState, contentDelivery, commandIndex }) {
       eyebrow: "Run preparation",
       title: appState.activePlan ? `Continue: ${planLabel}` : "Build a clean pre-drop plan.",
       copy: appState.activePlan
-        ? `${planLabel} is still unresolved. Re-open the prep board, tighten the checklist, and stop improvising your first two minutes.`
-        : "Use machine intel and prep guidance to turn the next run into a deliberate loadout and risk posture.",
+        ? `Re-open ${planLabel}, tighten the checklist, and lock the first two minutes.`
+        : "Set the loadout, set the posture, and stop dropping on improvisation.",
       primary: commandTarget,
       secondary: {
         target: "#materials-intel",
@@ -93,10 +153,10 @@ function buildCommandResult({ appState, contentDelivery, commandIndex }) {
       eyebrow: "Patch response",
       title: `Catch up on ${latestRelease.latestReleaseTitle}.`,
       copy: deferredCount > 0
-        ? `You still have ${deferredCount} deferred change signal${deferredCount > 1 ? "s" : ""}. Stop pretending 'later' means 'solved.'`
+        ? `Review ${deferredCount} deferred change signal${deferredCount > 1 ? "s" : ""} now. Later is not solved.`
         : appState.patchChangesSinceLastVisit > 0
-        ? `${appState.patchChangesSinceLastVisit} update signal${appState.patchChangesSinceLastVisit > 1 ? "s" : ""} changed since your last visit. Start with the update center before trusting old habits.`
-        : `${latestRelease.latestReleaseTitle} is still the latest release on the board. Use the update center to confirm what should change in your route or prep.`,
+        ? `Review ${appState.patchChangesSinceLastVisit} new update signal${appState.patchChangesSinceLastVisit > 1 ? "s" : ""} before trusting old habits.`
+        : `Confirm what changed in ${latestRelease.latestReleaseTitle}, then adjust the route or prep.`,
       primary: commandTarget,
       secondary: {
         target: "#curriculum",
@@ -115,7 +175,7 @@ function buildCommandResult({ appState, contentDelivery, commandIndex }) {
   return {
     eyebrow: "Problem correction",
     title: blocker.label,
-    copy: blocker.summary,
+    copy: `Fix ${blocker.label.toLowerCase()}, then route straight into the corrective lane.`,
     primary: {
       target: blocker.primaryTarget,
       label: blocker.primaryLabel
@@ -449,7 +509,7 @@ function renderFixModeWorkspace(modeWorkspace) {
           <article class="ri-fix-card ri-fix-card-emphasis">
             <p class="ri-kicker">Likely cause</p>
             <h3 class="ri-fix-card__title">${diagnostic.diagnosis.likelyCause}</h3>
-            <p class="ri-fix-card__copy">${diagnostic.diagnosis.fit}</p>
+            ${renderExpandableNote("Why this fits", diagnostic.diagnosis.fit)}
           </article>
 
           <article class="ri-fix-card">
@@ -501,10 +561,10 @@ function renderFixModeWorkspace(modeWorkspace) {
                   </button>
                 ` : ""}
                 <button class="ri-command-button" type="button" data-ri-fix-action="copy-why">
-                  Copy card
+                  Copy
                 </button>
                 <button class="ri-command-button" type="button" data-ri-fix-action="share-why">
-                  Share card
+                  Share
                 </button>
               </div>
             </article>
@@ -538,11 +598,12 @@ function renderFixModeWorkspace(modeWorkspace) {
           <article class="ri-fix-card">
             <p class="ri-kicker">Recommended path</p>
             <h3 class="ri-fix-card__title">${diagnostic.diagnosis.planSeed ? "Prep My Run" : "Brief Me"}</h3>
-            <p class="ri-fix-card__copy">
-              ${diagnostic.diagnosis.planSeed
+            ${renderExpandableNote(
+              "Why this path",
+              diagnostic.diagnosis.planSeed
                 ? "The system has a safer run posture ready. Push it straight into Prep My Run with the right context loaded."
-                : "The fastest corrective move is not another raid. It is a clearer brief and a cleaner learning lane."}
-            </p>
+                : "The fastest corrective move is not another raid. It is a clearer brief and a cleaner learning lane."
+            )}
           </article>
 
           <article class="ri-fix-card">
@@ -827,6 +888,14 @@ function renderLiveCompanionOverlay(liveCompanion) {
               <p class="ri-kicker">Extraction trigger</p>
               <p class="ri-live-companion__copy">${liveCompanion.plan.extractionTrigger}</p>
             </article>
+            ${liveCompanion.plan.confidence ? `
+              <article class="ri-live-companion__card">
+                <p class="ri-kicker">Confidence</p>
+                <p class="ri-live-companion__copy">${liveCompanion.plan.confidence.label}</p>
+                ${renderExpandableNote("Why confidence landed here", liveCompanion.plan.confidence.reason)}
+              </article>
+            ` : ""}
+            ${renderConditionalTriggers(liveCompanion.plan.conditionalTriggers)}
             ${liveCompanion.plan.adaptiveWarning ? `
               <article class="ri-live-companion__card ri-live-companion__card-alert">
                 <p class="ri-kicker">Adaptive warning</p>
@@ -934,8 +1003,9 @@ export function renderRaiderInterfacePreview({
   const briefingPanel = renderTacticalPanel({
     kicker: "System response",
     title: result.title,
-    copy: result.copy,
+    copy: "",
     body: `
+      ${renderDirectiveList([result.copy], "ri-mode-list ri-mode-list-tight", 1)}
       <div class="ri-response-actions">
         <button class="ri-command-button ri-command-button-primary" type="button" data-ri-target="${result.primary.target}">
           ${result.primary.label}
@@ -944,6 +1014,7 @@ export function renderRaiderInterfacePreview({
           ${result.secondary.label}
         </button>
       </div>
+      ${renderExpandableNote("Why this lane", result.copy)}
       ${renderWarningCallout({
         title: result.warning.title,
         body: result.warning.body,
@@ -994,6 +1065,7 @@ export function renderRaiderInterfacePreview({
             `
           )
           .join("")}
+        ${modeWorkspace.id === "prep-my-run" ? renderPlanConfidence(appState.activeRunPlan?.confidence) : ""}
       </div>
       ${renderLiveIntelSignals(modeWorkspace.intelSignals)}
       <div class="ri-mode-shell__body ri-mode-layout--${modeWorkspace.layout}">
@@ -1002,11 +1074,10 @@ export function renderRaiderInterfacePreview({
             renderTacticalPanel({
               kicker: panel.kicker,
               title: panel.title,
-              copy: panel.copy,
+              copy: "",
               body: `
-                <ul class="ri-mode-list">
-                  ${panel.list.map((item) => `<li>${item}</li>`).join("")}
-                </ul>
+                ${renderDirectiveList(panel.list)}
+                ${renderExpandableNote("Why this matters", panel.copy)}
                 <div class="ri-mode-actions">
                   ${panel.actions
                     .map(
