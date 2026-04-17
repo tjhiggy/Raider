@@ -1481,6 +1481,81 @@ body[data-raider-interface="entry-live"] .reference-archive[open] .reference-arc
     rgba(8, 12, 18, 0.88);
 }
 
+.ri-why-died-card {
+  gap: 16px;
+  border-color: rgba(255, 118, 92, 0.34);
+  background:
+    linear-gradient(180deg, rgba(255, 118, 92, 0.16), transparent 28%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.04), transparent 48%),
+    rgba(8, 12, 18, 0.96);
+}
+
+.ri-why-died-card__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ri-why-died-card__title {
+  margin: 0;
+  color: #fff3ec;
+  font-family: var(--display-font);
+  font-size: clamp(1.5rem, 4vw, 2.1rem);
+  line-height: 0.94;
+  text-transform: uppercase;
+}
+
+.ri-why-died-card__stamp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 164, 130, 0.3);
+  border-radius: 999px;
+  background: rgba(255, 118, 92, 0.12);
+  color: #ffd8cb;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.ri-why-died-card__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.ri-why-died-card__item {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid rgba(255, 118, 92, 0.16);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.ri-why-died-card__label {
+  color: rgba(255, 199, 180, 0.8);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.ri-why-died-card__value {
+  color: #fff3ec;
+  font-size: 0.98rem;
+  line-height: 1.35;
+}
+
+.ri-why-died-card__actions {
+  margin-top: 0;
+}
+
 .ri-delta-card,
 .ri-delta-spotlight,
 .ri-catchup-empty {
@@ -2148,6 +2223,10 @@ body[data-raider-interface="entry-live"] .briefing {
   }
 
   .ri-reflex-mode__compact-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ri-why-died-card__grid {
     grid-template-columns: 1fr;
   }
 

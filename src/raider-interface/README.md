@@ -98,6 +98,12 @@ This folder is the rewrite scaffold for the next ARC Raiders companion experienc
 - expanding Reflex Mode reveals only the execution essentials: mission summary, top priorities, extraction trigger, and fallback guidance
 - the overlay still reuses active run-plan state and persistent shell memory, but it now behaves like a real-time execution layer instead of a mini planning board
 
+## Phase 14 additions
+
+- `Fix My Problem` now includes a `WHY YOU DIED` verdict card for high-friction combat and extraction mistakes that need an instant read instead of a soft diagnosis
+- the verdict card is deliberately short, screenshot-friendly, and shareable, with cause, one-line explanation, fix, suggested run type, and a direct `Run This` handoff into planning
+- the share flow reuses the existing recovery and planning state so the feature stays grounded in real blocker logic instead of becoming a detached meme generator
+
 ## Visual direction
 
 - tactical over decorative

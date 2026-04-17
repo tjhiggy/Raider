@@ -102,6 +102,51 @@ function mountRaiderInterfaceScaffold() {
     runtime.helpers.scrollElementIntoView(document.querySelector(targetSelector));
   }
 
+  async function copyPlainText(text) {
+    if (!text) {
+      return false;
+    }
+
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.setAttribute("readonly", "true");
+    textArea.style.position = "fixed";
+    textArea.style.opacity = "0";
+    document.body.append(textArea);
+    textArea.select();
+    const copied = document.execCommand("copy");
+    textArea.remove();
+    return copied;
+  }
+
+  function pushPlanSeedToPrep(planSeed, feedbackTitle, feedbackCopy) {
+    if (!planSeed) {
+      return;
+    }
+
+    const nextPrepAnswers = {
+      ...appState.prepDraftAnswers,
+      ...planSeed
+    };
+
+    appState.persist({
+      prepDraftAnswers: nextPrepAnswers,
+      activeCommandId: "prep-my-run",
+      selectedModeId: "run-planning",
+      lastModeId: "run-planning",
+      modeHistory: ["run-planning", ...appState.modeHistory.filter((modeId) => modeId !== "run-planning")].slice(0, 8)
+    });
+    queueFocus('.ri-mode-shell[data-mode="prep-my-run"]');
+    flashFeedback(feedbackTitle, feedbackCopy, "ready");
+    writeModeToLocation("prep-my-run");
+    renderEntry();
+  }
+
   function activateCommand(commandId, feedbackTone = "intel", feedbackCopy = "Mode shifted. The interface has reprioritized the board for this lane.") {
     const command = commandIndex[commandId];
     if (!command) {
@@ -243,7 +288,7 @@ function mountRaiderInterfaceScaffold() {
     }
 
     for (const fixActionButton of previewRoot.querySelectorAll("[data-ri-fix-action]")) {
-      fixActionButton.addEventListener("click", () => {
+      fixActionButton.addEventListener("click", async () => {
         const action = fixActionButton.getAttribute("data-ri-fix-action");
         const modeWorkspace = buildModeWorkspace(runtime, appState, contentDelivery);
         const fixDiagnostic = modeWorkspace.diagnostic;
@@ -261,23 +306,73 @@ function mountRaiderInterfaceScaffold() {
         }
 
         if (action === "apply-plan" && fixDiagnostic.diagnosis.planSeed) {
-          const nextPrepAnswers = {
-            ...appState.prepDraftAnswers,
-            ...fixDiagnostic.diagnosis.planSeed
+          pushPlanSeedToPrep(
+            fixDiagnostic.diagnosis.planSeed,
+            "Prep context loaded",
+            "Recovery output has been pushed straight into run planning."
+          );
+          return;
+        }
+
+        if (action === "run-this" && fixDiagnostic.whyYouDied?.planSeed) {
+          pushPlanSeedToPrep(
+            fixDiagnostic.whyYouDied.planSeed,
+            "Run plan armed",
+            "The death verdict just got turned into a cleaner run lane."
+          );
+          return;
+        }
+
+        if (action === "copy-why" && fixDiagnostic.whyYouDied?.shareText) {
+          try {
+            const copied = await copyPlainText(fixDiagnostic.whyYouDied.shareText);
+            queueFocus('.ri-mode-shell[data-mode="fix-my-problem"]');
+            flashFeedback(
+              copied ? "Card copied" : "Copy blocked",
+              copied ? "The verdict card is on the clipboard and ready for screenshots, chat, or public shame with purpose." : "Copy failed on this device. The card is still screenshot-ready.",
+              copied ? "ready" : "caution"
+            );
+            renderEntry();
+          } catch {
+            queueFocus('.ri-mode-shell[data-mode="fix-my-problem"]');
+            flashFeedback("Copy blocked", "The card could not be copied here, but the layout is still screenshot-ready.", "caution");
+            renderEntry();
+          }
+          return;
+        }
+
+        if (action === "share-why" && fixDiagnostic.whyYouDied?.shareText) {
+          const sharePayload = {
+            title: fixDiagnostic.whyYouDied.title,
+            text: fixDiagnostic.whyYouDied.shareText
           };
 
-          appState.persist({
-            prepDraftAnswers: nextPrepAnswers,
-            activeCommandId: "prep-my-run",
-            selectedModeId: "run-planning",
-            lastModeId: "run-planning",
-            modeHistory: ["run-planning", ...appState.modeHistory.filter((modeId) => modeId !== "run-planning")].slice(0, 8)
-          });
-          queueFocus('.ri-mode-shell[data-mode="prep-my-run"]');
-          flashFeedback("Prep context loaded", "Recovery output has been pushed straight into run planning.", "ready");
-          writeModeToLocation("prep-my-run");
-          renderEntry();
-          return;
+          try {
+            if (navigator.share) {
+              await navigator.share(sharePayload);
+              queueFocus('.ri-mode-shell[data-mode="fix-my-problem"]');
+              flashFeedback("Card shared", "The verdict is out in the world now. Hopefully with better decisions attached.", "ready");
+              renderEntry();
+              return;
+            }
+
+            const copied = await copyPlainText(fixDiagnostic.whyYouDied.shareText);
+            queueFocus('.ri-mode-shell[data-mode="fix-my-problem"]');
+            flashFeedback(
+              copied ? "Share copied" : "Share unavailable",
+              copied ? "Native share is unavailable here, so the card text was copied instead." : "This device does not support sharing here. Screenshot mode still works fine.",
+              copied ? "intel" : "caution"
+            );
+            renderEntry();
+          } catch (error) {
+            if (error instanceof DOMException && error.name === "AbortError") {
+              return;
+            }
+
+            queueFocus('.ri-mode-shell[data-mode="fix-my-problem"]');
+            flashFeedback("Share unavailable", "Native share did not land here. Screenshot or copy still gets the job done.", "caution");
+            renderEntry();
+          }
         }
       });
     }

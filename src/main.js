@@ -1,5 +1,15 @@
 const VERSION_HISTORY = [
   {
+    version: "v1.35.0",
+    date: "2026-04-17",
+    summary: "Added Why You Died, a sharp Fix-mode verdict card that turns obvious mistakes into shareable corrective action.",
+    changes: [
+      "Expanded Fix My Problem with brutally clear verdict output for dying early, losing loot, failing extractions, and bad fights.",
+      "Added a screenshot-friendly WHY YOU DIED card with cause, one-line explanation, fix, suggested run type, and direct Run This handoff into Prep My Run.",
+      "Wired copy and native share behavior into the same recovery output so the feature is fast to spread without becoming a fake content generator."
+    ]
+  },
+  {
     version: "v1.34.0",
     date: "2026-04-17",
     summary: "Added Reflex Mode, a fast execution overlay built for live run recall instead of planning.",

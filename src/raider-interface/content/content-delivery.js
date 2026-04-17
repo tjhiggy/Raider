@@ -242,6 +242,86 @@ export function createContentDeliveryLayer(runtime) {
         secondaryLabel: "Open extraction lessons"
       },
       {
+        id: "losing-loot",
+        label: "I keep losing loot",
+        summary: "You are turning valuable bags into cautionary tales.",
+        followup: {
+          id: "loot-why",
+          prompt: "What usually kills the bag?",
+          options: [
+            { value: "greedy-reset", label: "One more loot stop" },
+            { value: "loud-exit", label: "Exit under pressure" },
+            { value: "no-leave-call", label: "No clear leave call" }
+          ]
+        },
+        diagnoses: {
+          default: {
+            likelyCause: "You do not tighten the run once the bag gets valuable.",
+            fit: "Strong fit if the loot looks great right before it becomes someone else's story.",
+            bluntAction: "Respect the bag sooner.",
+            stopDoing: "Stop treating secured loot like permission for one more gamble.",
+            saferPath: "Run a conservative extraction lane and let a good bag end the mission.",
+            planSeed: {
+              goal: "materials",
+              timeWindow: "short",
+              riskTolerance: "low",
+              confidence: "medium",
+              blocker: "poor-extractions",
+              aggression: "calm"
+            }
+          },
+          "greedy-reset": {
+            likelyCause: "You keep reopening a winning run for marginal upside.",
+            fit: "Best fit if the loot dies right after you decide to squeeze one more room out of the raid.",
+            bluntAction: "Cut the route before greed gets a vote.",
+            stopDoing: "Stop confusing extra value with smart value.",
+            saferPath: "Treat the first strong bag like the run's exit signal.",
+            planSeed: {
+              goal: "materials",
+              timeWindow: "short",
+              riskTolerance: "low",
+              confidence: "medium",
+              blocker: "poor-extractions",
+              aggression: "calm"
+            }
+          },
+          "loud-exit": {
+            likelyCause: "You are extracting through attention-heavy lanes after already showing your hand.",
+            fit: "Best fit if the loot is fine until the whole route turns into a public announcement.",
+            bluntAction: "Leave quieter and earlier.",
+            stopDoing: "Stop hauling value through the most obvious corridor on the map.",
+            saferPath: "Use prep mode to pre-pick the low-attention exit before the bag fills up.",
+            planSeed: {
+              goal: "learn",
+              timeWindow: "short",
+              riskTolerance: "low",
+              confidence: "medium",
+              blocker: "poor-extractions",
+              aggression: "calm"
+            }
+          },
+          "no-leave-call": {
+            likelyCause: "You have no real extraction trigger, so every extra move gets rationalized.",
+            fit: "Best fit if the loot loss feels preventable because the run never had a clear stop point.",
+            bluntAction: "Declare the bag good enough and act like it.",
+            stopDoing: "Stop waiting for the map to tell you the run is over.",
+            saferPath: "Set a leave line before the first good pickup, then obey it.",
+            planSeed: {
+              goal: "workshop",
+              timeWindow: "short",
+              riskTolerance: "low",
+              confidence: "medium",
+              blocker: "poor-extractions",
+              aggression: "calm"
+            }
+          }
+        },
+        primaryTarget: "#machine-intel",
+        secondaryTarget: "#materials-intel",
+        primaryLabel: "Open prep board",
+        secondaryLabel: "Open stash intel"
+      },
+      {
         id: "stash-pressure",
         label: "My stash is a mess",
         summary: "You do not have a progression filter, so the stash is doing what clutter always does.",
@@ -480,6 +560,86 @@ export function createContentDeliveryLayer(runtime) {
         secondaryTarget: "#curriculum",
         primaryLabel: "Open prep board",
         secondaryLabel: "Open learning track"
+      },
+      {
+        id: "bad-fights",
+        label: "I keep taking bad fights",
+        summary: "You are probably committing before the fight is actually yours.",
+        followup: {
+          id: "fight-why",
+          prompt: "What breaks the fight most often?",
+          options: [
+            { value: "wrong-range", label: "Wrong range" },
+            { value: "late-heal", label: "Late reset" },
+            { value: "bad-commit", label: "Bad chase or commit" }
+          ]
+        },
+        diagnoses: {
+          default: {
+            likelyCause: "You are letting contact turn into commitment too fast.",
+            fit: "Strong fit if the fight feels winnable right until it suddenly looks stupid in hindsight.",
+            bluntAction: "Take fewer dirty fights.",
+            stopDoing: "Stop converting maybe-pressure into mandatory combat.",
+            saferPath: "Run a cleaner confidence lane with fewer forced commits and better reset rules.",
+            planSeed: {
+              goal: "confidence",
+              timeWindow: "medium",
+              riskTolerance: "medium",
+              confidence: "medium",
+              blocker: "bad-loadouts",
+              aggression: "balanced"
+            }
+          },
+          "wrong-range": {
+            likelyCause: "Your route and kit are asking for one fight profile while you keep taking another.",
+            fit: "Best fit if the weapon feels fine until the engagement distance gets real.",
+            bluntAction: "Stop taking fights your kit did not plan for.",
+            stopDoing: "Stop pretending every sightline is equally playable.",
+            saferPath: "Use Prep My Run to shape the route and loadout around the same fight range.",
+            planSeed: {
+              goal: "confidence",
+              timeWindow: "medium",
+              riskTolerance: "medium",
+              confidence: "medium",
+              blocker: "bad-loadouts",
+              aggression: "balanced"
+            }
+          },
+          "late-heal": {
+            likelyCause: "You are trying to win through damage instead of respecting reset timing.",
+            fit: "Best fit if the fight collapses right after you decide to stay one beat too long.",
+            bluntAction: "Reset earlier and heal before swagger.",
+            stopDoing: "Stop acting like broken sustain is still fighting shape.",
+            saferPath: "Run a calmer lane with stricter utility and disengage rules.",
+            planSeed: {
+              goal: "learn",
+              timeWindow: "short",
+              riskTolerance: "low",
+              confidence: "medium",
+              blocker: "bad-loadouts",
+              aggression: "calm"
+            }
+          },
+          "bad-commit": {
+            likelyCause: "You are chasing pressure that never needed to become your problem.",
+            fit: "Best fit if the fight only looks bad after you realize you chose to stay in it.",
+            bluntAction: "Break the commit sooner.",
+            stopDoing: "Stop overvaluing momentum once the clean advantage is gone.",
+            saferPath: "Use a conservative extraction or learning run until your fight filtering improves.",
+            planSeed: {
+              goal: "learn",
+              timeWindow: "medium",
+              riskTolerance: "low",
+              confidence: "medium",
+              blocker: "survival",
+              aggression: "calm"
+            }
+          }
+        },
+        primaryTarget: "#machine-intel",
+        secondaryTarget: "#curriculum",
+        primaryLabel: "Open prep board",
+        secondaryLabel: "Open survival lessons"
       },
       {
         id: "confusion",

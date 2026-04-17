@@ -444,6 +444,49 @@ function renderFixModeWorkspace(modeWorkspace) {
             </div>
           </article>
 
+          ${diagnostic.whyYouDied ? `
+            <article class="ri-fix-card ri-why-died-card" aria-label="Why You Died share card">
+              <div class="ri-why-died-card__header">
+                <div>
+                  <p class="ri-kicker">Viral diagnostic</p>
+                  <h3 class="ri-why-died-card__title">${diagnostic.whyYouDied.title}</h3>
+                </div>
+                <span class="ri-why-died-card__stamp">Screenshot ready</span>
+              </div>
+              <div class="ri-why-died-card__grid">
+                <div class="ri-why-died-card__item">
+                  <span class="ri-why-died-card__label">Cause</span>
+                  <strong class="ri-why-died-card__value">${diagnostic.whyYouDied.cause}</strong>
+                </div>
+                <div class="ri-why-died-card__item">
+                  <span class="ri-why-died-card__label">Why</span>
+                  <strong class="ri-why-died-card__value">${diagnostic.whyYouDied.explanation}</strong>
+                </div>
+                <div class="ri-why-died-card__item">
+                  <span class="ri-why-died-card__label">Fix</span>
+                  <strong class="ri-why-died-card__value">${diagnostic.whyYouDied.fix}</strong>
+                </div>
+                <div class="ri-why-died-card__item">
+                  <span class="ri-why-died-card__label">Run</span>
+                  <strong class="ri-why-died-card__value">${diagnostic.whyYouDied.suggestedRunType}</strong>
+                </div>
+              </div>
+              <div class="ri-fix-actions ri-why-died-card__actions">
+                ${diagnostic.whyYouDied.planSeed ? `
+                  <button class="ri-command-button ri-command-button-primary" type="button" data-ri-fix-action="run-this">
+                    Run This
+                  </button>
+                ` : ""}
+                <button class="ri-command-button" type="button" data-ri-fix-action="copy-why">
+                  Copy card
+                </button>
+                <button class="ri-command-button" type="button" data-ri-fix-action="share-why">
+                  Share card
+                </button>
+              </div>
+            </article>
+          ` : ""}
+
           <article class="ri-fix-card">
             <p class="ri-kicker">Action handoff</p>
             <div class="ri-fix-actions">
